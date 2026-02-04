@@ -13,6 +13,10 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 Quick start:
 
 ```bash
+# clone project and move to the right branch
+git clone https://github.com/cggithub333/Frontend-TC-LLM-Generator.git Frontend_TC_LLM_Generator && cd Frontend_TC_LLM_Generator
+git checkout feature/integrate-ui
+
 # Stand at root path and run this one
 npm install
 
