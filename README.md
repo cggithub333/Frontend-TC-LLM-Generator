@@ -23,6 +23,9 @@ npm install
 # Run mock api data
 npm run mock-api
 
+# Copy .env
+cp .env.example .env
+
 # Open another terminal/cmd and run this
 npm run dev
 ```
