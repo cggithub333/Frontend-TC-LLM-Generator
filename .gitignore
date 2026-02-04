@@ -44,6 +44,12 @@ next-env.d.ts
 # vscode
 .vscode
 
-# agent
-.agent
-.claude
+# Ignore everything under .agent
+.agent/*
+
+# But keep workflows
+!.agent/workflows/
+!.agent/workflows/**
+
+# Ignore Claude local files
+.claude/
