@@ -2,16 +2,17 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+Quick start:
 
 ```bash
+# Stand at root path and run this one
+npm install
+
+# Run mock api data
+npm run mock-api
+
+# Open another terminal/cmd and run this
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
