@@ -1,6 +1,6 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Demo
+## Demo Vercel
 
 + Quick Demo: [Deployed Here! Try it!](https://frontend-tc-llm-generator.vercel.app)
 
@@ -10,7 +10,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-Quick start:
+Quick start on `Local`:
 
 ```bash
 # clone project and move to the right branch
@@ -22,19 +22,34 @@ npm install
 
 # Run mock api data
 npm run mock-api
+```
 
-# Copy .env
-cp .env.example .env
-
+```bash
 # Open another terminal/cmd and run this
+cp .env.example .env
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
++ Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## For Contributors
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
++ Install Husky
+```bash
+# check for husky existed or not
+which husky # for linux terminal
+where husky # for windows cmd
+
+# if it's not existed, then install by this command
+npm install -g husky
+
+# then run this command at root path of the project
+husky install
+```
+
+## Font
+
++ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More
 
