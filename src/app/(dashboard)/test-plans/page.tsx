@@ -1,186 +1,297 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { 
-  ClipboardList, 
-  Plus, 
-  Search, 
-  MoreHorizontal, 
-  ArrowUpRight,
-  TrendingUp,
-  Clock,
-  CheckCircle2,
-  AlertCircle
+import { Input } from "@/components/ui/input";
+import {
+  ChevronRight,
+  Plus,
+  Search,
+  SlidersHorizontal,
+  ArrowUpDown,
+  MoreHorizontal,
+  ArrowRight,
+  FlaskConical,
+  Calendar,
+  CheckCircle,
+  Bell,
 } from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+
+const tabs = [
+  { id: "test-plans", label: "Test Plans" },
+  { id: "user-stories", label: "User Stories" },
+  { id: "test-cases", label: "Test Cases" },
+];
 
 const testPlans = [
   {
-    id: "TP-742",
-    name: "Q4 Core App Regression",
-    stories: 14,
-    testCases: 124,
-    progress: 85,
-    status: "Active",
-    priority: "Critical",
-    dueDate: "Dec 20, 2024",
-    owner: "Alex Rivera",
-    ownerInitials: "AR"
+    id: "1",
+    name: "Sprint 24 - Biometric Auth",
+    status: "in-progress",
+    progress: 65,
+    testCount: 24,
+    date: "Oct 24",
+    avatars: [
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuD1PY9j0MLiP8sMZLGcbX1ScHZUJu7zcR9tf4DuRb9VVgWVH_ea-0H5RZBhjNDi4KXd3cdrxIce4pphOSEQ5IAl-6z9fBNNr2xud2MqPzvsjMgHWr6i1DVixFgTTRYEqIH8xj0fOuC5aIhngtDVelp-YU_qpV6okGXUpE5IHkZfdyj4nkEx4WA61OwirDfNqNAWRUGNIc8b5pbKz2oEdR7g487DG7IsuyZhbWWPLyfD1CC7LubTUxXzSpk5Kq1ozWsplmUIj6-zOmIo",
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuCSUMSTKYmh8tu4tYnrcXMMkOYnUSMk0c0SIj7BjJF9YatXYekBvK3IPNdPipisRh6gSDErO2L7jLjm1Mf9ZY7ZhwNz0ghHvRV5Y4kMEvuaKmOSLnLJtx_MX_35gbcQrg00H9dYU53xRmfG0jXjjqc1NhDl7CIPQhLvTBLoIlTpaz1W2mWjZY76r8D_0K6h_v4ODS7FkUlfIYB8syYxdlttL5fOmrKOzpIphzmIIXsRB1Aflqj1VQ8tNu3LsoHGT3TJ6dU6J3AKMD-W",
+    ],
+    action: "run",
   },
   {
-    id: "TP-740",
-    name: "Legacy Migration API",
-    stories: 6,
-    testCases: 42,
+    id: "2",
+    name: "Regression Pack v2.1",
+    status: "draft",
+    progress: 0,
+    testCount: 156,
+    date: "Nov 01",
+    avatars: [
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuArBuQTeuNSAp-C8cBwhm8LXL78qgcFpTXsP0DxrXKnQozwkZYR6TLDVYl2YglCf6glPOhYbdh47TbHvJCzV0ypsua8ybp4PeKfuauIz6yFFmC4rOUYM3KY3LIYrkdRhh9OPHPF8toeSr4_v_QwYcpM_APDoeZ93cIT20VZUrtIZIz6NzTZ0H-6T8SRNPqcqWye908zBIhMZ1-ZBGswZkL42SUbP44SQwBiDh702DZGwHz_SsQb0_Tj7vxPYXwihkrQREIyEZEbgYY9",
+    ],
+    action: "edit",
+  },
+  {
+    id: "3",
+    name: "Payment Gateway Integration",
+    status: "completed",
     progress: 100,
-    status: "Completed",
-    priority: "High",
-    dueDate: "Nov 28, 2024",
-    owner: "Sarah Chen",
-    ownerInitials: "SC"
+    testCount: 32,
+    passed: true,
+    avatars: [
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuBxTj7z4QPeQFmtGJKy6iQEQTNIdj8aLB-gAybEU113DYHKz98yuCzKluEE5F0OzimzFcZih4EmJBlC77WgmhrFGNy3vRinuWzbqF2ClEkIroV4twZpcuy3FIGx74reSZJLB3XYlRGz3BI4eoQygQf6KZSja8-NBLZXHM6NB4QMn5-4vySZugB8RdSD2i4e63MSsvHYaXJVrxoT3XxH6WgP0WS3QP3zRq7mLIyXkf5pFvSfRbeHPkPbSO7i4UsX1FYdX4PNfXVTdZir",
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuDWlFSmtSca_h5SeW58hFllnLAN8R3yaeQVlJHABNuzcQGY4W-6pT9EfgzThzv1fqPRpSqLckPrsMznvi_pxNnYWWlsmxBYuDRqI5bpPLfwAufxtsuhhi7JoLduVder6_4v3XrZufLXopc1YoI4kiDD-UnvDTTOaAZhSkPOVR19Nvo0gijhF_GadK-w5H92gtUxyWElmJX-6dIKh4nbS_rmkBHsxHYkSeKkHBAB7IqZdf1qnf14mwoF2Pb0wgx8To3GCFuz1L5-1oqq",
+    ],
+    extraCount: 1,
+    action: "report",
   },
   {
-    id: "TP-738",
-    name: "Payment Gateway Stress Test",
-    stories: 2,
-    testCases: 18,
-    progress: 45,
-    status: "In Progress",
-    priority: "Medium",
-    dueDate: "Jan 15, 2025",
-    owner: "John Doe",
-    ownerInitials: "JD"
-  }
+    id: "4",
+    name: "Mobile V2 - Smoke Test",
+    status: "in-progress",
+    progress: 32,
+    testCount: 8,
+    date: "Today",
+    avatars: [
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuCxqNoOo0Q2_9OFDgXz6Vri_QqVc3mvu1hE5AHpliFY-4DgpTy_7a5GKujZED3BTMXRGgQI8Yn2Y8rZ8_Me-u9lKCMXnkP11PyJMoKZbTs-Pmu0bFGUvz7hybwIAKo8jN1m7B2I4xeJkHVwBRgxabH3sd9tlSJ2hMtGVwQYPai8WgLYeOtuxkZLeW8mDflA1Hv6Mu9N2Qb7FoRtiUw2tyrbWzuXkVsQCnz_t7gvmO3OvA6qRoa8psZ_ZlO2DO3WVbHL_jfic0hiH79U",
+    ],
+    action: "run",
+  },
 ];
 
-export default function TestPlansPage() {
-  return (
-    <div className="p-8 space-y-8 max-w-7xl mx-auto w-full">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Test Plans</h1>
-          <p className="text-muted-foreground mt-1">
-            Overview of all quality assurance strategies and their execution progress.
-          </p>
-        </div>
-        <Button className="gap-2 bg-primary shadow-lg shadow-primary/20">
-          <Plus className="h-4 w-4" />
-          Create Test Plan
-        </Button>
-      </div>
+function getStatusBadge(status: string) {
+  switch (status) {
+    case "in-progress":
+      return (
+        <Badge className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-800 font-bold text-xs">
+          IN PROGRESS
+        </Badge>
+      );
+    case "draft":
+      return (
+        <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-bold text-xs">
+          DRAFT
+        </Badge>
+      );
+    case "completed":
+      return (
+        <Badge className="bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-100 dark:border-green-800 font-bold text-xs">
+          COMPLETED
+        </Badge>
+      );
+    default:
+      return null;
+  }
+}
 
-      {/* Stats Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { label: "Active Plans", value: "12", icon: Clock, color: "text-blue-500", bg: "bg-blue-500/10" },
-          { label: "Total Test Cases", value: "842", icon: ClipboardList, color: "text-primary", bg: "bg-primary/10" },
-          { label: "Completion Rate", value: "94%", icon: TrendingUp, color: "text-green-500", bg: "bg-green-500/10" }
-        ].map((stat, i) => (
-          <div key={i} className="bg-card border border-border p-6 rounded-2xl flex items-center gap-4">
-            <div className={`w-12 h-12 ${stat.bg} ${stat.color} rounded-xl flex items-center justify-center`}>
-              <stat.icon className="h-6 w-6" />
-            </div>
+function getProgressBarColor(status: string) {
+  switch (status) {
+    case "in-progress":
+      return "bg-primary";
+    case "draft":
+      return "bg-slate-300 dark:bg-slate-700";
+    case "completed":
+      return "bg-green-500";
+    default:
+      return "bg-primary";
+  }
+}
+
+export default function TestPlansPage() {
+  const [activeTab, setActiveTab] = useState("test-plans");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  return (
+    <div className="min-h-screen">
+      {/* Header */}
+      <header className="bg-card border-b px-6 pt-6 pb-0">
+        <div className="flex flex-col gap-6">
+          {/* Top Row */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{stat.label}</p>
-              <p className="text-2xl font-black">{stat.value}</p>
+              {/* Breadcrumb */}
+              <nav className="flex items-center text-sm text-muted-foreground mb-1">
+                <Link href="/workspaces" className="hover:text-primary transition-colors">Workspaces</Link>
+                <ChevronRight className="h-4 w-4 mx-1" />
+                <span>Mobile Redesign V2</span>
+              </nav>
+              <h1 className="text-2xl font-bold">Test Plans</h1>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="icon">
+                <Bell className="h-5 w-5 text-muted-foreground" />
+              </Button>
+              <Button className="gap-2 shadow-md shadow-primary/20">
+                <Plus className="h-4 w-4" />
+                Create Plan
+              </Button>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Search and Filters */}
-      <div className="flex gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input 
-            type="text" 
-            placeholder="Search test plans..." 
-            className="w-full h-12 pl-12 pr-4 rounded-xl border border-border bg-card focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-          />
+          {/* Tabs */}
+          <div className="flex items-center gap-8 border-b -mb-px">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "pb-3 border-b-2 font-semibold px-1 transition-colors",
+                  activeTab === tab.id
+                    ? "border-primary text-primary"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
-        <Button variant="outline" className="h-12 px-6 rounded-xl">Filters</Button>
-      </div>
+      </header>
 
-      {/* Test Plans Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {testPlans.map((plan) => (
-          <div 
-            key={plan.id}
-            className="group bg-card border border-border rounded-2xl p-6 hover:shadow-xl hover:border-primary/40 transition-all duration-300"
-          >
-            <div className="flex justify-between items-start mb-6">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold font-mono text-muted-foreground opacity-60">
-                    {plan.id}
+      {/* Content */}
+      <div className="p-6 max-w-7xl mx-auto">
+        {/* Search and Filters */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="relative flex-1 max-w-lg">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+              placeholder="Search test plans..."
+              className="pl-11"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <Button variant="outline" className="gap-2">
+            <SlidersHorizontal className="h-4 w-4" />
+            Filter
+          </Button>
+          <Button variant="outline" className="gap-2">
+            <ArrowUpDown className="h-4 w-4" />
+            Sort
+          </Button>
+        </div>
+
+        {/* Test Plan Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {testPlans.map((plan) => (
+            <Link
+              key={plan.id}
+              href={`/test-plans/${plan.id}`}
+              className={cn(
+                "bg-card border rounded-2xl p-5 hover:shadow-lg transition-all group cursor-pointer",
+                plan.status === "in-progress" && "hover:border-blue-200 dark:hover:border-blue-900/50",
+                plan.status === "completed" && "hover:border-green-200 dark:hover:border-green-900/50",
+                plan.status === "draft" && "hover:border-slate-300 dark:hover:border-slate-700"
+              )}
+            >
+              {/* Header */}
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  {getStatusBadge(plan.status)}
+                  <h3 className="font-bold text-lg leading-tight mt-2">{plan.name}</h3>
+                </div>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                  <MoreHorizontal className="h-5 w-5" />
+                </Button>
+              </div>
+
+              {/* Progress Section */}
+              <div className="mb-6 space-y-3">
+                <div className="flex justify-between text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <span>Progress</span>
+                  <span className={cn(
+                    plan.status === "completed" ? "text-green-600 dark:text-green-400 font-bold" : "text-foreground"
+                  )}>
+                    {plan.progress}%
                   </span>
-                  {plan.status === "Completed" ? (
-                    <Badge className="bg-green-500/10 text-green-500 border-none flex gap-1 items-center">
-                      <CheckCircle2 className="h-3 w-3" />
-                      Completed
-                    </Badge>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                  <div
+                    className={cn("h-2 rounded-full", getProgressBarColor(plan.status))}
+                    style={{ width: `${plan.progress}%` }}
+                  />
+                </div>
+                <div className="flex gap-4 pt-1 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1.5">
+                    <FlaskConical className="h-4 w-4" />
+                    <span>{plan.testCount} Tests</span>
+                  </div>
+                  {plan.passed ? (
+                    <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400 font-medium">
+                      <CheckCircle className="h-4 w-4" />
+                      <span>Passed</span>
+                    </div>
                   ) : (
-                    <Badge variant="outline" className="border-primary/20 text-primary">
-                      {plan.status}
-                    </Badge>
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="h-4 w-4" />
+                      <span>{plan.date}</span>
+                    </div>
                   )}
                 </div>
-                <h3 className="text-xl font-bold group-hover:text-primary transition-colors">
-                  {plan.name}
-                </h3>
               </div>
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </div>
 
-            <div className="grid grid-cols-2 gap-8 mb-8">
-              <div>
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Metrics</p>
-                <div className="flex gap-4">
-                  <div>
-                    <p className="text-lg font-bold">{plan.stories}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase">Stories</p>
-                  </div>
-                  <div className="border-l border-border pl-4">
-                    <p className="text-lg font-bold">{plan.testCases}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase">Tests</p>
-                  </div>
+              {/* Footer */}
+              <div className="flex items-center justify-between border-t pt-4 mt-auto">
+                {/* Avatars */}
+                <div className="flex -space-x-2">
+                  {plan.avatars.map((avatar, idx) => (
+                    <img
+                      key={idx}
+                      src={avatar}
+                      alt="Team member"
+                      className="w-8 h-8 rounded-full border-2 border-card bg-muted object-cover"
+                    />
+                  ))}
+                  {plan.extraCount && (
+                    <div className="w-8 h-8 rounded-full border-2 border-card bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground">
+                      +{plan.extraCount}
+                    </div>
+                  )}
                 </div>
-              </div>
-              <div className="text-right">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Due Date</p>
-                <p className="text-sm font-bold">{plan.dueDate}</p>
-                <p className="text-[10px] text-destructive font-bold uppercase tracking-tighter">
-                  {plan.priority}
-                </p>
-              </div>
-            </div>
 
-            <div className="space-y-4">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-muted-foreground">Execution Progress</span>
-                <span className="font-black text-primary">{plan.progress}%</span>
+                {/* Action */}
+                {plan.action === "run" && (
+                  <button className="text-primary font-semibold text-sm hover:text-blue-700 dark:hover:text-blue-400 flex items-center gap-1 transition-colors">
+                    Run
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                )}
+                {plan.action === "edit" && (
+                  <button className="text-muted-foreground font-semibold text-sm hover:text-foreground flex items-center gap-1 transition-colors">
+                    Edit Details
+                  </button>
+                )}
+                {plan.action === "report" && (
+                  <button className="text-primary font-semibold text-sm hover:text-blue-700 dark:hover:text-blue-400 flex items-center gap-1 transition-colors">
+                    View Report
+                  </button>
+                )}
               </div>
-              <Progress value={plan.progress} className="h-2" />
-            </div>
-
-            <div className="mt-8 pt-6 border-t border-border/50 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold border-2 border-background">
-                  {plan.ownerInitials}
-                </div>
-                <span className="text-xs font-semibold text-muted-foreground">{plan.owner}</span>
-              </div>
-              <Button size="sm" variant="secondary" className="gap-1 rounded-lg font-bold">
-                Details
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          </div>
-        ))}
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
