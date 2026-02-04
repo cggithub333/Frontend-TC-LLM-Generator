@@ -1,0 +1,339 @@
+{
+  "workspaces": [
+    {
+      "id": 1,
+      "name": "FinTech Core Team",
+      "description": "Financial technology platform development",
+      "createdAt": "2024-01-15T10:00:00Z"
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "workspaceId": 1,
+      "name": "Mobile Redesign V2",
+      "icon": "smartphone",
+      "stories": 12,
+      "tests": 88,
+      "status": "AI Processing",
+      "updated": "2h ago",
+      "members": 6
+    },
+    {
+      "id": 2,
+      "workspaceId": 1,
+      "name": "Payment Gateway",
+      "icon": "credit-card",
+      "stories": 24,
+      "tests": 142,
+      "defects": 8,
+      "status": "Review",
+      "updated": "Yesterday",
+      "members": 2
+    },
+    {
+      "id": 3,
+      "workspaceId": 1,
+      "name": "Security Audit Q3",
+      "icon": "shield",
+      "stories": 5,
+      "tests": 34,
+      "defects": 0,
+      "status": "Done",
+      "updated": "4 days ago",
+      "members": 1
+    }
+  ],
+  "stories": [
+    {
+      "id": "US-204",
+      "code": "US-204",
+      "projectId": 1,
+      "title": "Biometric Authentication",
+      "asA": "returning user",
+      "iWantTo": "log in with biometric authentication",
+      "soThat": "I can access my account faster",
+      "status": "In Progress",
+      "priority": "High",
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "description": "Show biometric prompt on app launch if enabled in settings.",
+          "completed": true
+        },
+        {
+          "id": "AC-2",
+          "description": "Fallback to PIN entry if biometric fails after 3 attempts.",
+          "completed": true
+        },
+        {
+          "id": "AC-3",
+          "description": "Provide toggle in Profile settings to enable/disable feature.",
+          "completed": false
+        }
+      ],
+      "assignedTo": "Alex Rivera",
+      "tags": [
+        "Auth",
+        "Security"
+      ],
+      "lastUpdated": "3h ago",
+      "comments": 12,
+      "testCases": 8
+    },
+    {
+      "id": "US-205",
+      "code": "US-205",
+      "projectId": 1,
+      "title": "App Feature Walkthrough",
+      "asA": "new user",
+      "iWantTo": "see a walkthrough of the app features",
+      "soThat": "I understand how to use the application effectively",
+      "status": "To Do",
+      "priority": "Medium",
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "description": "Display interactive tutorial on first app launch.",
+          "completed": false
+        },
+        {
+          "id": "AC-2",
+          "description": "Allow users to skip the walkthrough.",
+          "completed": false
+        },
+        {
+          "id": "AC-3",
+          "description": "Provide option to replay walkthrough from settings.",
+          "completed": false
+        },
+        {
+          "id": "AC-4",
+          "description": "Track completion status in user profile.",
+          "completed": false
+        },
+        {
+          "id": "AC-5",
+          "description": "Include tooltips for key features.",
+          "completed": false
+        }
+      ],
+      "assignedTo": "Maria Kim",
+      "tags": [
+        "Onboarding",
+        "UX"
+      ],
+      "lastUpdated": "1d ago",
+      "comments": 5,
+      "testCases": 12
+    },
+    {
+      "id": "US-208",
+      "code": "US-208",
+      "projectId": 1,
+      "title": "Dark Mode Support",
+      "asA": "mobile user",
+      "iWantTo": "switch between light and dark themes",
+      "soThat": "I can use the app comfortably in different lighting conditions",
+      "status": "Done",
+      "priority": "Medium",
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "description": "Implement theme toggle in settings.",
+          "completed": true
+        },
+        {
+          "id": "AC-2",
+          "description": "Persist theme preference across sessions.",
+          "completed": true
+        },
+        {
+          "id": "AC-3",
+          "description": "Support system theme detection.",
+          "completed": true
+        }
+      ],
+      "assignedTo": "John Valdez",
+      "tags": [
+        "UI",
+        "Accessibility"
+      ],
+      "lastUpdated": "2d ago",
+      "comments": 8,
+      "testCases": 6
+    },
+    {
+      "id": "US-210",
+      "code": "US-210",
+      "projectId": 1,
+      "title": "Push Notification Preferences",
+      "asA": "registered user",
+      "iWantTo": "customize my notification preferences",
+      "soThat": "I only receive alerts that are relevant to me",
+      "status": "In Progress",
+      "priority": "Low",
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "description": "Display notification categories in settings.",
+          "completed": true
+        },
+        {
+          "id": "AC-2",
+          "description": "Allow granular control per category.",
+          "completed": false
+        },
+        {
+          "id": "AC-3",
+          "description": "Sync preferences across devices.",
+          "completed": false
+        }
+      ],
+      "assignedTo": "Sarah Chen",
+      "tags": [
+        "Notifications",
+        "Settings"
+      ],
+      "lastUpdated": "5h ago",
+      "comments": 3,
+      "testCases": 9
+    }
+  ],
+  "testPlans": [
+    {
+      "id": "TP-742",
+      "projectId": 1,
+      "name": "Q4 Core App Regression",
+      "stories": 14,
+      "testCases": 124,
+      "progress": 85,
+      "status": "Active",
+      "priority": "Critical",
+      "dueDate": "2024-12-20",
+      "owner": "Alex Rivera",
+      "assignedTeams": [
+        "QA Team",
+        "Dev Team"
+      ],
+      "aiSuggestions": 3,
+      "createdAt": "2024-11-01T10:00:00Z"
+    },
+    {
+      "id": "TP-740",
+      "projectId": 1,
+      "name": "Legacy Migration API",
+      "stories": 6,
+      "testCases": 42,
+      "progress": 100,
+      "status": "Completed",
+      "priority": "High",
+      "dueDate": "2024-11-28",
+      "owner": "Sarah Chen",
+      "assignedTeams": [
+        "QA Team"
+      ],
+      "aiSuggestions": 0,
+      "createdAt": "2024-10-15T10:00:00Z"
+    }
+  ],
+  "testCases": [
+    {
+      "id": "TC-1024",
+      "storyId": "ST-101",
+      "testPlanId": "TP-742",
+      "title": "Verify Google OAuth Login Flow",
+      "type": "Positive",
+      "priority": "High",
+      "status": "Passed",
+      "preconditions": [
+        "User has a valid Google account",
+        "Application OAuth credentials are configured",
+        "User is on the login page"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "action": "Click on 'Sign in with Google' button",
+          "expected": "User is redirected to Google OAuth consent page"
+        },
+        {
+          "step": 2,
+          "action": "Select Google account and grant permissions",
+          "expected": "User is redirected back to application"
+        },
+        {
+          "step": 3,
+          "action": "Verify user session is created",
+          "expected": "User dashboard is displayed with user profile"
+        }
+      ],
+      "testData": {
+        "email": "test@example.com",
+        "environment": "staging"
+      },
+      "assignedTo": "Alex Rivera",
+      "executedBy": "Maria Kim",
+      "executedAt": "2024-12-01T14:30:00Z",
+      "suiteId": "TS-AUTH-001"
+    },
+    {
+      "id": "TC-1025",
+      "storyId": "ST-101",
+      "testPlanId": "TP-742",
+      "title": "Verify OAuth Error Handling - Invalid Credentials",
+      "type": "Negative",
+      "priority": "Medium",
+      "status": "Failed",
+      "preconditions": [
+        "User is on the login page",
+        "OAuth service is accessible"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "action": "Click 'Sign in with Google'",
+          "expected": "OAuth consent page loads"
+        },
+        {
+          "step": 2,
+          "action": "Cancel the OAuth flow",
+          "expected": "User is redirected to login page with error message"
+        },
+        {
+          "step": 3,
+          "action": "Verify error message is displayed",
+          "expected": "Error: 'Authentication cancelled by user' is shown"
+        }
+      ],
+      "testData": {},
+      "assignedTo": "John Valdez",
+      "executedBy": null,
+      "executedAt": null,
+      "suiteId": "TS-AUTH-001"
+    }
+  ],
+  "testSuites": [
+    {
+      "id": "TS-AUTH-001",
+      "name": "Authentication Module",
+      "description": "All test cases related to user authentication flows",
+      "testCases": [
+        "TC-1024",
+        "TC-1025"
+      ],
+      "projectId": 1,
+      "createdAt": "2024-11-15T10:00:00Z",
+      "lastUpdated": "2024-12-01T14:30:00Z"
+    },
+    {
+      "id": "TS-PAYMENT-001",
+      "name": "Payment Processing",
+      "description": "Test cases for payment gateway integration",
+      "testCases": [],
+      "projectId": 2,
+      "createdAt": "2024-11-20T10:00:00Z",
+      "lastUpdated": "2024-11-20T10:00:00Z"
+    }
+  ]
+}
