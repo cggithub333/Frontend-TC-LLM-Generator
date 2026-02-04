@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Demo
 
-+ Quick Demo: [Try this link](https://frontend-tc-llm-generator.vercel.app)
++ Quick Demo: [Deployed Here! Try it!](https://frontend-tc-llm-generator.vercel.app)
 
 <div align="center">
   <img src="images/dashboard-image.png" alt="Image 1" width="500"/>
