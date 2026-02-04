@@ -1,0 +1,41 @@
+#!/usr/bin/env sh
+
+MSG_FILE="$1"
+MSG="$(cat "$MSG_FILE")"
+
+# ✅ New format: type: message
+# Allowed types:
+# feat, fix, update, debug, test, refact, chore
+
+PATTERN='^(feat|fix|update|debug|test|refact|chore): .+'
+
+# 1️⃣ Validate format
+if ! printf '%s\n' "$MSG" | grep -Eq "$PATTERN"; then
+  echo "❌ Invalid commit message format"
+  echo ""
+  echo "Expected format:"
+  echo "  type: message"
+  echo ""
+  echo "Allowed types:"
+  echo "  feat, fix, update, debug, test, refact, chore"
+  echo ""
+  echo "Examples:"
+  echo "  feat: add login endpoint"
+  echo "  update: improve documentation"
+  echo "  refact: restructure Twitter schemas"
+  echo "  fix: resolve crash on startup"
+  exit 1
+fi
+
+# 2️⃣ Validate minimum word count
+WORD_COUNT=$(printf '%s\n' "$MSG" | wc -w)
+MIN_WORDS=5
+
+if [ "$WORD_COUNT" -lt "$MIN_WORDS" ]; then
+  echo "❌ Commit message too short: $WORD_COUNT words"
+  echo "Minimum required: $MIN_WORDS words"
+  exit 1
+fi
+
+# ✅ All checks passed
+exit 0
