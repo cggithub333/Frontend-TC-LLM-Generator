@@ -1,18 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "@/lib/axios";
-
-interface Project {
-  id: number;
-  workspaceId: number;
-  name: string;
-  icon: string;
-  stories: number;
-  tests: number;
-  defects?: number;
-  status: string;
-  updated: string;
-  members: number;
-}
+import type { Project } from "@/types/workspace.types";
 
 export function useProjects(workspaceId?: number) {
   return useQuery({

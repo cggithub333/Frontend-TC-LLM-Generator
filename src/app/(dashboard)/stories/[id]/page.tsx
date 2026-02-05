@@ -88,7 +88,7 @@ const tabs = [
 export default function StoryDetailPage() {
   const params = useParams();
   const storyId = params.id as string;
-  
+
   const [activeTab, setActiveTab] = useState("story");
   const [selectedCriteria, setSelectedCriteria] = useState<string[]>(["AC-1"]);
   const [newComment, setNewComment] = useState("");
@@ -106,13 +106,13 @@ export default function StoryDetailPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Breadcrumb */}
           <nav className="flex items-center text-sm font-medium text-muted-foreground">
-            <Link href="/workspaces" className="hover:text-primary transition-colors">Projects</Link>
+            <Link href="/workspaces" className="hover:text-primary transition-colors">Workspaces</Link>
             <ChevronRight className="h-4 w-4 mx-2" />
             <Link href="/stories" className="hover:text-primary transition-colors">{storyData.project}</Link>
             <ChevronRight className="h-4 w-4 mx-2" />
             <span className="text-foreground font-semibold">{storyId || storyData.code}</span>
           </nav>
-          
+
           {/* Actions */}
           <div className="flex items-center gap-3">
             <Button variant="outline" className="gap-2">
@@ -142,7 +142,7 @@ export default function StoryDetailPage() {
               </div>
               <h1 className="text-4xl font-extrabold tracking-tight">Story Details</h1>
             </div>
-            
+
             {/* Tabs */}
             <div className="flex p-1.5 bg-muted rounded-xl">
               {tabs.map((tab) => (
@@ -170,8 +170,8 @@ export default function StoryDetailPage() {
             <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
               {/* Hero Image */}
               <div className="h-72 overflow-hidden relative">
-                <img 
-                  alt="Abstract network visualization" 
+                <img
+                  alt="Abstract network visualization"
                   className="w-full h-full object-cover"
                   src={storyData.heroImage}
                 />
@@ -186,7 +186,7 @@ export default function StoryDetailPage() {
                   </Badge>
                 </div>
               </div>
-              
+
               {/* Title & Description */}
               <div className="p-8">
                 <h2 className="text-3xl font-extrabold mb-4">{storyData.title}</h2>
@@ -227,7 +227,7 @@ export default function StoryDetailPage() {
                 </h3>
                 <Button variant="link" className="text-sm text-primary p-0">View all</Button>
               </div>
-              
+
               <div className="space-y-8">
                 {storyData.discussion.map((comment) => (
                   <div key={comment.id} className="flex gap-4">
@@ -270,7 +270,7 @@ export default function StoryDetailPage() {
                   {storyData.acceptanceCriteria.length} Items
                 </Badge>
               </div>
-              
+
               <div className="space-y-3 mb-8">
                 {storyData.acceptanceCriteria.map((ac) => (
                   <label
