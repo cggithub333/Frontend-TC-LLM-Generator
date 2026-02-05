@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QA Artifacts - Test Suite Details</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2563EB", // Primary Blue as requested
+                        "sidebar": "#F9FAFB", // Very light gray for sidebar
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900 font-display">
+<div class="flex h-screen overflow-hidden">
+<aside class="w-64 flex-shrink-0 bg-sidebar border-r border-gray-200 flex flex-col">
+<div class="p-6">
+<div class="flex items-center gap-3">
+<div class="bg-primary rounded-lg p-2 text-white shadow-sm">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-gray-900 text-base font-bold leading-none">QA Artifacts</h1>
+<p class="text-gray-500 text-xs font-normal mt-1">AI QA Platform</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-200/50 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-primary bg-blue-50/80 rounded-lg" href="#">
+<span class="material-symbols-outlined active-fill">stack</span>
+<span class="text-sm font-bold">Test Suites</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-200/50 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="text-sm font-medium">Test Cases</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-200/50 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">play_circle</span>
+<span class="text-sm font-medium">Executions</span>
+</a>
+<div class="pt-4 pb-2 px-3">
+<p class="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Administration</p>
+</div>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-200/50 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="p-4 border-t border-gray-200">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-blue-400" data-alt="User avatar profile picture"></div>
+<div class="flex flex-col">
+<p class="text-xs font-bold text-gray-900">Alex Rivera</p>
+<p class="text-[10px] text-gray-500">QA Lead</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col overflow-y-auto bg-white">
+<header class="sticky top-0 z-20 flex flex-col gap-4 bg-white/90 backdrop-blur-md border-b border-gray-200 px-8 py-6">
+<div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
+<a class="hover:text-primary transition-colors" href="#">Test Suites</a>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="font-semibold text-gray-900">Authentication Module</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<h2 class="text-gray-900 text-2xl font-black tracking-tight">Authentication Module</h2>
+<span class="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-green-200">Active</span>
+</div>
+<div class="flex items-center gap-3">
+<button class="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 transition-all shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">edit</span>
+                            Edit Suite
+                        </button>
+<button class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all shadow-sm">
+<span class="material-symbols-outlined text-sm">play_arrow</span>
+                            Run Suite
+                        </button>
+</div>
+</div>
+</header>
+<div class="p-8 max-w-7xl mx-auto w-full space-y-8">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+<div class="flex items-center gap-3 mb-2">
+<div class="bg-blue-50 p-2 rounded-lg text-primary">
+<span class="material-symbols-outlined text-xl">list_alt</span>
+</div>
+<span class="text-sm font-medium text-gray-500">Total Cases</span>
+</div>
+<p class="text-2xl font-bold text-gray-900">24 <span class="text-sm font-normal text-gray-400">Test Cases</span></p>
+</div>
+<div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+<div class="flex items-center gap-3 mb-2">
+<div class="bg-purple-50 p-2 rounded-lg text-purple-600">
+<span class="material-symbols-outlined text-xl">rule</span>
+</div>
+<span class="text-sm font-medium text-gray-500">Coverage</span>
+</div>
+<p class="text-2xl font-bold text-gray-900">98% <span class="text-sm font-normal text-gray-400">of reqs</span></p>
+</div>
+<div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+<div class="flex items-center gap-3 mb-2">
+<div class="bg-amber-50 p-2 rounded-lg text-amber-600">
+<span class="material-symbols-outlined text-xl">history</span>
+</div>
+<span class="text-sm font-medium text-gray-500">Last Run</span>
+</div>
+<p class="text-2xl font-bold text-gray-900">2h ago <span class="text-sm font-normal text-gray-400">by Alex</span></p>
+</div>
+<div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+<div class="flex items-center gap-3 mb-2">
+<div class="bg-green-50 p-2 rounded-lg text-green-600">
+<span class="material-symbols-outlined text-xl">check_circle</span>
+</div>
+<span class="text-sm font-medium text-gray-500">Success Rate</span>
+</div>
+<p class="text-2xl font-bold text-gray-900">100% <span class="text-sm font-normal text-gray-400">last run</span></p>
+</div>
+</div>
+<div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+<div class="p-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex items-center gap-3 w-full sm:w-auto">
+<div class="relative w-full sm:w-80">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">search</span>
+<input class="pl-10 pr-4 py-2 w-full text-sm border-gray-200 rounded-lg focus:ring-primary focus:border-primary transition-all shadow-sm placeholder-gray-400 text-gray-900" placeholder="Search test cases..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="relative">
+<select class="appearance-none bg-white border border-gray-200 text-gray-700 text-sm rounded-lg pl-3 pr-8 py-2 focus:ring-primary focus:border-primary shadow-sm cursor-pointer hover:bg-gray-50 transition-colors">
+<option>All Statuses</option>
+<option>Active</option>
+<option>Draft</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none">expand_more</span>
+</div>
+<div class="relative">
+<select class="appearance-none bg-white border border-gray-200 text-gray-700 text-sm rounded-lg pl-3 pr-8 py-2 focus:ring-primary focus:border-primary shadow-sm cursor-pointer hover:bg-gray-50 transition-colors">
+<option>All Priorities</option>
+<option>High</option>
+<option>Medium</option>
+<option>Low</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<div class="sticky top-0 z-10 bg-blue-50/80 backdrop-blur-sm px-6 py-3 border-b border-blue-100 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<input checked="" class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
+<span class="text-sm font-bold text-primary">2 items selected</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1 text-xs font-bold bg-white text-gray-700 border border-gray-200 px-3 py-1.5 rounded-lg hover:shadow-sm hover:bg-gray-50 transition-all">
+<span class="material-symbols-outlined text-sm">drive_file_move</span>
+                            Move
+                        </button>
+<button class="flex items-center gap-1 text-xs font-bold bg-white text-gray-700 border border-gray-200 px-3 py-1.5 rounded-lg hover:shadow-sm hover:bg-gray-50 transition-all">
+<span class="material-symbols-outlined text-sm">content_copy</span>
+                            Duplicate
+                        </button>
+<button class="flex items-center gap-1 text-xs font-bold bg-white text-red-600 border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-all">
+<span class="material-symbols-outlined text-sm">delete</span>
+                            Remove
+                        </button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-gray-50 border-b border-gray-200">
+<th class="px-6 py-4 w-12"></th>
+<th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
+<th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-1/3">Test Case Name</th>
+<th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Priority</th>
+<th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+<th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-100 bg-white">
+<tr class="hover:bg-gray-50 transition-colors group">
+<td class="px-6 py-4">
+<input checked="" class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 bg-transparent cursor-pointer" type="checkbox"/>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-gray-500">TC-001</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-gray-900 text-sm">Valid User Login (Email/Password)</div>
+<div class="text-xs text-gray-400 mt-0.5">Updated 12 mins ago</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-100">
+                                        High
+                                    </span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100">
+                                        Active
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-gray-400 hover:text-primary hover:bg-blue-50 rounded-md transition-colors" title="Run">
+<span class="material-symbols-outlined text-lg">play_arrow</span>
+</button>
+<button class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors" title="Edit">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title="Remove">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors group">
+<td class="px-6 py-4">
+<input checked="" class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 bg-transparent cursor-pointer" type="checkbox"/>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-gray-500">TC-002</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-gray-900 text-sm">Invalid Password Rejection</div>
+<div class="text-xs text-gray-400 mt-0.5">Updated 1h ago</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-100">
+                                        Medium
+                                    </span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100">
+                                        Active
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-gray-400 hover:text-primary hover:bg-blue-50 rounded-md transition-colors" title="Run">
+<span class="material-symbols-outlined text-lg">play_arrow</span>
+</button>
+<button class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors" title="Edit">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title="Remove">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors group">
+<td class="px-6 py-4">
+<input class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 bg-transparent cursor-pointer" type="checkbox"/>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-gray-500">TC-005</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-gray-900 text-sm">Forgot Password - Reset Email Flow</div>
+<div class="text-xs text-gray-400 mt-0.5">Updated 3h ago</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-100">
+                                        High
+                                    </span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
+                                        Draft
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-gray-400 hover:text-primary hover:bg-blue-50 rounded-md transition-colors" title="Run">
+<span class="material-symbols-outlined text-lg">play_arrow</span>
+</button>
+<button class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors" title="Edit">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title="Remove">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors group">
+<td class="px-6 py-4">
+<input class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 bg-transparent cursor-pointer" type="checkbox"/>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-gray-500">TC-008</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-gray-900 text-sm">SSO Login with Google</div>
+<div class="text-xs text-gray-400 mt-0.5">Updated 5h ago</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                        Low
+                                    </span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100">
+                                        Active
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-gray-400 hover:text-primary hover:bg-blue-50 rounded-md transition-colors" title="Run">
+<span class="material-symbols-outlined text-lg">play_arrow</span>
+</button>
+<button class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors" title="Edit">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title="Remove">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors group">
+<td class="px-6 py-4">
+<input class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 bg-transparent cursor-pointer" type="checkbox"/>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-gray-500">TC-012</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-gray-900 text-sm">Two-Factor Authentication Setup</div>
+<div class="text-xs text-gray-400 mt-0.5">Updated 1d ago</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-100">
+                                        High
+                                    </span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100">
+                                        Active
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-gray-400 hover:text-primary hover:bg-blue-50 rounded-md transition-colors" title="Run">
+<span class="material-symbols-outlined text-lg">play_arrow</span>
+</button>
+<button class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors" title="Edit">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title="Remove">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+<p class="text-sm text-gray-500">Showing <span class="font-medium text-gray-900">1</span> to <span class="font-medium text-gray-900">5</span> of <span class="font-medium text-gray-900">24</span> results</p>
+<div class="flex items-center gap-2">
+<button class="p-2 border border-gray-300 rounded-lg bg-white text-gray-400 hover:bg-gray-50 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="p-2 border border-gray-300 rounded-lg bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>
+
