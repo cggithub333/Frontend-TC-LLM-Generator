@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QA Artifacts Admin Settings</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white antialiased h-screen flex overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 flex-shrink-0 bg-white dark:bg-[#151b2b] border-r border-slate-200 dark:border-slate-800 flex flex-col h-full z-10">
+<!-- Brand / User Profile -->
+<div class="p-6 border-b border-slate-100 dark:border-slate-800/50">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat bg-cover rounded-xl size-10 shrink-0 shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10" data-alt="Abstract geometric avatar with blue gradients" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBmZ8XmDfzukY-BgNeUNsrrx8WyaPF4QtSjnHsm5Dl7akSAlFw019p_0e_Reww6w9ZswBRplP3eT4gW0w52aSMjPQQAXFYP_dbjupK1TLk-wLhGlNc6WN0ez3T2oD1lrODBNbP4r9eZZoEGmYW8rE1JyuJKm_TPRbv9iKjCy_agYaIaJ-enc2nHhJ_7I77Mdo5uJrARDheqy5mCanTOpmGpa-_WXfKq-NjRWQP1zllqPXgjAkBQ-rv3uDKGjpwoEhpGYqSrZRUtHSBW");'></div>
+<div class="flex flex-col overflow-hidden">
+<h1 class="text-slate-900 dark:text-white text-sm font-bold leading-tight truncate">QA Artifacts</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium truncate">Admin Console</p>
+</div>
+</div>
+</div>
+<!-- Navigation -->
+<nav class="flex-1 overflow-y-auto py-6 px-3 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">folder_open</span>
+<span class="text-sm font-medium">QA Projects</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">play_circle</span>
+<span class="text-sm font-medium">Test Runs</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">bar_chart</span>
+<span class="text-sm font-medium">Reports</span>
+</a>
+<div class="my-2 border-t border-slate-100 dark:border-slate-800/50 mx-2"></div>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-300 font-semibold group" href="#">
+<span class="material-symbols-outlined text-[20px] fill-1">settings</span>
+<span class="text-sm">Settings</span>
+</a>
+</nav>
+<!-- Footer -->
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 px-2 py-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors">
+<div class="size-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-sm">person</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-semibold text-slate-700 dark:text-slate-200">Jane Doe</span>
+<span class="text-[10px] text-slate-500 dark:text-slate-400">Admin</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<!-- Top Header -->
+<header class="h-16 flex items-center justify-between px-8 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#151b2b] shrink-0">
+<h2 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Admin Settings</h2>
+<div class="flex items-center gap-3">
+<button class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 px-3 py-2 text-sm font-medium transition-colors">Cancel</button>
+<button class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm shadow-blue-500/20 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                    Save Changes
+                </button>
+</div>
+</header>
+<!-- Scrollable Content Area -->
+<div class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark p-6 lg:p-10">
+<div class="max-w-6xl mx-auto w-full">
+<!-- Layout Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Settings Navigation (Left Column) -->
+<div class="lg:col-span-3">
+<nav class="flex flex-col gap-1 sticky top-0">
+<p class="px-3 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Configuration</p>
+<!-- Active Item -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white dark:bg-slate-800 shadow-sm ring-1 ring-slate-900/5 dark:ring-white/5 text-primary dark:text-blue-400 font-medium transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+                                General
+                            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+                                User Management
+                            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">smart_toy</span>
+                                AI Configurations
+                            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">receipt_long</span>
+                                Billing
+                            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">security</span>
+                                Security
+                            </a>
+</nav>
+</div>
+<!-- Main Settings Area (Right Column) -->
+<div class="lg:col-span-9 flex flex-col gap-6">
+<!-- Workspace Identity Card -->
+<div class="bg-white dark:bg-[#151b2b] rounded-xl shadow-sm border border-slate-200 dark:border-slate-800/60 overflow-hidden">
+<div class="p-6 border-b border-slate-100 dark:border-slate-800/50 flex justify-between items-center">
+<div>
+<h3 class="text-lg font-semibold text-slate-900 dark:text-white">Workspace Identity</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage your workspace branding and basic information.</p>
+</div>
+</div>
+<div class="p-6 space-y-8">
+<!-- Logo Upload -->
+<div class="flex items-center gap-6">
+<div class="relative group cursor-pointer">
+<div class="size-20 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-600 flex items-center justify-center overflow-hidden" data-alt="Placeholder for logo upload area">
+<span class="material-symbols-outlined text-slate-400 text-3xl">add_photo_alternate</span>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-white dark:bg-slate-700 rounded-full p-1.5 shadow-sm border border-slate-200 dark:border-slate-600">
+<span class="material-symbols-outlined text-xs text-slate-600 dark:text-slate-300 block">edit</span>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<span class="text-sm font-medium text-slate-900 dark:text-white">Workspace Logo</span>
+<p class="text-xs text-slate-500 dark:text-slate-400">Recommended size: 400x400px. JPG, PNG or SVG.</p>
+<div class="flex gap-3 mt-1">
+<button class="text-xs font-semibold text-primary hover:text-blue-700 dark:text-blue-400">Upload new</button>
+<button class="text-xs font-semibold text-red-500 hover:text-red-700">Remove</button>
+</div>
+</div>
+</div>
+<!-- Workspace Name -->
+<div class="grid gap-2 max-w-lg">
+<label class="text-sm font-medium text-slate-700 dark:text-slate-300">Workspace Name</label>
+<input class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm placeholder:text-slate-400" type="text" value="QA Artifacts Production"/>
+</div>
+<!-- Workspace URL -->
+<div class="grid gap-2 max-w-lg">
+<label class="text-sm font-medium text-slate-700 dark:text-slate-300">Workspace URL</label>
+<div class="flex rounded-lg shadow-sm">
+<span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 sm:text-sm">
+                                            app.qa-artifacts.com/
+                                        </span>
+<input class="flex-1 min-w-0 block w-full px-3 py-2.5 rounded-none rounded-r-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white sm:text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary" type="text" value="acme-corp"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Localization Card -->
+<div class="bg-white dark:bg-[#151b2b] rounded-xl shadow-sm border border-slate-200 dark:border-slate-800/60 overflow-hidden">
+<div class="p-6 border-b border-slate-100 dark:border-slate-800/50">
+<h3 class="text-lg font-semibold text-slate-900 dark:text-white">Localization</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Set regional preferences for your team.</p>
+</div>
+<div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="grid gap-2">
+<label class="text-sm font-medium text-slate-700 dark:text-slate-300">Timezone</label>
+<div class="relative">
+<select class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none cursor-pointer">
+<option>(GMT-08:00) Pacific Time (US &amp; Canada)</option>
+<option>(GMT-05:00) Eastern Time (US &amp; Canada)</option>
+<option>(GMT+00:00) London</option>
+<option>(GMT+01:00) Paris</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-slate-400 pointer-events-none text-[20px]">expand_more</span>
+</div>
+</div>
+<div class="grid gap-2">
+<label class="text-sm font-medium text-slate-700 dark:text-slate-300">Language</label>
+<div class="relative">
+<select class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none cursor-pointer">
+<option>English (US)</option>
+<option>French (FR)</option>
+<option>Spanish (ES)</option>
+<option>German (DE)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-slate-400 pointer-events-none text-[20px]">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Team Preferences Card -->
+<div class="bg-white dark:bg-[#151b2b] rounded-xl shadow-sm border border-slate-200 dark:border-slate-800/60 overflow-hidden">
+<div class="p-6 border-b border-slate-100 dark:border-slate-800/50">
+<h3 class="text-lg font-semibold text-slate-900 dark:text-white">Team Preferences</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Control visibility and access settings.</p>
+</div>
+<div class="p-6 space-y-5">
+<div class="flex items-start justify-between">
+<div class="flex flex-col gap-1">
+<p class="text-sm font-medium text-slate-900 dark:text-white">Enable Public Links</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">Allow users to share test results via public URLs.</p>
+</div>
+<button aria-checked="true" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-primary" role="switch">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<hr class="border-slate-100 dark:border-slate-800"/>
+<div class="flex items-start justify-between">
+<div class="flex flex-col gap-1">
+<p class="text-sm font-medium text-slate-900 dark:text-white">Allow Guest Access</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">Guests can view projects without editing rights.</p>
+</div>
+<button aria-checked="false" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-slate-200 dark:bg-slate-700" role="switch">
+<span class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<hr class="border-slate-100 dark:border-slate-800"/>
+<div class="flex items-start justify-between">
+<div class="flex flex-col gap-1">
+<p class="text-sm font-medium text-slate-900 dark:text-white">Weekly Digest Emails</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">Send summary of test runs to all admins every Monday.</p>
+</div>
+<button aria-checked="true" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-primary" role="switch">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="h-20"></div> <!-- Spacer for bottom scrolling -->
+</div>
+</div>
+</main>
+</body></html>
+

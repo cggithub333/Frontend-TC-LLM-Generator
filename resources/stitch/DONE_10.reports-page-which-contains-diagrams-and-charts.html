@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QA Artifacts - Quality Analytics</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#135bec",
+              "background-light": "#f6f6f8",
+              "background-dark": "#101622",
+              "surface-light": "#ffffff",
+              "surface-dark": "#1e293b",
+              "border-light": "#e2e8f0",
+              "border-dark": "#334155",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Hide scrollbar for cleaner look in sidebar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- Sidebar -->
+<aside class="w-64 flex-shrink-0 flex flex-col bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark h-full transition-all duration-300">
+<div class="flex flex-col h-full p-4 justify-between">
+<div class="flex flex-col gap-6">
+<!-- User/App Profile -->
+<div class="flex gap-3 items-center px-2">
+<div class="relative bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-primary/10" data-alt="Abstract geometric logo in blue and white" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAK8PQpv-ZWoYpkpuRpeU7EE4tgQGEJBCnf5c1P_vjAHOZIy64eNlhpGh6gkmyRABYPK-TPrtY3nL6u5lCp3wsTbF4YEUlOPUOWEyZ2oa8LJfGKutjsYq0833ho3N4LK1GFTXxTS0TjPTLq5PuPm3asuZFN4dcSL23nng_7q4dfT1me7tc6Fb18EefVAj7HxjKCE04nmv8SynXW1OtKrSUR_x48zafm8ac9T2MSmDYC5nnYqm_5yDHzXsqirdCejz9-whs-PHDTk7jG");'>
+</div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-base font-bold leading-tight">QA Artifacts</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-normal">AI QA Platform</p>
+</div>
+</div>
+<!-- Navigation -->
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary">fact_check</span>
+<span class="text-sm font-medium">Test Cases</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary">play_circle</span>
+<span class="text-sm font-medium">Executions</span>
+</a>
+<!-- Active State: Reports -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary dark:text-primary dark:bg-primary/20 transition-colors" href="#">
+<span class="material-symbols-outlined filled">analytics</span>
+<span class="text-sm font-bold">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+</div>
+<!-- Footer/User -->
+<div class="mt-auto pt-4 border-t border-border-light dark:border-border-dark px-2">
+<button class="flex items-center gap-3 w-full text-left hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors">
+<div class="bg-gray-200 rounded-full size-8 flex items-center justify-center text-xs font-bold text-gray-600">JD</div>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-slate-700 dark:text-slate-200">Jane Doe</span>
+<span class="text-xs text-slate-500 dark:text-slate-400">Lead QA Engineer</span>
+</div>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 h-full overflow-y-auto bg-background-light dark:bg-background-dark">
+<div class="max-w-[1280px] mx-auto p-6 md:p-8 flex flex-col gap-8">
+<!-- Page Heading & Actions -->
+<header class="flex flex-wrap items-center justify-between gap-4">
+<div>
+<h2 class="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">Quality Analytics</h2>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Overview of QA performance metrics.</p>
+</div>
+<button class="group flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg shadow-sm hover:border-primary dark:hover:border-primary transition-all">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary text-[20px]">calendar_today</span>
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Last 30 Days</span>
+<span class="material-symbols-outlined text-slate-400 text-[20px]">arrow_drop_down</span>
+</button>
+</header>
+<!-- Top Row: Stats Cards -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+<!-- Card 1 -->
+<div class="flex flex-col gap-3 p-5 rounded-xl bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Total Test Cases</p>
+<span class="material-symbols-outlined text-primary/70 bg-primary/10 p-1.5 rounded-md text-[20px]">list_alt</span>
+</div>
+<div>
+<p class="text-2xl font-bold text-slate-900 dark:text-white">1,245</p>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-emerald-600 text-[16px]">trending_up</span>
+<p class="text-emerald-600 text-xs font-semibold">+5% <span class="text-slate-400 font-normal ml-1">vs last month</span></p>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="flex flex-col gap-3 p-5 rounded-xl bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Pass Rate</p>
+<span class="material-symbols-outlined text-primary/70 bg-primary/10 p-1.5 rounded-md text-[20px]">check_circle</span>
+</div>
+<div>
+<p class="text-2xl font-bold text-slate-900 dark:text-white">94.2%</p>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-emerald-600 text-[16px]">trending_up</span>
+<p class="text-emerald-600 text-xs font-semibold">+1.2% <span class="text-slate-400 font-normal ml-1">vs last month</span></p>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="flex flex-col gap-3 p-5 rounded-xl bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">AI Generated</p>
+<span class="material-symbols-outlined text-purple-500 bg-purple-100 dark:bg-purple-900/30 p-1.5 rounded-md text-[20px]">auto_awesome</span>
+</div>
+<div>
+<p class="text-2xl font-bold text-slate-900 dark:text-white">68%</p>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-emerald-600 text-[16px]">trending_up</span>
+<p class="text-emerald-600 text-xs font-semibold">+15% <span class="text-slate-400 font-normal ml-1">adoption rate</span></p>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="flex flex-col gap-3 p-5 rounded-xl bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Defects Found</p>
+<span class="material-symbols-outlined text-rose-500 bg-rose-100 dark:bg-rose-900/30 p-1.5 rounded-md text-[20px]">bug_report</span>
+</div>
+<div>
+<p class="text-2xl font-bold text-slate-900 dark:text-white">12</p>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-rose-500 text-[16px]">trending_down</span>
+<p class="text-rose-500 text-xs font-semibold">-3% <span class="text-slate-400 font-normal ml-1">vs last month</span></p>
+</div>
+</div>
+</div>
+</section>
+<!-- Middle Row: Large Chart -->
+<section class="w-full bg-white dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark p-6 shadow-sm">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Test Execution Trend</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Total executions over the last 30 days</p>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<div class="size-3 rounded-full bg-primary"></div>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-300">Passed</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="size-3 rounded-full bg-slate-300 dark:bg-slate-600"></div>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-300">Failed</span>
+</div>
+</div>
+</div>
+<!-- Chart Container -->
+<div class="relative w-full h-[280px]">
+<!-- Grid Lines Background -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+<div class="w-full border-t border-dashed border-slate-100 dark:border-slate-800"></div>
+<div class="w-full border-t border-dashed border-slate-100 dark:border-slate-800"></div>
+<div class="w-full border-t border-dashed border-slate-100 dark:border-slate-800"></div>
+<div class="w-full border-t border-dashed border-slate-100 dark:border-slate-800"></div>
+<div class="w-full border-t border-dashed border-slate-200 dark:border-slate-700"></div>
+</div>
+<!-- SVG Chart Line -->
+<svg class="absolute inset-0 w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 1000 200">
+<!-- Defs for gradient -->
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#135bec" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#135bec" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Area fill -->
+<path d="M0 150 C 100 150, 150 50, 250 80 C 350 110, 400 160, 500 120 C 600 80, 700 40, 800 60 C 900 80, 950 20, 1000 40 V 200 H 0 Z" fill="url(#chartGradient)"></path>
+<!-- Main Line -->
+<path d="M0 150 C 100 150, 150 50, 250 80 C 350 110, 400 160, 500 120 C 600 80, 700 40, 800 60 C 900 80, 950 20, 1000 40" fill="none" stroke="#135bec" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" vector-effect="non-scaling-stroke"></path>
+<!-- Data Points -->
+<circle class="fill-white dark:fill-surface-dark stroke-primary stroke-2" cx="250" cy="80" r="4"></circle>
+<circle class="fill-white dark:fill-surface-dark stroke-primary stroke-2" cx="500" cy="120" r="4"></circle>
+<circle class="fill-white dark:fill-surface-dark stroke-primary stroke-2" cx="800" cy="60" r="4"></circle>
+</svg>
+</div>
+<!-- X Axis Labels -->
+<div class="flex justify-between mt-4 text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+<span>Week 1</span>
+<span>Week 2</span>
+<span>Week 3</span>
+<span>Week 4</span>
+</div>
+</section>
+<!-- Bottom Row: 2 Charts -->
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Left: Test Suite Health -->
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark p-6 shadow-sm flex flex-col h-full">
+<div class="mb-6">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Test Suite Health</h3>
+<div class="flex items-end gap-2 mt-1">
+<span class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">98%</span>
+<span class="text-sm font-medium text-emerald-600 mb-1.5">Healthy</span>
+</div>
+</div>
+<!-- Horizontal Bar Chart -->
+<div class="flex flex-col gap-5 flex-1 justify-center">
+<!-- Item 1 -->
+<div class="group">
+<div class="flex justify-between text-xs font-semibold mb-1.5">
+<span class="text-slate-600 dark:text-slate-300">Authentication</span>
+<span class="text-slate-900 dark:text-white">100%</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 100%"></div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="group">
+<div class="flex justify-between text-xs font-semibold mb-1.5">
+<span class="text-slate-600 dark:text-slate-300">Checkout Process</span>
+<span class="text-slate-900 dark:text-white">92%</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 92%"></div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="group">
+<div class="flex justify-between text-xs font-semibold mb-1.5">
+<span class="text-slate-600 dark:text-slate-300">User Profile</span>
+<span class="text-slate-900 dark:text-white">88%</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+<div class="bg-orange-400 h-full rounded-full" style="width: 88%"></div>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="group">
+<div class="flex justify-between text-xs font-semibold mb-1.5">
+<span class="text-slate-600 dark:text-slate-300">Search Engine</span>
+<span class="text-slate-900 dark:text-white">96%</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 96%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: AI Productivity -->
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark p-6 shadow-sm flex flex-col h-full">
+<div class="mb-6 flex justify-between items-start">
+<div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">AI Productivity</h3>
+<div class="flex items-end gap-2 mt-1">
+<span class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">3.5x</span>
+<span class="text-sm font-medium text-purple-600 mb-1.5">Faster Generation</span>
+</div>
+</div>
+<div class="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+<span class="material-symbols-outlined text-purple-600 dark:text-purple-300">bolt</span>
+</div>
+</div>
+<!-- Vertical Bar Chart -->
+<div class="flex-1 flex items-end justify-center gap-12 pt-4 px-8 pb-2">
+<!-- Manual Bar -->
+<div class="flex flex-col items-center gap-3 w-20 group">
+<span class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-auto">45m</span>
+<div class="w-full bg-slate-200 dark:bg-slate-700 rounded-t-lg relative group-hover:bg-slate-300 transition-all h-40">
+</div>
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Manual</span>
+</div>
+<!-- AI Bar -->
+<div class="flex flex-col items-center gap-3 w-20 group">
+<span class="text-xs font-bold text-primary dark:text-primary mb-auto">12m</span>
+<div class="w-full bg-primary/20 dark:bg-primary/30 rounded-t-lg relative h-12 border-t-2 border-primary">
+<!-- Animated pulse effect to draw attention -->
+<div class="absolute -top-1 left-0 right-0 h-0.5 bg-primary/50 animate-pulse"></div>
+</div>
+<span class="text-sm font-bold text-primary dark:text-primary">AI Assisted</span>
+</div>
+</div>
+<p class="text-center text-xs text-slate-400 dark:text-slate-500 mt-4">Average time per test case generation</p>
+</div>
+</section>
+<!-- Bottom Spacer -->
+<div class="h-6"></div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QA Artifacts Executive Reports Summary</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display antialiased overflow-hidden">
+<div class="flex h-screen w-full overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-[#151b2b] flex flex-col justify-between p-4 hidden md:flex">
+<div class="flex flex-col gap-6">
+<!-- User Profile / Brand -->
+<div class="flex items-center gap-3 px-2">
+<div class="bg-center bg-no-repeat bg-cover rounded-full h-10 w-10 shadow-sm" data-alt="User profile avatar showing a smiling person" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDcUQ3vZA55Bcj0VFvU5w8aE_VEPzqnDmvvjsl1b9cKAYCHsb3GmR-o59tnTTgq-JTxAKrLftGrJ3kllVx9qIhEYICE-JlSMu8M1-oUUaEp5ZcSM5mtcUVSqPeXa-Dxeu1OLXkImUoRzzmc_S1q92mykfz2W-X2WsXQ_-q0ryyOJClGA5DXVtPdhoyZCwZjhMjlVyRGePXfoFt_53adsGYuuZOFdjIU4vZ4uKjRld8oZfqzLXbM6jhnNJ4VhCFUBABm8a5dlm-ucR-K");'>
+</div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-sm font-semibold leading-tight">QA Artifacts</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-normal">Admin Workspace</p>
+</div>
+</div>
+<!-- Navigation -->
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary" style="font-size: 24px;">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary" style="font-size: 24px;">assignment</span>
+<span class="text-sm font-medium">Test Plans</span>
+</a>
+<!-- Active Item -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary dark:text-blue-400 transition-colors" href="#">
+<span class="material-symbols-outlined fill-1" style="font-size: 24px;">pie_chart</span>
+<span class="text-sm font-semibold">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary" style="font-size: 24px;">bug_report</span>
+<span class="text-sm font-medium">Defects</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary" style="font-size: 24px;">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+</div>
+<!-- Bottom Actions -->
+<div class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-size: 24px;">logout</span>
+<span class="text-sm font-medium">Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 h-full overflow-y-auto bg-background-light dark:bg-background-dark">
+<div class="max-w-[1200px] mx-auto p-6 md:p-8 flex flex-col gap-8">
+<!-- Page Header -->
+<header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex flex-col gap-1">
+<h1 class="text-slate-900 dark:text-white text-3xl font-bold tracking-tight">Executive Summary</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm md:text-base">Overview of current QA performance and test execution status</p>
+</div>
+<button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-primary hover:bg-blue-700 text-white text-sm font-semibold shadow-sm transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none">
+<span class="material-symbols-outlined" style="font-size: 20px;">picture_as_pdf</span>
+<span>Export PDF</span>
+</button>
+</header>
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Pie Chart Card -->
+<div class="lg:col-span-2 bg-white dark:bg-[#151b2b] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Current Test Plan Status</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Distribution across all active suites</p>
+</div>
+<div class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300">
+                                Total: 450 Tests
+                            </div>
+</div>
+<div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 flex-1">
+<!-- CSS Pie Chart -->
+<div class="relative w-48 h-48 rounded-full" style="background: conic-gradient(#10b981 0% 65%, #ef4444 65% 80%, #f59e0b 80% 90%, #e2e8f0 90% 100%);">
+<!-- Inner White Circle for Donut Effect -->
+<div class="absolute inset-0 m-auto w-32 h-32 bg-white dark:bg-[#151b2b] rounded-full flex items-center justify-center flex-col">
+<span class="text-3xl font-bold text-slate-900 dark:text-white">65%</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase">Passing</span>
+</div>
+</div>
+<!-- Legend -->
+<div class="grid grid-cols-2 gap-x-8 gap-y-4">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-[#10b981]"></div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-slate-900 dark:text-white">Pass</span>
+<span class="text-xs text-slate-500 dark:text-slate-400">292 tests</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-[#ef4444]"></div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-slate-900 dark:text-white">Fail</span>
+<span class="text-xs text-slate-500 dark:text-slate-400">67 tests</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-[#f59e0b]"></div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-slate-900 dark:text-white">Blocked</span>
+<span class="text-xs text-slate-500 dark:text-slate-400">45 tests</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-[#e2e8f0]"></div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-slate-900 dark:text-white">Pending</span>
+<span class="text-xs text-slate-500 dark:text-slate-400">46 tests</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Gauge Chart Card -->
+<div class="bg-white dark:bg-[#151b2b] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col">
+<div class="mb-4">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Requirement Coverage</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Test cases vs defined requirements</p>
+</div>
+<div class="flex flex-col items-center justify-center flex-1 py-4">
+<!-- Gauge Visual Wrapper -->
+<div class="relative w-48 h-24 overflow-hidden mt-4">
+<div class="w-48 h-48 rounded-full border-[20px] border-slate-100 dark:border-slate-800 absolute top-0 left-0 box-border"></div>
+<div class="w-48 h-48 rounded-full border-[20px] border-primary absolute top-0 left-0 box-border" style="clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%); transform: rotate(153deg);"></div> <!-- 85% of 180deg is approx 153deg rotation logic simplified for visual -->
+</div>
+<div class="text-center -mt-6 relative z-10">
+<h2 class="text-4xl font-black text-slate-900 dark:text-white">85%</h2>
+<p class="text-sm font-medium text-emerald-600 dark:text-emerald-400 mt-1">
+<span class="material-symbols-outlined align-middle text-sm">trending_up</span> +2.4%
+                                </p>
+</div>
+<p class="text-xs text-slate-400 text-center mt-6">Target: 90% by end of sprint</p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+<!-- Top Failing Test Suites Table -->
+<div class="xl:col-span-2 flex flex-col gap-4">
+<div class="flex items-center justify-between px-1">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Top Failing Test Suites</h3>
+<a class="text-primary text-sm font-semibold hover:underline" href="#">View All</a>
+</div>
+<div class="bg-white dark:bg-[#151b2b] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm">
+<thead class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+<tr>
+<th class="px-6 py-3 font-semibold text-slate-700 dark:text-slate-300">Suite Name</th>
+<th class="px-6 py-3 font-semibold text-slate-700 dark:text-slate-300 text-center">Failed / Total</th>
+<th class="px-6 py-3 font-semibold text-slate-700 dark:text-slate-300">Error Rate</th>
+<th class="px-6 py-3 font-semibold text-slate-700 dark:text-slate-300">Last Run</th>
+<th class="px-6 py-3 font-semibold text-slate-700 dark:text-slate-300">Owner</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 font-medium text-slate-900 dark:text-white">Payment Gateway Integration</td>
+<td class="px-6 py-4 text-center text-slate-600 dark:text-slate-400">12 / 45</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                                    26.6%
+                                                </span>
+</td>
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400">2 mins ago</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover" data-alt="Avatar of Sarah" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB7mQQniYpCppgCQJsZydRPLJKnfSps7V2u9tp3ThjH5Q8P1m8l0as-VtPXbRD5O9SoPdgruPOapE3z4LdWn8siBYcA4sDQVe0JZ9ac-cLkCLmTU-YMR5bgopm0FhP-3iX2wmFw0KnHkIroXeGKq529q4tGZue6L4eB6_dVmVOAXLjmru6KKVLWJZTV78dyDN6aKJonu7Nc1Km9h6BoAOmEB1LqfXPkuf3ptg_EC3sWtxdzhgyGxJeCjXfOwLs_erhT_6yWRoOXHQqa");'></div>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 font-medium text-slate-900 dark:text-white">User Authentication Flow</td>
+<td class="px-6 py-4 text-center text-slate-600 dark:text-slate-400">8 / 120</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
+                                                    6.6%
+                                                </span>
+</td>
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400">1 hr ago</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover" data-alt="Avatar of Mike" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCPz6NF1eP3nw9UhUuux2GVayoko9u0RVvDsWtC5slCZcocKiw5VhU__mV5Tk8bFfITjRKpWV3AvYDip_A_mAdU9RERDd9v5pNvuszf3WeW9zM0769NuPGgdwMeuK254OGopfTA2NcKhffRrw46MZqqwwndiHbjWmXuZIviGOHapSiGjFXkZQk0Cfl0zzcIBkiGhT5UiMUTav95eN1OvYW7wRDi313oJzFM4dpjU4TwtL0VahloCwAtArwPwRDuY76jD811aLBGRewk");'></div>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 font-medium text-slate-900 dark:text-white">Cart Calculation Logic</td>
+<td class="px-6 py-4 text-center text-slate-600 dark:text-slate-400">5 / 80</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                                    6.2%
+                                                </span>
+</td>
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400">4 hrs ago</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover" data-alt="Avatar of Jessica" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAxb0t2dxvoZXCwI_vWgGZ3lemU8dgihwx5OLDgqPwlULyteIRz5V9Md9N1tWPcUx6DQcKRl8ufpiOZyW-ukkKAK625o4q-S-kN2jrqrVn6oeXdpJW5o8Gfs28zmKalYEWfsw_i-souhSDF3bB7xni316r3shb_w9n-JZp-4FOAltz1Cs7PGWsSlN04zFPLjs16r5jV9m8JRbOzoMmeCRD9O7ZbmSrMOTklqYg40EOAtl0AxEN6hJpF3W5EVKvRZjwQ_RCO6Eypo77V");'></div>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 font-medium text-slate-900 dark:text-white">API Rate Limiting</td>
+<td class="px-6 py-4 text-center text-slate-600 dark:text-slate-400">2 / 200</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                                    1.0%
+                                                </span>
+</td>
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400">Yesterday</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover" data-alt="Avatar of Tom" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCwZ9rzxj60YTfy4Uds3okNcaDM9Mi92N5DJ-0sI0TPNRQoMndXbiW9OaTgyKVFIpM_i4eEx6PYtNmA00jpxJ41zc3OKBoM2osVTOP2VkdhhxYLcKXazFS5dQQbs4z9zHJjbSglUslMqY09tj0f77xJnpTFqDzpgg8eppVShviwVa0BLY3EUJVSm63EvKXkPdHjV7D_Mcdb3zfbSJQq6NMnogWMQNbVlrRoEg-_O8uFsNtyOUpvoj0xdUfJUtpcCo-E5aGAtAVMyU86");'></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Recent Activity Feed -->
+<div class="flex flex-col gap-4">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white px-1">Recent Activity</h3>
+<div class="bg-white dark:bg-[#151b2b] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-5 h-full">
+<ul class="relative border-l border-slate-200 dark:border-slate-700 ml-3 space-y-6">
+<li class="ml-6">
+<span class="absolute -left-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-100 dark:bg-red-900 ring-4 ring-white dark:ring-[#151b2b]">
+<span class="material-symbols-outlined text-red-600 dark:text-red-400" style="font-size: 14px; font-weight: 700;">close</span>
+</span>
+<h4 class="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
+                                        Regression Suite Failed
+                                        <span class="text-[10px] font-normal text-slate-400">10m ago</span>
+</h4>
+<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Critical error in Checkout module.</p>
+</li>
+<li class="ml-6">
+<span class="absolute -left-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-green-100 dark:bg-green-900 ring-4 ring-white dark:ring-[#151b2b]">
+<span class="material-symbols-outlined text-green-600 dark:text-green-400" style="font-size: 14px; font-weight: 700;">check</span>
+</span>
+<h4 class="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
+                                        Smoke Test Passed
+                                        <span class="text-[10px] font-normal text-slate-400">45m ago</span>
+</h4>
+<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">v2.4.0 deployment verification successful.</p>
+</li>
+<li class="ml-6">
+<span class="absolute -left-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900 ring-4 ring-white dark:ring-[#151b2b]">
+<span class="material-symbols-outlined text-blue-600 dark:text-blue-400" style="font-size: 14px; font-weight: 700;">priority_high</span>
+</span>
+<h4 class="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
+                                        New Defect Reported
+                                        <span class="text-[10px] font-normal text-slate-400">2h ago</span>
+</h4>
+<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">UI misalignment on mobile devices reported by QA.</p>
+</li>
+<li class="ml-6">
+<span class="absolute -left-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-green-100 dark:bg-green-900 ring-4 ring-white dark:ring-[#151b2b]">
+<span class="material-symbols-outlined text-green-600 dark:text-green-400" style="font-size: 14px; font-weight: 700;">check</span>
+</span>
+<h4 class="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
+                                        API Tests Completed
+                                        <span class="text-[10px] font-normal text-slate-400">4h ago</span>
+</h4>
+<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">All 240 endpoints verified.</p>
+</li>
+</ul>
+<button class="mt-6 w-full py-2 text-sm text-slate-500 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                                View Full History
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

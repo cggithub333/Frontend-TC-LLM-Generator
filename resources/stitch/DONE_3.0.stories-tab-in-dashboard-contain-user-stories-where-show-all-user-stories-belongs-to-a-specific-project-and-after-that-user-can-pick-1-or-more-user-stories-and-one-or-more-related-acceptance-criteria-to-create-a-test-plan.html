@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>QA Artifacts - Batch AI Selection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2563eb",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "12px",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-200">
+    <div class="flex h-screen overflow-hidden">
+        <aside
+            class="w-20 lg:w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center lg:items-stretch transition-all">
+            <div class="p-6 flex items-center gap-3">
+                <div
+                    class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                    <span class="material-symbols-outlined">verified</span>
+                </div>
+                <span class="font-bold text-xl hidden lg:block tracking-tight">QA Artifacts</span>
+            </div>
+            <nav class="flex-1 mt-6 px-3 space-y-2">
+                <a class="flex items-center gap-4 p-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                    href="#">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="font-medium hidden lg:block">Projects</span>
+                </a>
+                <a class="flex items-center gap-4 p-3 rounded-xl bg-primary/10 text-primary transition-all" href="#">
+                    <span class="material-symbols-outlined">list_alt</span>
+                    <span class="font-medium hidden lg:block">Stories</span>
+                </a>
+                <a class="flex items-center gap-4 p-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                    href="#">
+                    <span class="material-symbols-outlined">assignment</span>
+                    <span class="font-medium hidden lg:block">Test Plans</span>
+                </a>
+                <a class="flex items-center gap-4 p-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                    href="#">
+                    <span class="material-symbols-outlined">play_circle</span>
+                    <span class="font-medium hidden lg:block">Runs</span>
+                </a>
+                <a class="flex items-center gap-4 p-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                    href="#">
+                    <span class="material-symbols-outlined">assessment</span>
+                    <span class="font-medium hidden lg:block">Reports</span>
+                </a>
+            </nav>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+                <button
+                    class="w-full flex items-center gap-4 p-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                    onclick="document.documentElement.classList.toggle('dark')">
+                    <span class="material-symbols-outlined">dark_mode</span>
+                    <span class="font-medium hidden lg:block">Dark Mode</span>
+                </button>
+            </div>
+        </aside>
+        <main class="flex-1 flex flex-col overflow-hidden relative">
+            <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <nav class="flex items-center text-sm text-slate-500 dark:text-slate-400 mb-1">
+                            <span>Workspaces</span>
+                            <span class="material-symbols-outlined text-base mx-1">chevron_right</span>
+                            <span>Mobile Redesign V2</span>
+                        </nav>
+                        <div class="flex items-center gap-3">
+                            <h1 class="text-2xl font-bold">Mobile Redesign V2</h1>
+                            <span
+                                class="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-bold tracking-wider uppercase">Active
+                                Sprint</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button
+                            class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                            <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">more_horiz</span>
+                        </button>
+                        <div class="relative group">
+                            <button
+                                class="bg-primary hover:bg-blue-700 text-white pl-4 pr-3 py-2 rounded-lg font-medium flex items-center gap-2 shadow-md shadow-primary/10 transition-all">
+                                <span class="material-symbols-outlined text-sm">bolt</span>
+                                AI Actions
+                                <div class="w-px h-4 bg-blue-400 mx-1"></div>
+                                <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <div class="flex-1 overflow-y-auto p-6 custom-scrollbar pb-32">
+                <div class="max-w-5xl mx-auto space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div
+                            class="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/50 p-6 rounded-2xl flex items-center gap-5 hover:shadow-md transition-shadow cursor-pointer group">
+                            <div
+                                class="w-12 h-12 bg-blue-500/10 dark:bg-blue-500/20 rounded-xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined">folder_open</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-primary">Repository</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">View and manage test assets</p>
+                            </div>
+                        </div>
+                        <div
+                            class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 rounded-2xl flex items-center gap-5 hover:shadow-md transition-shadow cursor-pointer group">
+                            <div
+                                class="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-xl flex items-center justify-center text-slate-600 dark:text-slate-400 group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined">assignment</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">Test Plans</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Structure your testing strategy
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="relative flex-1">
+                            <span
+                                class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+                            <input
+                                class="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                placeholder="Search user stories..." type="text" />
+                        </div>
+                        <button
+                            class="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                            <span class="material-symbols-outlined text-slate-500">tune</span>
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4">
+                            <div class="pt-6 pl-2">
+                                <input checked=""
+                                    class="form-checkbox w-5 h-5 text-primary border-slate-300 rounded focus:ring-primary cursor-pointer transition-colors"
+                                    type="checkbox" />
+                            </div>
+                            <div
+                                class="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 shadow-sm ring-1 ring-primary/5">
+                                <div class="flex items-start justify-between mb-6">
+                                    <div class="flex items-center gap-3">
+                                        <span
+                                            class="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-primary text-xs font-bold rounded-md">US-204</span>
+                                        <h2 class="font-bold text-lg">Biometric Authentication</h2>
+                                    </div>
+                                    <span class="material-symbols-outlined text-slate-400">expand_less</span>
+                                </div>
+                                <div class="space-y-1 mb-8">
+                                    <p
+                                        class="text-slate-500 dark:text-slate-400 text-sm uppercase font-bold tracking-wider">
+                                        User Story</p>
+                                    <div class="text-lg leading-relaxed">
+                                        <span class="text-slate-400">AS A</span> returning user,<br />
+                                        <span class="text-slate-400">I WANT TO</span> log in with biometric
+                                        authentication,<br />
+                                        <span class="text-slate-400">SO THAT</span> I can access my account faster.
+                                    </div>
+                                </div>
+                                <div class="space-y-4 border-t border-slate-100 dark:border-slate-800 pt-6">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="text-sm font-bold uppercase tracking-widest text-slate-400">
+                                            Acceptance Criteria</h4>
+                                        <span
+                                            class="px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-bold rounded">2/3
+                                            DONE</span>
+                                    </div>
+                                    <ul class="space-y-3">
+                                        <li class="flex items-start gap-3">
+                                            <div
+                                                class="mt-0.5 w-5 h-5 flex items-center justify-center bg-primary text-white rounded cursor-pointer">
+                                                <span class="material-symbols-outlined text-sm">check</span>
+                                            </div>
+                                            <span class="text-slate-600 dark:text-slate-300">Show biometric prompt on
+                                                app launch if enabled in settings.</span>
+                                        </li>
+                                        <li class="flex items-start gap-3">
+                                            <div
+                                                class="mt-0.5 w-5 h-5 flex items-center justify-center bg-primary text-white rounded cursor-pointer">
+                                                <span class="material-symbols-outlined text-sm">check</span>
+                                            </div>
+                                            <span class="text-slate-600 dark:text-slate-300">Fallback to PIN entry if
+                                                biometric fails after 3 attempts.</span>
+                                        </li>
+                                        <li class="flex items-start gap-3 opacity-60">
+                                            <div
+                                                class="mt-0.5 w-5 h-5 border-2 border-slate-300 dark:border-slate-600 rounded cursor-pointer">
+                                            </div>
+                                            <span class="text-slate-600 dark:text-slate-300">Provide toggle in Profile
+                                                settings to enable/disable feature.</span>
+                                        </li>
+                                    </ul>
+                                    <button
+                                        class="w-full mt-4 flex items-center justify-center gap-2 py-3 bg-blue-50 dark:bg-blue-900/10 text-primary font-bold rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/20 transition-all group">
+                                        <span
+                                            class="material-symbols-outlined text-lg group-hover:rotate-12 transition-transform">auto_awesome</span>
+                                        Generate Tests
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 group">
+                            <div class="pt-5 pl-2">
+                                <input checked=""
+                                    class="form-checkbox w-5 h-5 text-primary border-slate-300 rounded focus:ring-primary cursor-pointer transition-colors"
+                                    type="checkbox" />
+                            </div>
+                            <div
+                                class="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm hover:border-slate-300 dark:hover:border-slate-600 transition-all cursor-pointer">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <span
+                                            class="px-3 py-1 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-xs font-bold rounded-md mb-3 inline-block">US-205</span>
+                                        <p class="font-medium text-slate-800 dark:text-slate-200 line-clamp-2">As a new
+                                            user, I want to see a walkthrough of the app features so that I understand
+                                            how to...</p>
+                                        <div class="flex items-center gap-6 mt-4">
+                                            <div class="flex items-center gap-2 text-slate-400 text-sm">
+                                                <span
+                                                    class="material-symbols-outlined text-sm">format_list_bulleted</span>
+                                                <span>5 ACs</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-slate-400 text-sm">
+                                                <span class="material-symbols-outlined text-sm">science</span>
+                                                <span>12 Tests</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-slate-400">expand_more</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 group">
+                            <div class="pt-5 pl-2">
+                                <input checked=""
+                                    class="form-checkbox w-5 h-5 text-primary border-slate-300 rounded focus:ring-primary cursor-pointer transition-colors"
+                                    type="checkbox" />
+                            </div>
+                            <div
+                                class="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm hover:border-slate-300 dark:hover:border-slate-600 transition-all cursor-pointer">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <span
+                                            class="px-3 py-1 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-xs font-bold rounded-md mb-3 inline-block">US-208</span>
+                                        <p class="font-medium text-slate-800 dark:text-slate-200 line-clamp-2">As a
+                                            customer, I want to receive push notifications for my transactions so that I
+                                            can...</p>
+                                        <div class="flex items-center gap-6 mt-4">
+                                            <div class="flex items-center gap-2 text-slate-400 text-sm">
+                                                <span
+                                                    class="material-symbols-outlined text-sm">format_list_bulleted</span>
+                                                <span>4 ACs</span>
+                                            </div>
+                                            <div
+                                                class="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider">
+                                                <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                                                AI Ready
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-slate-400">expand_more</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="h-24"></div>
+                </div>
+            </div>
+            <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 w-auto">
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 pl-5 pr-2 rounded-full shadow-2xl shadow-slate-300/50 dark:shadow-black/50 flex items-center gap-5 transition-all animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div class="flex items-center gap-3 text-slate-700 dark:text-slate-200">
+                        <span
+                            class="flex items-center justify-center w-6 h-6 bg-slate-100 dark:bg-slate-700 rounded-full text-xs font-bold">3</span>
+                        <span class="font-semibold text-sm whitespace-nowrap">Stories Selected</span>
+                    </div>
+                    <div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
+                    <button
+                        class="bg-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-full font-medium text-sm flex items-center gap-2 transition-colors shadow-lg shadow-primary/25 whitespace-nowrap">
+                        <span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+                        Create New Test Plan
+                    </button>
+                </div>
+            </div>
+            <button
+                class="absolute bottom-10 right-10 w-16 h-16 bg-primary text-white rounded-full shadow-2xl shadow-primary/40 flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-20">
+                <span class="material-symbols-outlined text-3xl">add</span>
+            </button>
+        </main>
+    </div>
+</body>
+
+</html>
