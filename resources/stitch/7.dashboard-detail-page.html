@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6200EE","primary-light": "#F2E7FE","background-light": "#FFFFFF",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .nav-item-active {
+                @apply bg-primary-light text-primary font-bold;
+            }
+            .nav-item-inactive {
+                @apply text-[#617589] hover:bg-gray-50 font-medium;
+            }
+        }
+    </style>
+<title>QA Artifacts - Workspace Dashboard</title>
+</head>
+<body class="bg-white dark:bg-background-dark font-display text-[#111418] dark:text-white">
+<div class="flex h-screen overflow-hidden">
+<aside class="w-64 border-r border-[#E5E7EB] dark:border-[#2d3b4b] bg-white dark:bg-background-dark flex flex-col h-full overflow-y-auto shrink-0">
+<div class="p-5">
+<div class="flex items-center gap-3">
+<div class="bg-primary size-9 rounded-lg flex items-center justify-center text-white shadow-sm">
+<span class="text-sm font-bold">QA</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-[#111418] dark:text-white text-base font-bold leading-tight">QA Artifacts</h1>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<div class="space-y-1">
+<a class="flex items-center justify-between gap-3 px-3 py-2 bg-primary-light text-primary rounded-lg transition-colors" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+<p class="text-sm font-bold">Workspace</p>
+</div>
+<span class="material-symbols-outlined text-sm">expand_less</span>
+</a>
+<div class="pl-3 space-y-1 pt-1">
+<a class="flex items-center gap-3 px-3 py-1.5 text-[#617589] hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">smartphone</span>
+<p class="text-sm">Mobile Redesign V2</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-1.5 text-[#617589] hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">credit_card</span>
+<p class="text-sm">Payment Gateway</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-1.5 text-[#617589] hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">security</span>
+<p class="text-sm">Security Audit Q3</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-1.5 text-[#617589] hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">layers</span>
+<p class="text-sm">Test</p>
+</a>
+</div>
+</div>
+<a class="flex items-center gap-3 px-3 py-2 nav-item-inactive rounded-lg mt-2" href="#">
+<span class="material-symbols-outlined text-[20px]">description</span>
+<p class="text-sm">Stories</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 nav-item-inactive rounded-lg" href="#">
+<span class="material-symbols-outlined text-[20px]">assignment</span>
+<p class="text-sm">Test Plans</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 nav-item-inactive rounded-lg" href="#">
+<span class="material-symbols-outlined text-[20px]">folder_open</span>
+<p class="text-sm">Test Suites</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 nav-item-inactive rounded-lg" href="#">
+<span class="material-symbols-outlined text-[20px]">bar_chart</span>
+<p class="text-sm">Reports</p>
+</a>
+<div class="pt-6 pb-2 px-3">
+<p class="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-wider">ADMINISTRATION</p>
+</div>
+<a class="flex items-center gap-3 px-3 py-2 nav-item-inactive rounded-lg" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<p class="text-sm">Settings</p>
+</a>
+</nav>
+<div class="p-4 border-t border-[#E5E7EB] dark:border-[#2d3b4b]">
+<div class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 bg-gray-200" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB7iB75KPom355AUA--4fEHZ-BLtC3Z1ubsmhayaX7SPvCPLNAhTP6Ea8nWJ_TIrWAWtYHSnrOTX_Ay4BWM9VacT2dgKTt2IlQPRN50E7f28F852nvJJj_-8IBTN3ElQNQ9OJ0Q1DUPUmaSs4ZJrkS4uGPk0QLnQ8DfcEcRwgFXE1hnCPsr005LjAXjCdLeIHecwqZgWS_JKGoTdmG0SaJZ0B9fbmbNIzna9k18yGSOy7IpCxFQZarJtxugZ6xQ_3ImELwNQXbbujrB");'></div>
+<div class="flex flex-col min-w-0">
+<p class="text-[#111418] dark:text-white text-sm font-medium truncate">Alex Rivera</p>
+<p class="text-[#617589] text-xs truncate">Owner</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full overflow-hidden bg-[#F9FAFB]">
+<header class="flex items-center justify-between px-8 py-5 bg-white border-b border-[#E5E7EB]">
+<div class="flex flex-col gap-1">
+<nav class="flex items-center gap-2 text-xs text-[#6B7280]">
+<a class="hover:text-primary transition-colors" href="#">Workspaces</a>
+<span>/</span>
+<span class="font-medium text-[#111827]">Owner View</span>
+</nav>
+<h2 class="text-[#111418] dark:text-white text-2xl font-bold leading-tight">FinTech Core Team</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative w-64">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary" placeholder="Search workspace..." type="text"/>
+</div>
+<button class="flex items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
+<span class="material-symbols-outlined mr-2 text-[20px]">add</span>
+<span>Create Project</span>
+</button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-8">
+<div class="max-w-7xl mx-auto space-y-8">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-white p-5 rounded-xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-32">
+<div class="flex items-start justify-between">
+<h3 class="text-sm font-medium text-gray-500">Total Projects</h3>
+<span class="material-symbols-outlined text-primary bg-primary-light p-1.5 rounded-lg text-[20px]">folder</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-bold text-[#111827]">12</span>
+<span class="text-xs font-medium text-green-600 flex items-center bg-green-50 px-1.5 py-0.5 rounded">
+<span class="material-symbols-outlined text-[12px] mr-0.5">trending_up</span>+2
+                            </span>
+</div>
+</div>
+<div class="bg-white p-5 rounded-xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-32">
+<div class="flex items-start justify-between">
+<h3 class="text-sm font-medium text-gray-500">Total Team Members</h3>
+<span class="material-symbols-outlined text-purple-600 bg-purple-50 p-1.5 rounded-lg text-[20px]">group</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-bold text-[#111827]">28</span>
+<span class="text-xs font-medium text-gray-500">Active users</span>
+</div>
+</div>
+<div class="bg-white p-5 rounded-xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-32">
+<div class="flex items-start justify-between">
+<h3 class="text-sm font-medium text-gray-500">Global Pass Rate</h3>
+<span class="material-symbols-outlined text-green-600 bg-green-50 p-1.5 rounded-lg text-[20px]">check_circle</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-bold text-[#111827]">94%</span>
+<span class="text-xs font-medium text-green-600 flex items-center bg-green-50 px-1.5 py-0.5 rounded">
+<span class="material-symbols-outlined text-[12px] mr-0.5">trending_up</span>+1.2%
+                            </span>
+</div>
+</div>
+<div class="bg-white p-5 rounded-xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-32">
+<div class="flex items-start justify-between">
+<h3 class="text-sm font-medium text-gray-500">Active Test Runs</h3>
+<span class="material-symbols-outlined text-blue-600 bg-blue-50 p-1.5 rounded-lg text-[20px]">play_circle</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-bold text-[#111827]">8</span>
+<span class="text-xs font-medium text-gray-500">Running now</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 h-full">
+<div class="lg:col-span-2 bg-white rounded-xl border border-[#E5E7EB] shadow-sm flex flex-col">
+<div class="px-6 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
+<h3 class="font-bold text-[#111827] flex items-center gap-2">
+<span class="material-symbols-outlined text-gray-400">history</span>
+                                Workspace Activity
+                            </h3>
+<button class="text-sm text-primary font-medium hover:text-primary/80 transition-colors">View All</button>
+</div>
+<div class="p-6 flex-1">
+<div class="relative pl-4 border-l border-gray-200 space-y-8">
+<div class="relative">
+<div class="absolute -left-[21px] top-1 bg-white border border-gray-200 rounded-full p-1">
+<div class="size-2 bg-blue-500 rounded-full"></div>
+</div>
+<div class="flex items-start justify-between group">
+<div>
+<p class="text-sm text-[#111827]">
+<span class="font-semibold">Alex Rivera</span> added a new test case in <span class="font-medium text-primary cursor-pointer hover:underline">Mobile Redesign V2</span>
+</p>
+<p class="text-xs text-gray-500 mt-0.5">Authentication Flow • Verify login with 2FA</p>
+</div>
+<span class="text-xs text-gray-400 whitespace-nowrap">10m ago</span>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -left-[21px] top-1 bg-white border border-gray-200 rounded-full p-1">
+<div class="size-2 bg-green-500 rounded-full"></div>
+</div>
+<div class="flex items-start justify-between group">
+<div>
+<p class="text-sm text-[#111827]">
+<span class="font-semibold">Sarah Chen</span> completed a test run in <span class="font-medium text-primary cursor-pointer hover:underline">Payment Gateway</span>
+</p>
+<p class="text-xs text-gray-500 mt-0.5">Stripe Integration V1 • 42/42 Passed</p>
+</div>
+<span class="text-xs text-gray-400 whitespace-nowrap">45m ago</span>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -left-[21px] top-1 bg-white border border-gray-200 rounded-full p-1">
+<div class="size-2 bg-purple-500 rounded-full"></div>
+</div>
+<div class="flex items-start justify-between group">
+<div>
+<p class="text-sm text-[#111827]">
+<span class="font-semibold">AI Assistant</span> generated 15 test cases for <span class="font-medium text-primary cursor-pointer hover:underline">Security Audit Q3</span>
+</p>
+<p class="text-xs text-gray-500 mt-0.5">Based on new API documentation</p>
+</div>
+<span class="text-xs text-gray-400 whitespace-nowrap">2h ago</span>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -left-[21px] top-1 bg-white border border-gray-200 rounded-full p-1">
+<div class="size-2 bg-red-400 rounded-full"></div>
+</div>
+<div class="flex items-start justify-between group">
+<div>
+<p class="text-sm text-[#111827]">
+<span class="font-semibold">System</span> flagged a critical regression in <span class="font-medium text-primary cursor-pointer hover:underline">Test</span>
+</p>
+<p class="text-xs text-gray-500 mt-0.5">Checkout Module • Button unresponsive</p>
+</div>
+<span class="text-xs text-gray-400 whitespace-nowrap">4h ago</span>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -left-[21px] top-1 bg-white border border-gray-200 rounded-full p-1">
+<div class="size-2 bg-gray-400 rounded-full"></div>
+</div>
+<div class="flex items-start justify-between group">
+<div>
+<p class="text-sm text-[#111827]">
+<span class="font-semibold">Mike Johnson</span> joined the <span class="font-medium text-primary cursor-pointer hover:underline">FinTech Core Team</span> workspace
+                                            </p>
+<p class="text-xs text-gray-500 mt-0.5">Role: QA Engineer</p>
+</div>
+<span class="text-xs text-gray-400 whitespace-nowrap">Yesterday</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-1 space-y-6">
+<div class="bg-white rounded-xl border border-[#E5E7EB] shadow-sm flex flex-col overflow-hidden">
+<div class="px-6 py-4 border-b border-[#E5E7EB] flex items-center justify-between bg-gradient-to-r from-purple-50 to-white">
+<h3 class="font-bold text-[#111827] flex items-center gap-2">
+<span class="material-symbols-outlined text-purple-600">auto_awesome</span>
+                                    AI Processing Status
+                                </h3>
+<div class="flex items-center gap-1.5">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+</span>
+<span class="text-xs font-bold text-green-700 uppercase tracking-wide">Live</span>
+</div>
+</div>
+<div class="p-6">
+<div class="mb-6">
+<div class="flex justify-between items-end mb-2">
+<span class="text-sm font-medium text-gray-500">Workspace Load</span>
+<span class="text-2xl font-bold text-[#111827]">42%</span>
+</div>
+<div class="w-full bg-gray-100 rounded-full h-2">
+<div class="bg-primary h-2 rounded-full transition-all duration-500" style="width: 42%"></div>
+</div>
+<p class="text-xs text-gray-400 mt-2">Current LLM generation capacity usage</p>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-white flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-[18px]">smartphone</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-gray-800">Mobile Redesign V2</span>
+<span class="text-[10px] text-gray-500">Generating Cases...</span>
+</div>
+</div>
+<div class="size-4 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-white border border-gray-100">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-gray-800">Payment Gateway</span>
+<span class="text-[10px] text-green-600">Analysis Complete</span>
+</div>
+</div>
+<span class="text-[10px] text-gray-400">2m ago</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-white border border-gray-100">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-gray-800">Security Audit Q3</span>
+<span class="text-[10px] text-green-600">Optimization Done</span>
+</div>
+</div>
+<span class="text-[10px] text-gray-400">15m ago</span>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-gray-100">
+<button class="w-full py-2 flex items-center justify-center gap-2 rounded-lg bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+                                        Configure AI Models
+                                    </button>
+</div>
+</div>
+</div>
+<div class="bg-gradient-to-br from-primary to-purple-800 rounded-xl shadow-md p-6 text-white">
+<h3 class="font-bold text-lg mb-2">Quick Actions</h3>
+<p class="text-purple-100 text-xs mb-4">Common tasks for workspace owners</p>
+<div class="space-y-2">
+<button class="w-full text-left px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+                                    Invite Team Member
+                                </button>
+<button class="w-full text-left px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">summarize</span>
+                                    Generate Weekly Report
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
