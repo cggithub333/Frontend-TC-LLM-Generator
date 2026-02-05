@@ -20,6 +20,7 @@ import {
   TeamStatsCards,
   MembersTable,
   TeamPagination,
+  InviteMemberDialog,
 } from "@/components/features/team";
 
 export default function TeamManagementPage() {
@@ -30,6 +31,7 @@ export default function TeamManagementPage() {
   // State
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
   // Data fetching
   const { data: projects, isLoading: projectsLoading } = useProjects();
@@ -37,6 +39,7 @@ export default function TeamManagementPage() {
     data: members,
     isLoading: membersLoading,
     error,
+    refetch: refetchMembers,
   } = useProjectMembers(projectId);
 
   // Get current project - handle both string and number IDs
@@ -93,8 +96,7 @@ export default function TeamManagementPage() {
   }, []);
 
   const handleInviteMember = useCallback(() => {
-    // TODO: Open invite member dialog
-    console.log("Invite member clicked");
+    setInviteDialogOpen(true);
   }, []);
 
   const handleMemberMenuClick = useCallback((memberId: number) => {
@@ -221,6 +223,17 @@ export default function TeamManagementPage() {
           </>
         )}
       </main>
+
+      {/* Invite Member Dialog */}
+      <InviteMemberDialog
+        open={inviteDialogOpen}
+        onOpenChange={setInviteDialogOpen}
+        projectId={projectId}
+        onSuccess={() => {
+          // Refetch members after successful invitation
+          refetchMembers();
+        }}
+      />
     </>
   );
 }
