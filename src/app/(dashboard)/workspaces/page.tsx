@@ -7,21 +7,28 @@
  */
 
 import { useState, useMemo, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useProjects } from "@/hooks/use-projects";
 import { useWorkspaces } from "@/hooks/use-workspaces";
 import { filterProjectsByQuery } from "@/lib/utils/project.utils";
 
 // Feature components
-import { WorkspaceHeader } from "@/components/features/workspaces/workspace-header";
-import { ProjectCard } from "@/components/features/workspaces/project-card";
-import { CreateProjectCard } from "@/components/features/workspaces/create-project-card";
-import { EmptyState } from "@/components/features/workspaces/empty-state";
-import { LoadingSkeleton } from "@/components/features/workspaces/loading-skeleton";
-import { ErrorState } from "@/components/features/workspaces/error-state";
+import {
+  WorkspaceHeader,
+  ProjectCard,
+  CreateProjectCard,
+  EmptyState,
+  LoadingSkeleton,
+  ErrorState,
+  CreateProjectDialog,
+} from "@/components/features/workspaces";
 
 export default function WorkspacesPage() {
+  const router = useRouter();
+
   // State
   const [searchQuery, setSearchQuery] = useState("");
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   // Data fetching
   const {
@@ -55,14 +62,15 @@ export default function WorkspacesPage() {
   }, []);
 
   const handleCreateProject = useCallback(() => {
-    // TODO: Open create project dialog
-    console.log("Create project clicked");
+    setCreateDialogOpen(true);
   }, []);
 
-  const handleManageTeam = useCallback((projectId: number) => {
-    // TODO: Navigate to team management page
-    console.log("Manage team for project:", projectId);
-  }, []);
+  const handleManageTeam = useCallback(
+    (projectId: number) => {
+      router.push(`/projects/${projectId}/team`);
+    },
+    [router]
+  );
 
   const handleViewDetails = useCallback((projectId: number) => {
     // TODO: Navigate to project details page
@@ -159,6 +167,17 @@ export default function WorkspacesPage() {
           <CreateProjectCard onClick={handleCreateProject} />
         </div>
       </main>
+
+      {/* Create Project Dialog */}
+      <CreateProjectDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        workspaceId={currentWorkspace?.id || 1}
+        onSuccess={() => {
+          // Refetch projects after successful creation
+          refetchProjects();
+        }}
+      />
     </>
   );
 }
