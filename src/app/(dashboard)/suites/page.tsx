@@ -12,6 +12,7 @@ import {
   MoreVertical,
   ChevronRight
 } from "lucide-react";
+import Link from "next/link";
 
 const suites = [
   {
@@ -99,9 +100,10 @@ export default function TestSuitesPage() {
       {/* Suites Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {suites.map((suite) => (
-          <div
+          <Link
             key={suite.id}
-            className="group bg-card border border-border rounded-2xl p-6 hover:shadow-xl hover:border-primary/40 transition-all duration-300 cursor-pointer"
+            href={`/suites/${suite.id}`}
+            className="group bg-card border border-border rounded-2xl p-6 hover:shadow-xl hover:border-primary/40 transition-all duration-300 cursor-pointer block"
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
@@ -152,7 +154,7 @@ export default function TestSuitesPage() {
               </div>
               <ChevronRight className="h-5 w-5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 

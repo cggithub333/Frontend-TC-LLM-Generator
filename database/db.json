@@ -254,6 +254,197 @@
   ],
   "testCases": [
     {
+      "id": "TC-001",
+      "storyId": "ST-101",
+      "testPlanId": "TP-742",
+      "title": "Valid User Login (Email/Password)",
+      "type": "Positive",
+      "priority": "High",
+      "status": "Active",
+      "preconditions": [
+        "User has valid credentials",
+        "User is on the login page"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "action": "Enter valid email address",
+          "expected": "Email field accepts input"
+        },
+        {
+          "step": 2,
+          "action": "Enter valid password",
+          "expected": "Password field accepts masked input"
+        },
+        {
+          "step": 3,
+          "action": "Click login button",
+          "expected": "User is redirected to dashboard"
+        }
+      ],
+      "testData": {
+        "email": "user@example.com",
+        "password": "ValidPass123!"
+      },
+      "assignedTo": "Alex Rivera",
+      "executedBy": "Alex Rivera",
+      "executedAt": "2024-12-01T14:18:00Z",
+      "suiteId": "TS-AUTH-001"
+    },
+    {
+      "id": "TC-002",
+      "storyId": "ST-101",
+      "testPlanId": "TP-742",
+      "title": "Invalid Password Rejection",
+      "type": "Negative",
+      "priority": "Medium",
+      "status": "Active",
+      "preconditions": [
+        "User is on the login page"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "action": "Enter valid email",
+          "expected": "Email field accepts input"
+        },
+        {
+          "step": 2,
+          "action": "Enter incorrect password",
+          "expected": "Password field accepts input"
+        },
+        {
+          "step": 3,
+          "action": "Click login button",
+          "expected": "Error message displayed: Invalid credentials"
+        }
+      ],
+      "testData": {
+        "email": "user@example.com",
+        "password": "WrongPassword"
+      },
+      "assignedTo": "Maria Kim",
+      "executedBy": "Maria Kim",
+      "executedAt": "2024-12-01T13:30:00Z",
+      "suiteId": "TS-AUTH-001"
+    },
+    {
+      "id": "TC-005",
+      "storyId": "ST-102",
+      "testPlanId": "TP-742",
+      "title": "Forgot Password - Reset Email Flow",
+      "type": "Positive",
+      "priority": "High",
+      "status": "Draft",
+      "preconditions": [
+        "User is on the login page",
+        "Email service is configured"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "action": "Click 'Forgot Password' link",
+          "expected": "Redirect to password reset page"
+        },
+        {
+          "step": 2,
+          "action": "Enter registered email address",
+          "expected": "Email field accepts input"
+        },
+        {
+          "step": 3,
+          "action": "Click 'Send Reset Link' button",
+          "expected": "Confirmation message displayed and email sent"
+        }
+      ],
+      "testData": {
+        "email": "user@example.com"
+      },
+      "assignedTo": "John Valdez",
+      "executedBy": null,
+      "executedAt": null,
+      "suiteId": "TS-AUTH-001"
+    },
+    {
+      "id": "TC-008",
+      "storyId": "ST-103",
+      "testPlanId": "TP-742",
+      "title": "SSO Login with Google",
+      "type": "Positive",
+      "priority": "Low",
+      "status": "Active",
+      "preconditions": [
+        "User has a valid Google account",
+        "Google OAuth is configured"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "action": "Click 'Sign in with Google' button",
+          "expected": "Redirect to Google OAuth consent page"
+        },
+        {
+          "step": 2,
+          "action": "Select Google account and authorize",
+          "expected": "User is redirected back to application"
+        },
+        {
+          "step": 3,
+          "action": "Verify user session",
+          "expected": "User dashboard displayed with profile info"
+        }
+      ],
+      "testData": {
+        "provider": "Google"
+      },
+      "assignedTo": "Sarah Chen",
+      "executedBy": "Sarah Chen",
+      "executedAt": "2024-12-01T09:15:00Z",
+      "suiteId": "TS-AUTH-001"
+    },
+    {
+      "id": "TC-012",
+      "storyId": "ST-104",
+      "testPlanId": "TP-742",
+      "title": "Two-Factor Authentication Setup",
+      "type": "Positive",
+      "priority": "High",
+      "status": "Active",
+      "preconditions": [
+        "User is logged in",
+        "User has not enabled 2FA yet"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "action": "Navigate to Security Settings",
+          "expected": "Security settings page displayed"
+        },
+        {
+          "step": 2,
+          "action": "Click 'Enable Two-Factor Authentication'",
+          "expected": "QR code and setup instructions displayed"
+        },
+        {
+          "step": 3,
+          "action": "Scan QR code with authenticator app",
+          "expected": "App generates verification code"
+        },
+        {
+          "step": 4,
+          "action": "Enter verification code",
+          "expected": "2FA enabled confirmation message displayed"
+        }
+      ],
+      "testData": {
+        "authenticatorApp": "Google Authenticator"
+      },
+      "assignedTo": "Alex Rivera",
+      "executedBy": "Alex Rivera",
+      "executedAt": "2024-11-30T16:45:00Z",
+      "suiteId": "TS-AUTH-001"
+    },
+    {
       "id": "TC-1024",
       "storyId": "ST-101",
       "testPlanId": "TP-742",
@@ -334,6 +525,11 @@
       "name": "Authentication Module",
       "description": "All test cases related to user authentication flows",
       "testCases": [
+        "TC-001",
+        "TC-002",
+        "TC-005",
+        "TC-008",
+        "TC-012",
         "TC-1024",
         "TC-1025"
       ],
