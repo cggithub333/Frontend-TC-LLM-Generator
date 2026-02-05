@@ -208,24 +208,12 @@ export function CreateProjectDialog({
       <DialogContent className="max-w-[560px] p-0 gap-0">
         {/* Header */}
         <DialogHeader className="px-6 py-5 border-b space-y-1">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <DialogTitle className="text-lg font-bold">
-                Create New Project
-              </DialogTitle>
-              <DialogDescription className="text-xs">
-                Configure your new QA environment
-              </DialogDescription>
-            </div>
-            <button
-              onClick={handleClose}
-              disabled={createProject.isPending}
-              className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
-              aria-label="Close dialog"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
+          <DialogTitle className="text-lg font-bold">
+            Create New Project
+          </DialogTitle>
+          <DialogDescription className="text-xs">
+            Configure your new QA environment
+          </DialogDescription>
         </DialogHeader>
 
         {/* Form */}
