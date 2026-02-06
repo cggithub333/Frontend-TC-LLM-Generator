@@ -49,8 +49,8 @@ export function ProjectCard({
   };
 
   return (
-    <Link href={`/projects/${project.id}`} className="block">
-      <article className="group flex flex-col rounded-xl border border-border bg-card p-6 shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer">
+    <Link href={`/projects/${project.id}`} className="block h-full">
+      <article className="group flex flex-col rounded-xl border border-border bg-card p-6 shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer h-full">
         {/* Header - Icon, Name, Status, Menu */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
