@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -15,6 +14,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { ModeToggle } from "@/components/layout/mode-toggle";
+import { useSidebar } from "@/components/layout/sidebar-context";
 
 const navigation = [
   { name: "Workspace", href: "/workspaces", icon: LayoutDashboard },
@@ -30,18 +30,18 @@ const adminNav = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isCollapsed, toggleSidebar } = useSidebar();
 
   return (
     <aside
       className={cn(
         "border-r border-border bg-card flex flex-col fixed inset-y-0 z-50 transition-all duration-300",
-        isCollapsed ? "w-20" : "w-20 lg:w-64"
+        isCollapsed ? "w-20" : "w-64"
       )}
     >
       {/* Toggle Button */}
       <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
+        onClick={toggleSidebar}
         className="absolute -right-3 top-7 z-50 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card shadow-md hover:bg-accent transition-colors"
         aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
@@ -60,7 +60,7 @@ export function Sidebar() {
         <span
           className={cn(
             "font-bold text-xl tracking-tight transition-all duration-300 whitespace-nowrap overflow-hidden",
-            isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100 hidden lg:block"
+            isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
           )}
         >
           QA Artifacts
@@ -87,7 +87,7 @@ export function Sidebar() {
               <span
                 className={cn(
                   "font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
-                  isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100 hidden lg:block"
+                  isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
                 )}
               >
                 {item.name}
@@ -101,7 +101,7 @@ export function Sidebar() {
           <p
             className={cn(
               "text-[10px] uppercase tracking-wider text-muted-foreground font-bold transition-all duration-300 whitespace-nowrap overflow-hidden",
-              isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100 hidden lg:block"
+              isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
             )}
           >
             Administration
@@ -125,7 +125,7 @@ export function Sidebar() {
               <span
                 className={cn(
                   "font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
-                  isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100 hidden lg:block"
+                  isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
                 )}
               >
                 {item.name}
@@ -145,7 +145,7 @@ export function Sidebar() {
           <span
             className={cn(
               "font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
-              isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100 hidden lg:block"
+              isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
             )}
           >
             Theme Mode
@@ -160,7 +160,7 @@ export function Sidebar() {
           <div
             className={cn(
               "transition-all duration-300 overflow-hidden",
-              isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100 hidden lg:block"
+              isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
             )}
           >
             <p className="text-xs font-bold whitespace-nowrap">Alex Rivera</p>
