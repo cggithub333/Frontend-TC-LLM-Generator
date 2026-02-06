@@ -10,7 +10,10 @@ import {
   Folder,
   BarChart3,
   Settings,
+  Moon,
+  Sun,
 } from "lucide-react";
+import { ModeToggle } from "@/components/layout/mode-toggle";
 
 const navigation = [
   { name: "Workspace", href: "/workspaces", icon: LayoutDashboard },
@@ -85,6 +88,14 @@ export function Sidebar() {
           );
         })}
       </nav>
+
+      {/* Theme Toggle */}
+      <div className="px-3 pb-2">
+        <div className="flex items-center gap-4 p-3 rounded-xl text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all">
+          <ModeToggle />
+          <span className="font-medium hidden lg:block">Theme Mode</span>
+        </div>
+      </div>
 
       {/* User Profile */}
       <div className="p-4 border-t border-border">
