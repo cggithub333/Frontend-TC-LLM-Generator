@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -12,6 +13,9 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  User,
+  SlidersHorizontal,
+  LogOut,
 } from "lucide-react";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 import { useSidebar } from "@/components/layout/sidebar-context";
@@ -30,7 +34,25 @@ const adminNav = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { isCollapsed, toggleSidebar } = useSidebar();
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const openProfileMenu = () => {
+    if (profileTimeoutRef.current) clearTimeout(profileTimeoutRef.current);
+    setProfileOpen(true);
+  };
+
+  const closeProfileMenu = () => {
+    profileTimeoutRef.current = setTimeout(() => setProfileOpen(false), 150);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (profileTimeoutRef.current) clearTimeout(profileTimeoutRef.current);
+    };
+  }, []);
 
   return (
     <aside
@@ -154,8 +176,53 @@ export function Sidebar() {
       </div>
 
       {/* User Profile */}
-      <div className="p-4 border-t border-border">
-        <div className="flex items-center gap-3">
+      <div
+        className="relative p-4 border-t border-border"
+        onMouseEnter={openProfileMenu}
+        onMouseLeave={closeProfileMenu}
+      >
+        {/* Popover menu */}
+        <div
+          className={cn(
+            "absolute bottom-full left-2 right-2 mb-2 rounded-xl border border-border bg-popover p-1.5 shadow-lg shadow-black/10 dark:shadow-black/30 transition-all duration-200 origin-bottom",
+            profileOpen
+              ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 scale-95 translate-y-1 pointer-events-none"
+          )}
+          onMouseEnter={openProfileMenu}
+          onMouseLeave={closeProfileMenu}
+        >
+          <div className="px-3 py-2 mb-1">
+            <p className="text-sm font-semibold truncate">Alex Rivera</p>
+            <p className="text-xs text-muted-foreground truncate">alex.rivera@qaartifacts.com</p>
+          </div>
+          <div className="h-px bg-border mx-1.5 mb-1" />
+          <Link
+            href="/settings"
+            className="flex items-center gap-3 px-3 py-2 text-sm rounded-lg text-foreground hover:bg-accent transition-colors"
+          >
+            <User className="h-4 w-4 text-muted-foreground" />
+            View Profile
+          </Link>
+          <Link
+            href="/settings"
+            className="flex items-center gap-3 px-3 py-2 text-sm rounded-lg text-foreground hover:bg-accent transition-colors"
+          >
+            <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+            Preferences
+          </Link>
+          <div className="h-px bg-border mx-1.5 my-1" />
+          <button
+            onClick={() => router.push("/login")}
+            className="flex w-full items-center gap-3 px-3 py-2 text-sm rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+          >
+            <LogOut className="h-4 w-4" />
+            Log out
+          </button>
+        </div>
+
+        {/* Profile trigger */}
+        <div className="flex items-center gap-3 rounded-xl p-1 cursor-pointer hover:bg-accent/50 transition-colors">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-blue-400 shrink-0" />
           <div
             className={cn(
