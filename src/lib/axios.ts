@@ -1,35 +1,47 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api",
+  baseURL: "/api/proxy",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Request interceptor
-axiosInstance.interceptors.request.use(
-  (config) => {
-    // Add auth token if available
-    // const token = localStorage.getItem("token");
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
-    return config;
+axiosInstance.interceptors.response.use(
+  (response) => {
+    const data = response.data;
+
+    if (data && typeof data === "object" && "success" in data) {
+      if (data.success === true && data.data !== undefined) {
+        return { ...response, data: data.data };
+      }
+
+      if (data.success === false) {
+        const message =
+          data.errors?.map((e: { message: string }) => e.message).join(", ") ||
+          data.message ||
+          "Request failed";
+        return Promise.reject(new Error(message));
+      }
+    }
+
+    return response;
   },
   (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Response interceptor
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized
-      // window.location.href = "/login";
+      window.location.href = "/login";
+      return Promise.reject(new Error("Session expired"));
     }
+
+    const data = error.response?.data;
+    if (data?.success === false) {
+      const message =
+        data.errors?.map((e: { message: string }) => e.message).join(", ") ||
+        data.message ||
+        "Request failed";
+      return Promise.reject(new Error(message));
+    }
+
     return Promise.reject(error);
   }
 );
