@@ -1,6 +1,5 @@
 export interface CreateProjectInput {
   workspaceId: string;
-  createdByUserId: string;
   name: string;
   projectKey: string;
   description?: string;

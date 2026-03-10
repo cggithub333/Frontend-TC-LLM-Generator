@@ -11,7 +11,6 @@ export interface TestPlan {
 
 export interface CreateTestPlanInput {
   projectId: string;
-  createdByUserId: string;
   name: string;
   description?: string;
   status: string;

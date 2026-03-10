@@ -48,7 +48,6 @@ export function CreateProjectDialog({
 }: CreateProjectDialogProps) {
   const [formData, setFormData] = useState<CreateProjectInput>({
     workspaceId,
-    createdByUserId: "",
     name: "",
     projectKey: "",
     description: "",
@@ -160,7 +159,6 @@ export function CreateProjectDialog({
 
         setFormData({
           workspaceId,
-          createdByUserId: "",
           name: "",
           projectKey: "",
           description: "",

@@ -31,7 +31,7 @@ export function useCreateWorkspace() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (input: { ownerUserId: string; name: string; description?: string }) => {
+    mutationFn: async (input: { name: string; description?: string }) => {
       const { data } = await axios.post<Workspace>("/workspaces", input);
       return data;
     },
