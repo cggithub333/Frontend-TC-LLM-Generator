@@ -2,38 +2,36 @@
  * Utility functions for member management
  */
 
-import type { MemberRole, ProjectMember } from "@/types/team.types";
+import type { ProjectMember } from "@/types/team.types";
 import { MEMBER_ROLE_CONFIG } from "@/lib/constants/member.constants";
 
 /**
  * Get role badge class for a member role
  */
-export function getRoleBadgeClass(role: MemberRole): string {
+export function getRoleBadgeClass(role: string): string {
   return MEMBER_ROLE_CONFIG[role]?.badgeClass || MEMBER_ROLE_CONFIG.Viewer.badgeClass;
 }
 
 /**
  * Filter members by search query
- * Searches in name and email
+ * Searches in userFullName and userEmail
  */
-export function filterMembersByQuery<T extends { name: string; email: string }>(
-  members: T[],
+export function filterMembersByQuery(
+  members: ProjectMember[],
   query: string
-): T[] {
+): ProjectMember[] {
   if (!query.trim()) return members;
 
   const lowerQuery = query.toLowerCase();
   return members.filter(
     (member) =>
-      member.name.toLowerCase().includes(lowerQuery) ||
-      member.email.toLowerCase().includes(lowerQuery)
+      member.userFullName.toLowerCase().includes(lowerQuery) ||
+      member.userEmail.toLowerCase().includes(lowerQuery)
   );
 }
 
 /**
  * Get member initials from name
- * @param name - Member full name
- * @returns Initials (e.g., "John Doe" -> "JD")
  */
 export function getMemberInitials(name: string): string {
   if (!name || name.trim().length === 0) return "?";
@@ -59,13 +57,13 @@ export function isValidEmail(email: string): boolean {
  * Lead > Contributor > Viewer
  */
 export function sortMembersByRole(members: ProjectMember[]): ProjectMember[] {
-  const rolePriority: Record<MemberRole, number> = {
+  const rolePriority: Record<string, number> = {
     Lead: 1,
     Contributor: 2,
     Viewer: 3,
   };
 
   return [...members].sort((a, b) => {
-    return rolePriority[a.role] - rolePriority[b.role];
+    return (rolePriority[a.role] ?? 99) - (rolePriority[b.role] ?? 99);
   });
 }

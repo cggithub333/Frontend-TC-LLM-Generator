@@ -1,45 +1,24 @@
-/**
- * Type definitions for Project domain
- * Form inputs and validation schemas
- */
-
-import type { UUID, Project, ProjectIconType, ProjectStatus } from "./workspace.types";
-
-/**
- * Form input for creating a new project
- */
 export interface CreateProjectInput {
-  workspaceId: number; // Will migrate to UUID
+  workspaceId: string;
+  createdByUserId: string;
   name: string;
-  projectKey: string; // Uppercase, unique identifier
+  projectKey: string;
   description?: string;
-  icon: ProjectIconType;
   jiraSiteId?: string;
   jiraProjectKey?: string;
 }
 
-/**
- * Form validation errors
- */
-export interface ProjectFormErrors {
+export interface UpdateProjectInput {
   name?: string;
-  projectKey?: string;
   description?: string;
+  status?: string;
   jiraSiteId?: string;
   jiraProjectKey?: string;
 }
 
-/**
- * Project key validation result
- */
 export interface ProjectKeyValidation {
   isValid: boolean;
   message?: string;
 }
 
-/**
- * Project creation response
- */
-export interface CreateProjectResponse extends Project {
-  createdAt: string;
-}
+export type ProjectFormErrors = Partial<Record<keyof CreateProjectInput | "jiraSiteId" | "jiraProjectKey", string>>;

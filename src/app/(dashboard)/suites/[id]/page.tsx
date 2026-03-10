@@ -59,7 +59,23 @@ interface TestCaseWithSuite {
 export default function SuiteDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { data: suite, isLoading: isSuiteLoading } = useTestSuite(id);
-  const { data: allTestCases = [], isLoading: isTestCasesLoading } = useTestCases(id);
+  const { data: testCaseResult, isLoading: isTestCasesLoading } = useTestCases();
+  const allTestCases: TestCaseWithSuite[] = (testCaseResult?.items ?? []).map((tc) => ({
+    id: tc.testCaseId,
+    storyId: "",
+    testPlanId: "",
+    title: tc.title,
+    type: tc.testCaseTypeName ?? "Functional",
+    priority: "Medium",
+    status: "Not Run",
+    preconditions: tc.preconditions ? [tc.preconditions] : [],
+    steps: tc.steps ? [{ step: 1, action: tc.steps, expected: tc.expectedResult ?? "" }] : [],
+    testData: {},
+    assignedTo: "",
+    executedBy: null,
+    executedAt: null,
+    suiteId: id,
+  }));
 
   const [selectedTests, setSelectedTests] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");

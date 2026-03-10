@@ -1,21 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "@/lib/axios";
 import type { Workspace } from "@/types/workspace.types";
+import type { PagedResponse, PaginatedResult, PaginationParams } from "@/types/pagination.types";
+import { extractPage } from "@/types/pagination.types";
 
-type CreateWorkspaceInput = Omit<Workspace, "id" | "createdAt">;
-type UpdateWorkspaceInput = Partial<Workspace>;
-
-export function useWorkspaces() {
+export function useWorkspaces(params?: PaginationParams) {
   return useQuery({
-    queryKey: ["workspaces"],
-    queryFn: async () => {
-      const { data } = await axios.get<Workspace[]>("/workspaces");
-      return data;
+    queryKey: ["workspaces", params],
+    queryFn: async (): Promise<PaginatedResult<Workspace>> => {
+      const { data } = await axios.get<PagedResponse<Workspace>>("/workspaces", {
+        params: { page: params?.page ?? 0, size: params?.size ?? 20, sort: params?.sort },
+      });
+      return extractPage(data);
     },
   });
 }
 
-export function useWorkspace(id: number) {
+export function useWorkspace(id: string) {
   return useQuery({
     queryKey: ["workspaces", id],
     queryFn: async () => {
@@ -30,7 +31,7 @@ export function useCreateWorkspace() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (input: CreateWorkspaceInput) => {
+    mutationFn: async (input: { ownerUserId: string; name: string; description?: string }) => {
       const { data } = await axios.post<Workspace>("/workspaces", input);
       return data;
     },
@@ -44,13 +45,12 @@ export function useUpdateWorkspace() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, ...updates }: UpdateWorkspaceInput & { id: number }) => {
-      const { data } = await axios.patch<Workspace>(`/workspaces/${id}`, updates);
+    mutationFn: async ({ id, ...updates }: { id: string; name?: string; description?: string }) => {
+      const { data } = await axios.put<Workspace>(`/workspaces/${id}`, updates);
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workspaces"] });
-      queryClient.invalidateQueries({ queryKey: ["workspaces", data.id] });
     },
   });
 }
@@ -59,7 +59,7 @@ export function useDeleteWorkspace() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       await axios.delete(`/workspaces/${id}`);
       return id;
     },

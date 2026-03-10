@@ -1,33 +1,29 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "@/lib/axios";
-import type { ProjectMember, InviteMemberInput, MemberStatus } from "@/types/team.types";
+import type { ProjectMember, AddProjectMemberInput, UpdateProjectMemberInput } from "@/types/team.types";
+import type { PagedResponse, PaginatedResult, PaginationParams } from "@/types/pagination.types";
+import { extractPage } from "@/types/pagination.types";
 
-/**
- * Fetch project members
- */
-export function useProjectMembers(projectId: number) {
+export function useProjectMembers(projectId: string, params?: PaginationParams) {
   return useQuery({
-    queryKey: ["project-members", projectId],
-    queryFn: async () => {
-      const { data } = await axios.get<ProjectMember[]>(`/project-members?projectId=${projectId}`);
-      return data;
+    queryKey: ["project-members", projectId, params],
+    queryFn: async (): Promise<PaginatedResult<ProjectMember>> => {
+      const { data } = await axios.get<PagedResponse<ProjectMember>>(
+        `/project-members/project/${projectId}`,
+        { params: { page: params?.page ?? 0, size: params?.size ?? 20, sort: params?.sort } }
+      );
+      return extractPage(data);
     },
     enabled: !!projectId,
   });
 }
 
-/**
- * Invite member to project
- */
-export function useInviteMember() {
+export function useAddProjectMember() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (input: InviteMemberInput) => {
-      const { data } = await axios.post<ProjectMember>(
-        `/project-members`,
-        input
-      );
+    mutationFn: async (input: AddProjectMemberInput) => {
+      const { data } = await axios.post<ProjectMember>("/project-members", input);
       return data;
     },
     onSuccess: (_, variables) => {
@@ -38,25 +34,18 @@ export function useInviteMember() {
   });
 }
 
-/**
- * Update member status (Active/Inactive)
- */
-export function useUpdateMemberStatus() {
+export function useUpdateProjectMember() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({
       projectId,
       memberId,
-      status,
-    }: {
-      projectId: number;
-      memberId: number;
-      status: MemberStatus;
-    }) => {
-      const { data } = await axios.patch<ProjectMember>(
+      ...updates
+    }: UpdateProjectMemberInput & { projectId: string; memberId: string }) => {
+      const { data } = await axios.put<ProjectMember>(
         `/project-members/${memberId}`,
-        { status }
+        updates
       );
       return data;
     },
@@ -68,10 +57,7 @@ export function useUpdateMemberStatus() {
   });
 }
 
-/**
- * Remove member from project
- */
-export function useRemoveMember() {
+export function useRemoveProjectMember() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -79,8 +65,8 @@ export function useRemoveMember() {
       projectId,
       memberId,
     }: {
-      projectId: number;
-      memberId: number;
+      projectId: string;
+      memberId: string;
     }) => {
       await axios.delete(`/project-members/${memberId}`);
       return { projectId, memberId };

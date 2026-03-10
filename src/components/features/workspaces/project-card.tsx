@@ -1,14 +1,13 @@
 /**
  * ProjectCard Component
- * Displays individual project information with team members and last updated time
+ * Displays individual project information with status and key details
  */
 
 import Link from "next/link";
-import { Users, Clock, MoreHorizontal } from "lucide-react";
+import { Clock, MoreHorizontal, Layers, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Project } from "@/types/workspace.types";
 import {
-  getProjectIcon,
   getStatusColors,
   getProjectActionLabel,
   isProjectArchived,
@@ -16,9 +15,9 @@ import {
 
 interface ProjectCardProps {
   project: Project;
-  onManageTeam?: (projectId: number) => void;
-  onViewDetails?: (projectId: number) => void;
-  onMenuClick?: (projectId: number) => void;
+  onManageTeam?: (projectId: string) => void;
+  onViewDetails?: (projectId: string) => void;
+  onMenuClick?: (projectId: string) => void;
 }
 
 export function ProjectCard({
@@ -27,7 +26,6 @@ export function ProjectCard({
   onViewDetails,
   onMenuClick,
 }: ProjectCardProps) {
-  const Icon = getProjectIcon(project.icon);
   const statusColors = getStatusColors(project.status);
   const actionLabel = getProjectActionLabel(project.status);
   const archived = isProjectArchived(project.status);
@@ -36,29 +34,37 @@ export function ProjectCard({
     e.preventDefault();
     e.stopPropagation();
     if (archived && onViewDetails) {
-      onViewDetails(project.id);
+      onViewDetails(project.projectId);
     } else if (!archived && onManageTeam) {
-      onManageTeam(project.id);
+      onManageTeam(project.projectId);
     }
   };
 
   const handleMenuClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    onMenuClick?.(project.id);
+    onMenuClick?.(project.projectId);
   };
 
+  const formattedDate = project.updatedAt
+    ? new Date(project.updatedAt).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "—";
+
   return (
-    <Link href={`/projects/${project.id}`} className="block h-full">
+    <Link href={`/projects/${project.projectId}`} className="block h-full">
       <article className="group flex flex-col rounded-xl border border-border bg-card p-6 shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer h-full">
-        {/* Header - Icon, Name, Status, Menu */}
+        {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
             <div
               className={`size-10 rounded-lg ${statusColors.bg} ${statusColors.text} flex items-center justify-center border border-border`}
               aria-hidden="true"
             >
-              <Icon className="h-5 w-5" />
+              <Layers className="h-5 w-5" />
             </div>
             <div>
               <h3 className="font-bold text-base group-hover:text-primary transition-colors">{project.name}</h3>
@@ -81,15 +87,15 @@ export function ProjectCard({
           </button>
         </div>
 
-        {/* Stats - Team Members & Last Updated */}
+        {/* Stats */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="flex flex-col gap-1">
             <span className="text-xs font-medium text-muted-foreground">
-              Team Members
+              Project Key
             </span>
             <div className="flex items-center gap-2">
-              <Users className="h-4 w-4" aria-hidden="true" />
-              <span className="text-sm font-bold">{project.members}</span>
+              <KeyRound className="h-4 w-4" aria-hidden="true" />
+              <span className="text-sm font-bold">{project.projectKey}</span>
             </div>
           </div>
           <div className="flex flex-col gap-1">
@@ -98,10 +104,17 @@ export function ProjectCard({
             </span>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4" aria-hidden="true" />
-              <span className="text-sm font-bold">{project.updated}</span>
+              <span className="text-sm font-bold">{formattedDate}</span>
             </div>
           </div>
         </div>
+
+        {/* Description preview */}
+        {project.description && (
+          <p className="text-xs text-muted-foreground line-clamp-2 mb-4">
+            {project.description}
+          </p>
+        )}
 
         {/* Action Button */}
         <div className="mt-auto">
@@ -121,4 +134,3 @@ export function ProjectCard({
     </Link>
   );
 }
-

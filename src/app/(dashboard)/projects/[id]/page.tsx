@@ -2,7 +2,7 @@
 
 /**
  * Project Detail Page
- * Dashboard view matching 6.project-detail-page.html template
+ * Dashboard view for a single project
  */
 
 import { useParams } from "next/navigation";
@@ -12,51 +12,31 @@ import { Badge } from "@/components/ui/badge";
 import {
   Calendar,
   Plus,
-  Smartphone,
   LogIn,
   ShoppingCart,
   User,
   UserPlus,
   Filter,
   Gavel,
-  CreditCard,
-  Shield,
   Layers,
-  LayoutDashboard,
   AlertCircle,
 } from "lucide-react";
 import { useProject } from "@/hooks/use-projects";
 import { cn } from "@/lib/utils";
-import type { ProjectIconType } from "@/types/workspace.types";
 
-// Icon mapping for projects
-const projectIcons: Record<ProjectIconType, React.ElementType> = {
-  smartphone: Smartphone,
-  "credit-card": CreditCard,
-  shield: Shield,
-  "shopping-cart": ShoppingCart,
-  layers: Layers,
-  "dashboard-customize": LayoutDashboard,
-  api: Layers,
-  "integration-instructions": Layers,
-};
-
-// Status colors
 const statusColors: Record<string, string> = {
-  "Active": "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  Active: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
   "AI Processing": "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  "Review": "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-  "Done": "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+  Review: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  Done: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
 };
 
-// Mock data for test suites
 const testSuites = [
   { id: 1, name: "Auth Flow", icon: LogIn, cases: 24, updated: "2h ago", color: "bg-indigo-50 text-indigo-600" },
   { id: 2, name: "Checkout", icon: ShoppingCart, cases: 42, updated: "5h ago", color: "bg-teal-50 text-teal-600" },
   { id: 3, name: "Profile Mgmt", icon: User, cases: 18, updated: "1d ago", color: "bg-rose-50 text-rose-600" },
 ];
 
-// Mock data for sprint plan
 const sprintPlan = {
   name: "Sprint 42 Regression Cycle",
   completion: 78,
@@ -66,28 +46,24 @@ const sprintPlan = {
   pending: 24,
 };
 
-// Mock data for user stories
 const userStories = [
   { id: "US-1024", name: "Implement OAuth 2.0 flow", priority: "High", status: "In Progress", assignee: "JD", assigneeColor: "bg-purple-200 text-purple-700" },
   { id: "US-1025", name: "Shopping cart persistence", priority: "Medium", status: "Done", assignee: "AS", assigneeColor: "bg-blue-200 text-blue-700" },
   { id: "US-1028", name: "Update payment API version", priority: "High", status: "To Do", assignee: "MK", assigneeColor: "bg-green-200 text-green-700" },
 ];
 
-// Mock data for team members
 const teamMembers = [
   { id: 1, name: "Alex Rivera", role: "Owner", permission: "Admin", avatar: null, avatarUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuB7iB75KPom355AUA--4fEHZ-BLtC3Z1ubsmhayaX7SPvCPLNAhTP6Ea8nWJ_TIrWAWtYHSnrOTX_Ay4BWM9VacT2dgKTt2IlQPRN50E7f28F852nvJJj_-8IBTN3ElQNQ9OJ0Q1DUPUmaSs4ZJrkS4uGPk0QLnQ8DfcEcRwgFXE1hnCPsr005LjAXjCdLeIHecwqZgWS_JKGoTdmG0SaJZ0B9fbmbNIzna9k18yGSOy7IpCxFQZarJtxugZ6xQ_3ImELwNQXbbujrB" },
   { id: 2, name: "Sarah Jenkins", role: "QA Lead", permission: "Editor", avatar: "SJ", avatarColor: "bg-purple-100 text-purple-600" },
   { id: 3, name: "Mike Ross", role: "Developer", permission: "Viewer", avatar: "MR", avatarColor: "bg-blue-100 text-blue-600" },
 ];
 
-// Mock data for business rules
 const businessRules = [
   { id: 1, title: "Free shipping logic", description: "Orders over $50 must trigger free standard shipping automatically." },
   { id: 2, title: "Age verification", description: "Users must be 18+ to access the 'Restricted' category items." },
   { id: 3, title: "Coupon Stacking", description: "Only one promotional code can be applied per checkout session." },
 ];
 
-// Mock data for recent activity
 const recentActivity = [
   { id: 1, title: "Test Suite 'Auth Flow' Executed", description: "Triggered by Jenkins CI/CD Pipeline", time: "10:42 AM", isActive: true },
   { id: 2, title: "Sarah updated 'Checkout' Test Plan", description: "Modified 3 test cases for edge scenarios", time: "Yesterday", isActive: false },
@@ -99,8 +75,7 @@ export default function ProjectDetailPage() {
   const params = useParams();
   const projectId = params.id as string;
 
-  // Fetch project data
-  const { data: project, isLoading, error } = useProject(Number(projectId));
+  const { data: project, isLoading, error } = useProject(projectId);
 
   if (isLoading) {
     return (
@@ -128,8 +103,6 @@ export default function ProjectDetailPage() {
     );
   }
 
-  const ProjectIcon = projectIcons[project.icon] || Layers;
-
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-muted/30">
       {/* Header */}
@@ -137,12 +110,17 @@ export default function ProjectDetailPage() {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 p-1.5 rounded-md">
-              <ProjectIcon className="h-5 w-5" />
+              <Layers className="h-5 w-5" />
             </div>
             <h2 className="text-xl font-bold">{project.name}</h2>
             <Badge className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ml-2", statusColors[project.status] || statusColors["Active"])}>
               {project.status}
             </Badge>
+            {project.projectKey && (
+              <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded ml-1">
+                {project.projectKey}
+              </span>
+            )}
           </div>
           <p className="text-muted-foreground text-xs font-medium pl-10">Project Dashboard</p>
         </div>

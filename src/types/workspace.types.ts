@@ -1,46 +1,28 @@
-/**
- * Type definitions for Workspace domain
- * Following backend API structure with UUID-based IDs
- */
-
-export type UUID = string;
-
 export interface Workspace {
-  id: number; // Mock API uses number, will migrate to UUID
+  workspaceId: string;
+  ownerUserId: string;
+  ownerFullName: string;
   name: string;
   description: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface Project {
-  id: number; // Mock API uses number, will migrate to UUID
-  workspaceId: number;
+  projectId: string;
+  workspaceId: string;
+  workspaceName: string;
+  createdByUserId: string;
+  createdByUserName: string;
+  projectKey: string;
   name: string;
-  icon: ProjectIconType;
-  stories: number;
-  tests: number;
-  defects?: number;
-  status: ProjectStatus;
-  updated: string;
-  members: number;
+  description: string;
+  jiraSiteId?: string;
+  jiraProjectKey?: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
 }
-
-export type ProjectStatus =
-  | "Active"
-  | "Archived"
-  | "AI Processing"
-  | "Review"
-  | "Done";
-
-export type ProjectIconType =
-  | "smartphone"
-  | "credit-card"
-  | "shield"
-  | "shopping-cart"
-  | "layers"
-  | "dashboard-customize"
-  | "api"
-  | "integration-instructions";
 
 export interface StatusColorConfig {
   bg: string;

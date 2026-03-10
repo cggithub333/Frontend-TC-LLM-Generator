@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { X, CheckCircle2, AlertCircle, Link as LinkIcon } from "lucide-react";
+import { CheckCircle2, AlertCircle, Link as LinkIcon } from "lucide-react";
 import type {
   CreateProjectInput,
   ProjectFormErrors,
@@ -36,7 +36,7 @@ import { cn } from "@/lib/utils";
 interface CreateProjectDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  workspaceId: number;
+  workspaceId: string;
   onSuccess?: () => void;
 }
 
@@ -46,13 +46,12 @@ export function CreateProjectDialog({
   workspaceId,
   onSuccess,
 }: CreateProjectDialogProps) {
-  // Form state
   const [formData, setFormData] = useState<CreateProjectInput>({
     workspaceId,
+    createdByUserId: "",
     name: "",
     projectKey: "",
     description: "",
-    icon: "layers",
     jiraSiteId: "",
     jiraProjectKey: "",
   });
@@ -60,13 +59,10 @@ export function CreateProjectDialog({
   const [errors, setErrors] = useState<ProjectFormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  // Mutation
   const createProject = useCreateProject();
 
-  // Validate project key in real-time
   const projectKeyValidation = validateProjectKey(formData.projectKey);
 
-  // Auto-generate project key when name changes
   useEffect(() => {
     if (formData.name && !touched.projectKey) {
       const generatedKey = generateProjectKey(formData.name);
@@ -74,24 +70,23 @@ export function CreateProjectDialog({
     }
   }, [formData.name, touched.projectKey]);
 
-  // Handle field change
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, workspaceId }));
+  }, [workspaceId]);
+
   const handleFieldChange = useCallback(
     (field: keyof CreateProjectInput, value: string) => {
       setFormData((prev) => ({ ...prev, [field]: value }));
       setTouched((prev) => ({ ...prev, [field]: true }));
-
-      // Clear error for this field
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     },
     []
   );
 
-  // Handle field blur - validate on blur
   const handleFieldBlur = useCallback(
     (field: keyof CreateProjectInput) => {
       setTouched((prev) => ({ ...prev, [field]: true }));
 
-      // Validate field
       let error: string | undefined;
       switch (field) {
         case "name":
@@ -118,11 +113,9 @@ export function CreateProjectDialog({
     [formData, projectKeyValidation]
   );
 
-  // Validate entire form
   const validateForm = useCallback((): boolean => {
     const newErrors: ProjectFormErrors = {};
 
-    // Validate required fields
     const nameError = validateProjectName(formData.name);
     if (nameError) newErrors.name = nameError;
 
@@ -130,7 +123,6 @@ export function CreateProjectDialog({
       newErrors.projectKey = projectKeyValidation.message;
     }
 
-    // Validate Jira fields if provided
     const jiraSiteError = validateJiraSiteId(formData.jiraSiteId || "");
     if (jiraSiteError) newErrors.jiraSiteId = jiraSiteError;
 
@@ -144,12 +136,10 @@ export function CreateProjectDialog({
     return Object.keys(newErrors).length === 0;
   }, [formData, projectKeyValidation]);
 
-  // Handle form submit
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
 
-      // Mark all fields as touched
       setTouched({
         name: true,
         projectKey: true,
@@ -163,27 +153,17 @@ export function CreateProjectDialog({
       }
 
       try {
-        await createProject.mutateAsync({
-          ...formData,
-          // Mock API expects these fields
-          stories: 0,
-          tests: 0,
-          status: "Active",
-          updated: "Just now",
-          members: 1,
-        });
+        await createProject.mutateAsync(formData);
 
-        // Success - close dialog and reset form
         onOpenChange(false);
         onSuccess?.();
 
-        // Reset form
         setFormData({
           workspaceId,
+          createdByUserId: "",
           name: "",
           projectKey: "",
           description: "",
-          icon: "layers",
           jiraSiteId: "",
           jiraProjectKey: "",
         });
@@ -196,7 +176,6 @@ export function CreateProjectDialog({
     [validateForm, createProject, formData, onOpenChange, onSuccess, workspaceId]
   );
 
-  // Handle dialog close
   const handleClose = useCallback(() => {
     if (!createProject.isPending) {
       onOpenChange(false);
@@ -206,7 +185,6 @@ export function CreateProjectDialog({
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-[560px] p-0 gap-0">
-        {/* Header */}
         <DialogHeader className="px-6 py-5 border-b space-y-1">
           <DialogTitle className="text-lg font-bold">
             Create New Project
@@ -216,11 +194,9 @@ export function CreateProjectDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Project Name & Key */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Project Name */}
             <div className="md:col-span-2 space-y-1.5">
               <Label htmlFor="project-name" className="text-sm font-semibold">
                 Project Name <span className="text-destructive">*</span>
@@ -245,7 +221,6 @@ export function CreateProjectDialog({
               )}
             </div>
 
-            {/* Project Key */}
             <div className="space-y-1.5">
               <Label htmlFor="project-key" className="text-sm font-semibold">
                 Key <span className="text-destructive">*</span>
@@ -318,7 +293,6 @@ export function CreateProjectDialog({
             </div>
 
             <div className="space-y-4">
-              {/* Jira Site ID */}
               <div className="space-y-1.5">
                 <Label
                   htmlFor="jira-site"
@@ -349,7 +323,6 @@ export function CreateProjectDialog({
                 )}
               </div>
 
-              {/* Jira Project Key */}
               <div className="space-y-1.5">
                 <Label
                   htmlFor="jira-key"
@@ -393,7 +366,6 @@ export function CreateProjectDialog({
             </div>
           </div>
 
-          {/* Footer */}
           <DialogFooter className="gap-2 sm:gap-0">
             <Button
               type="button"

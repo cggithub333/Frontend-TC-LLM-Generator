@@ -1,18 +1,11 @@
 "use client";
 
-/**
- * Workspaces Page
- * Main workspace view displaying projects in a grid layout
- * Follows clean architecture patterns and component composition
- */
-
 import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useProjects } from "@/hooks/use-projects";
 import { useWorkspaces } from "@/hooks/use-workspaces";
 import { filterProjectsByQuery } from "@/lib/utils/project.utils";
 
-// Feature components
 import {
   WorkspaceHeader,
   ProjectCard,
@@ -26,37 +19,33 @@ import {
 export default function WorkspacesPage() {
   const router = useRouter();
 
-  // State
   const [searchQuery, setSearchQuery] = useState("");
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
-  // Data fetching
   const {
-    data: workspaces,
+    data: workspacesResult,
     isLoading: workspacesLoading,
     error: workspacesError,
-    refetch: refetchWorkspaces
+    refetch: refetchWorkspaces,
   } = useWorkspaces();
 
   const {
-    data: projects,
+    data: projectsResult,
     isLoading: projectsLoading,
     error: projectsError,
-    refetch: refetchProjects
+    refetch: refetchProjects,
   } = useProjects();
 
-  // Computed values
-  const currentWorkspace = workspaces?.[0];
+  const currentWorkspace = workspacesResult?.items?.[0];
+  const projects = projectsResult?.items;
   const isLoading = workspacesLoading || projectsLoading;
   const hasError = workspacesError || projectsError;
 
-  // Memoized filtered projects
   const filteredProjects = useMemo(() => {
     if (!projects) return [];
     return filterProjectsByQuery(projects, searchQuery);
   }, [projects, searchQuery]);
 
-  // Event handlers
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
   }, []);
@@ -66,20 +55,18 @@ export default function WorkspacesPage() {
   }, []);
 
   const handleManageTeam = useCallback(
-    (projectId: number) => {
+    (projectId: string) => {
       router.push(`/projects/${projectId}/team`);
     },
     [router]
   );
 
-  const handleViewDetails = useCallback((projectId: number) => {
-    // TODO: Navigate to project details page
-    console.log("View details for project:", projectId);
-  }, []);
+  const handleViewDetails = useCallback((projectId: string) => {
+    router.push(`/projects/${projectId}`);
+  }, [router]);
 
-  const handleMenuClick = useCallback((projectId: number) => {
+  const handleMenuClick = useCallback((_projectId: string) => {
     // TODO: Open project menu
-    console.log("Menu clicked for project:", projectId);
   }, []);
 
   const handleRetry = useCallback(() => {
@@ -87,7 +74,6 @@ export default function WorkspacesPage() {
     refetchProjects();
   }, [refetchWorkspaces, refetchProjects]);
 
-  // Render error state
   if (hasError) {
     return (
       <>
@@ -102,7 +88,6 @@ export default function WorkspacesPage() {
     );
   }
 
-  // Render loading state
   if (isLoading) {
     return (
       <>
@@ -117,7 +102,6 @@ export default function WorkspacesPage() {
     );
   }
 
-  // Render empty state
   if (!filteredProjects || filteredProjects.length === 0) {
     const isSearching = searchQuery.trim().length > 0;
 
@@ -140,7 +124,6 @@ export default function WorkspacesPage() {
     );
   }
 
-  // Render projects grid
   return (
     <>
       <WorkspaceHeader
@@ -152,10 +135,9 @@ export default function WorkspacesPage() {
 
       <main className="p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {/* Project Cards */}
           {filteredProjects.map((project) => (
             <ProjectCard
-              key={project.id}
+              key={project.projectId}
               project={project}
               onManageTeam={handleManageTeam}
               onViewDetails={handleViewDetails}
@@ -163,18 +145,15 @@ export default function WorkspacesPage() {
             />
           ))}
 
-          {/* Create New Project Card */}
           <CreateProjectCard onClick={handleCreateProject} />
         </div>
       </main>
 
-      {/* Create Project Dialog */}
       <CreateProjectDialog
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
-        workspaceId={currentWorkspace?.id || 1}
+        workspaceId={currentWorkspace?.workspaceId || ""}
         onSuccess={() => {
-          // Refetch projects after successful creation
           refetchProjects();
         }}
       />

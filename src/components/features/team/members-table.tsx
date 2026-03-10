@@ -10,7 +10,7 @@ import { MemberTableRow } from "./member-table-row";
 
 interface MembersTableProps {
   members: ProjectMember[];
-  onMemberMenuClick: (memberId: number) => void;
+  onMemberMenuClick: (memberId: string) => void;
 }
 
 export function MembersTable({
@@ -51,7 +51,7 @@ export function MembersTable({
                 Project Role
               </th>
               <th className="px-6 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Access Status
+                Change Role
               </th>
               <th className="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Actions
@@ -61,7 +61,7 @@ export function MembersTable({
           <tbody className="divide-y divide-border">
             {members.map((member) => (
               <MemberTableRow
-                key={member.id}
+                key={member.projectMemberId}
                 member={member}
                 onMenuClick={onMemberMenuClick}
               />

@@ -36,7 +36,7 @@ export function TeamHeader({
             /
           </span>
           <a
-            href={`/projects/${project.id}`}
+            href={`/projects/${project.projectId}`}
             className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
           >
             {project.name}

@@ -3,7 +3,6 @@
 /**
  * Team Management Page
  * Displays project team members with search, filtering, and management capabilities
- * Follows clean architecture patterns and component composition
  */
 
 import { useState, useMemo, useCallback } from "react";
@@ -14,7 +13,6 @@ import { filterMembersByQuery } from "@/lib/utils/member.utils";
 import { DEFAULT_MEMBERS_PER_PAGE } from "@/lib/constants/member.constants";
 import type { ProjectTeamStats } from "@/types/team.types";
 
-// Feature components
 import {
   TeamHeader,
   TeamStatsCards,
@@ -25,36 +23,32 @@ import {
 
 export default function TeamManagementPage() {
   const params = useParams();
-  const projectIdParam = params.id as string;
-  const projectId = Number(projectIdParam);
+  const projectId = params.id as string;
 
-  // State
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
-  // Data fetching
-  const { data: projects, isLoading: projectsLoading } = useProjects();
+  const { data: projectsResult, isLoading: projectsLoading } = useProjects();
   const {
-    data: members,
+    data: membersResult,
     isLoading: membersLoading,
     error,
     refetch: refetchMembers,
   } = useProjectMembers(projectId);
 
-  // Get current project - handle both string and number IDs
+  const members = membersResult?.items;
+
   const currentProject = useMemo(
-    () => projects?.find((p) => String(p.id) === projectIdParam),
-    [projects, projectIdParam]
+    () => projectsResult?.items.find((p) => p.projectId === projectId),
+    [projectsResult, projectId]
   );
 
-  // Memoized filtered members
   const filteredMembers = useMemo(() => {
     if (!members) return [];
     return filterMembersByQuery(members, searchQuery);
   }, [members, searchQuery]);
 
-  // Pagination calculations
   const totalMembers = filteredMembers.length;
   const totalPages = Math.ceil(totalMembers / DEFAULT_MEMBERS_PER_PAGE);
   const startIndex = (currentPage - 1) * DEFAULT_MEMBERS_PER_PAGE + 1;
@@ -66,40 +60,28 @@ export default function TeamManagementPage() {
     return filteredMembers.slice(start, end);
   }, [filteredMembers, currentPage]);
 
-  // Calculate team stats
   const teamStats: ProjectTeamStats = useMemo(() => {
-    if (!members) {
-      return {
-        totalMembers: 0,
-        availableSlots: 0,
-        activeMembers: 0,
-        inactiveMembers: 0,
-      };
-    }
-
-    const activeMembers = members.filter((m) => m.status === "Active").length;
-    const inactiveMembers = members.filter((m) => m.status === "Inactive").length;
-    const maxSlots = 30; // TODO: Get from project settings
+    const total = members?.length ?? 0;
+    const maxSlots = 30;
 
     return {
-      totalMembers: members.length,
-      availableSlots: maxSlots - members.length,
-      activeMembers,
-      inactiveMembers,
+      totalMembers: total,
+      availableSlots: maxSlots - total,
+      activeMembers: total,
+      inactiveMembers: 0,
     };
   }, [members]);
 
-  // Event handlers
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
-    setCurrentPage(1); // Reset to first page on search
+    setCurrentPage(1);
   }, []);
 
   const handleInviteMember = useCallback(() => {
     setInviteDialogOpen(true);
   }, []);
 
-  const handleMemberMenuClick = useCallback((memberId: number) => {
+  const handleMemberMenuClick = useCallback((memberId: string) => {
     // TODO: Open member actions menu
     console.log("Member menu clicked:", memberId);
   }, []);
@@ -108,7 +90,6 @@ export default function TeamManagementPage() {
     setCurrentPage(page);
   }, []);
 
-  // Loading state
   if (projectsLoading || membersLoading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
@@ -120,7 +101,6 @@ export default function TeamManagementPage() {
     );
   }
 
-  // Project not found
   if (!currentProject) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
@@ -137,7 +117,6 @@ export default function TeamManagementPage() {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
@@ -153,7 +132,6 @@ export default function TeamManagementPage() {
     );
   }
 
-  // Empty state
   if (!members || members.length === 0) {
     return (
       <>
@@ -181,7 +159,6 @@ export default function TeamManagementPage() {
     );
   }
 
-  // Main render
   return (
     <>
       <TeamHeader
@@ -192,10 +169,8 @@ export default function TeamManagementPage() {
       />
 
       <main className="p-8">
-        {/* Stats Cards */}
         <TeamStatsCards stats={teamStats} />
 
-        {/* Members Table */}
         {filteredMembers.length === 0 ? (
           <div className="text-center py-12 bg-card border border-border rounded-xl">
             <p className="text-muted-foreground">
@@ -209,7 +184,6 @@ export default function TeamManagementPage() {
               onMemberMenuClick={handleMemberMenuClick}
             />
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <TeamPagination
                 currentPage={currentPage}
@@ -224,13 +198,11 @@ export default function TeamManagementPage() {
         )}
       </main>
 
-      {/* Invite Member Dialog */}
       <InviteMemberDialog
         open={inviteDialogOpen}
         onOpenChange={setInviteDialogOpen}
         projectId={projectId}
         onSuccess={() => {
-          // Refetch members after successful invitation
           refetchMembers();
         }}
       />
