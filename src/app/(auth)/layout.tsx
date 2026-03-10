@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +11,8 @@ import {
   Sparkles,
   BarChart3,
 } from "lucide-react";
+
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
 
 const FEATURES = [
   {
@@ -35,6 +38,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
     <div className="bg-background min-h-screen flex transition-colors duration-300">
       {/* Theme toggle */}
       <div className="fixed top-5 right-5 z-50">
@@ -130,5 +134,6 @@ export default function AuthLayout({
         </div>
       </main>
     </div>
+    </GoogleOAuthProvider>
   );
 }
