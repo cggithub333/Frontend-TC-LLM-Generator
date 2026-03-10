@@ -74,53 +74,37 @@ export default function WorkspacesPage() {
     refetchProjects();
   }, [refetchWorkspaces, refetchProjects]);
 
+  let content;
+
   if (hasError) {
-    return (
-      <>
-        <WorkspaceHeader
-          workspace={currentWorkspace}
-          searchQuery={searchQuery}
-          onSearchChange={handleSearchChange}
-          onCreateProject={handleCreateProject}
-        />
-        <ErrorState onRetry={handleRetry} />
-      </>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <>
-        <WorkspaceHeader
-          workspace={currentWorkspace}
-          searchQuery={searchQuery}
-          onSearchChange={handleSearchChange}
-          onCreateProject={handleCreateProject}
-        />
-        <LoadingSkeleton />
-      </>
-    );
-  }
-
-  if (!filteredProjects || filteredProjects.length === 0) {
+    content = <ErrorState onRetry={handleRetry} />;
+  } else if (isLoading) {
+    content = <LoadingSkeleton />;
+  } else if (!filteredProjects || filteredProjects.length === 0) {
     const isSearching = searchQuery.trim().length > 0;
-
-    return (
-      <>
-        <WorkspaceHeader
-          workspace={currentWorkspace}
-          searchQuery={searchQuery}
-          onSearchChange={handleSearchChange}
-          onCreateProject={handleCreateProject}
-        />
-        {isSearching ? (
-          <div className="p-8">
-            <EmptyState onCreateProject={handleCreateProject} />
-          </div>
-        ) : (
-          <EmptyState onCreateProject={handleCreateProject} />
-        )}
-      </>
+    content = isSearching ? (
+      <div className="p-8">
+        <EmptyState onCreateProject={handleCreateProject} />
+      </div>
+    ) : (
+      <EmptyState onCreateProject={handleCreateProject} />
+    );
+  } else {
+    content = (
+      <main className="p-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filteredProjects.map((project) => (
+            <ProjectCard
+              key={project.projectId}
+              project={project}
+              onManageTeam={handleManageTeam}
+              onViewDetails={handleViewDetails}
+              onMenuClick={handleMenuClick}
+            />
+          ))}
+          <CreateProjectCard onClick={handleCreateProject} />
+        </div>
+      </main>
     );
   }
 
@@ -133,21 +117,7 @@ export default function WorkspacesPage() {
         onCreateProject={handleCreateProject}
       />
 
-      <main className="p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredProjects.map((project) => (
-            <ProjectCard
-              key={project.projectId}
-              project={project}
-              onManageTeam={handleManageTeam}
-              onViewDetails={handleViewDetails}
-              onMenuClick={handleMenuClick}
-            />
-          ))}
-
-          <CreateProjectCard onClick={handleCreateProject} />
-        </div>
-      </main>
+      {content}
 
       <CreateProjectDialog
         open={createDialogOpen}

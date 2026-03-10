@@ -147,6 +147,11 @@ export function CreateProjectDialog({
         jiraProjectKey: true,
       });
 
+      if (!formData.workspaceId) {
+        setErrors((prev) => ({ ...prev, name: "No workspace available. Please create a workspace first." }));
+        return;
+      }
+
       if (!validateForm()) {
         return;
       }
