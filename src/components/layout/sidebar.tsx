@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 import { useSidebar } from "@/components/layout/sidebar-context";
-import { useLogout } from "@/hooks/use-auth";
+import { useLogout, useCurrentUser } from "@/hooks/use-auth";
 import { broadcastLogout, onLogoutBroadcast } from "@/lib/auth-broadcast";
 
 const navigation = [
@@ -42,6 +42,16 @@ export function Sidebar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const profileTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const logout = useLogout();
+  const { data: user } = useCurrentUser();
+
+  const displayName = user?.name || "User";
+  const displayEmail = user?.email || "";
+  const initials = displayName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
   const openProfileMenu = () => {
     if (profileTimeoutRef.current) clearTimeout(profileTimeoutRef.current);
@@ -210,8 +220,8 @@ export function Sidebar() {
           onMouseLeave={closeProfileMenu}
         >
           <div className="px-3 py-2 mb-1">
-            <p className="text-sm font-semibold truncate">Alex Rivera</p>
-            <p className="text-xs text-muted-foreground truncate">alex.rivera@qaartifacts.com</p>
+            <p className="text-sm font-semibold truncate">{displayName}</p>
+            <p className="text-xs text-muted-foreground truncate">{displayEmail}</p>
           </div>
           <div className="h-px bg-border mx-1.5 mb-1" />
           <Link
@@ -245,15 +255,17 @@ export function Sidebar() {
 
         {/* Profile trigger */}
         <div className="flex items-center gap-3 rounded-xl p-1 cursor-pointer hover:bg-accent/50 transition-colors">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-blue-400 shrink-0" />
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-blue-400 shrink-0 flex items-center justify-center text-[10px] font-bold text-primary-foreground">
+            {initials}
+          </div>
           <div
             className={cn(
               "transition-all duration-300 overflow-hidden",
               isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
             )}
           >
-            <p className="text-xs font-bold whitespace-nowrap">Alex Rivera</p>
-            <p className="text-[10px] text-muted-foreground whitespace-nowrap">QA Lead</p>
+            <p className="text-xs font-bold whitespace-nowrap">{displayName}</p>
+            <p className="text-[10px] text-muted-foreground whitespace-nowrap">{displayEmail}</p>
           </div>
         </div>
       </div>
