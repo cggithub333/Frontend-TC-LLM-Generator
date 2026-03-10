@@ -16,9 +16,12 @@ import {
   User,
   SlidersHorizontal,
   LogOut,
+  Loader2,
 } from "lucide-react";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 import { useSidebar } from "@/components/layout/sidebar-context";
+import { useLogout } from "@/hooks/use-auth";
+import { broadcastLogout, onLogoutBroadcast } from "@/lib/auth-broadcast";
 
 const navigation = [
   { name: "Workspace", href: "/workspaces", icon: LayoutDashboard },
@@ -38,6 +41,7 @@ export function Sidebar() {
   const { isCollapsed, toggleSidebar } = useSidebar();
   const [profileOpen, setProfileOpen] = useState(false);
   const profileTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const logout = useLogout();
 
   const openProfileMenu = () => {
     if (profileTimeoutRef.current) clearTimeout(profileTimeoutRef.current);
@@ -48,11 +52,24 @@ export function Sidebar() {
     profileTimeoutRef.current = setTimeout(() => setProfileOpen(false), 150);
   };
 
+  const handleLogout = () => {
+    logout.mutate(undefined, {
+      onSuccess: () => {
+        broadcastLogout();
+        router.push("/login");
+      },
+    });
+  };
+
   useEffect(() => {
+    const unsubscribe = onLogoutBroadcast(() => {
+      router.push("/login");
+    });
     return () => {
+      unsubscribe();
       if (profileTimeoutRef.current) clearTimeout(profileTimeoutRef.current);
     };
-  }, []);
+  }, [router]);
 
   return (
     <aside
@@ -213,11 +230,16 @@ export function Sidebar() {
           </Link>
           <div className="h-px bg-border mx-1.5 my-1" />
           <button
-            onClick={() => router.push("/login")}
-            className="flex w-full items-center gap-3 px-3 py-2 text-sm rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+            onClick={handleLogout}
+            disabled={logout.isPending}
+            className="flex w-full items-center gap-3 px-3 py-2 text-sm rounded-lg text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
           >
-            <LogOut className="h-4 w-4" />
-            Log out
+            {logout.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <LogOut className="h-4 w-4" />
+            )}
+            {logout.isPending ? "Logging out..." : "Log out"}
           </button>
         </div>
 

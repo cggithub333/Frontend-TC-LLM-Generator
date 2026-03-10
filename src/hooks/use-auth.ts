@@ -65,3 +65,12 @@ export function useLogout() {
     },
   });
 }
+
+export function useRefreshToken() {
+  return useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/auth/refresh", { method: "POST" });
+      return handleAuthResponse(res);
+    },
+  });
+}
