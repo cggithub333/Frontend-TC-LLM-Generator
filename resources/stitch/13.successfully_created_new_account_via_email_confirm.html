@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-black" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Account Created Successfully - QA Artifacts</title>
+<!-- Tailwind CSS v3 with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style data-purpose="global-typography">
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+<style data-purpose="layout-styles">
+    /* Subtle grid background for the left section to match the reference image */
+    .grid-bg {
+      background-image: linear-gradient(to right, #1f2937 1px, transparent 1px),
+                        linear-gradient(to bottom, #1f2937 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+  </style>
+</head>
+<body class="h-full text-gray-100">
+<main class="flex min-h-full">
+<!-- BEGIN: Left Branding Section -->
+<!-- END: Left Branding Section -->
+<!-- BEGIN: Success Message Section -->
+<section class="w-full flex items-center justify-center p-8 bg-[#0a0a0a] relative" data-purpose="success-content">
+<div class="max-w-md w-full text-center space-y-8">
+<!-- Success Icon -->
+<div class="flex justify-center" data-purpose="success-animation">
+<div class="w-20 h-20 bg-green-500/10 border border-green-500/20 rounded-full flex items-center justify-center animate-pulse">
+<svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<!-- Success Text -->
+<div class="space-y-4">
+<h2 class="text-3xl font-bold text-white">Account Created Successfully!</h2>
+<p class="text-gray-400 leading-relaxed">
+            A confirmation email has been sent to your inbox. Please verify your address to access all features.
+          </p>
+</div>
+<!-- Redirection & Countdown -->
+<div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 space-y-4" data-purpose="redirection-container">
+<p class="text-sm text-gray-400">
+            You will be redirected to the login page in 
+            <span class="text-white font-bold text-lg" id="countdown">5</span> seconds...
+          </p>
+<!-- Visual Countdown Progress -->
+<div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+<div class="h-full bg-white transition-all duration-1000 ease-linear" id="progress-bar" style="width: 100%;"></div>
+</div>
+</div>
+<!-- Manual Navigation -->
+<div class="pt-4">
+<a class="text-sm text-gray-400 hover:text-white transition-colors underline underline-offset-4" href="#">
+            Didn't get redirected? Click here to login manually.
+          </a>
+</div>
+</div>
+<!-- Top Right Theme Toggle (Visual only as per ref) -->
+<div class="absolute top-8 right-8 text-gray-400 hover:text-white cursor-pointer">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</section>
+<!-- END: Success Message Section -->
+</main>
+<script data-purpose="countdown-logic">
+    /**
+     * Handles the visual countdown and simulated redirection
+     */
+    document.addEventListener('DOMContentLoaded', () => {
+      let secondsLeft = 5;
+      const countdownEl = document.getElementById('countdown');
+      const progressBar = document.getElementById('progress-bar');
+      
+      const timer = setInterval(() => {
+        secondsLeft--;
+        
+        if (countdownEl) {
+          countdownEl.textContent = secondsLeft;
+        }
+        
+        if (progressBar) {
+          // Update progress bar width
+          const percentage = (secondsLeft / 5) * 100;
+          progressBar.style.width = `${percentage}%`;
+        }
+
+        if (secondsLeft <= 0) {
+          clearInterval(timer);
+          // In a real app, this would be: window.location.href = '/login';
+          console.log('Redirecting to login...');
+        }
+      }, 1000);
+    });
+  </script>
+</body></html>

@@ -22,6 +22,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Pass public env vars as build args (Next.js inlines NEXT_PUBLIC_* at build time)
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
+
 # Set Next.js to produce a standalone output
 ENV NEXT_TELEMETRY_DISABLED=1
 
