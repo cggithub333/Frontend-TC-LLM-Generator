@@ -7,7 +7,6 @@ import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Eye,
   EyeOff,
@@ -141,16 +140,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Checkbox id="remember" />
-            <Label
-              htmlFor="remember"
-              className="text-sm font-normal text-muted-foreground cursor-pointer select-none"
-            >
-              Remember me for 30 days
-            </Label>
-          </div>
+        <div className="flex justify-end">
           <Link
             href="/forgot-password"
             className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"

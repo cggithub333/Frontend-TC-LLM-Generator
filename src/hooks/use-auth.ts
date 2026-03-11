@@ -40,11 +40,11 @@ async function handleAuthResponse(res: Response) {
 
 export function useLogin() {
   return useMutation({
-    mutationFn: async (input: LoginRequest) => {
+    mutationFn: async (credentials: LoginRequest) => {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
+        body: JSON.stringify(credentials),
       });
       return handleAuthResponse(res);
     },
