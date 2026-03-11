@@ -7,8 +7,6 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Users,
-  CreditCard,
-  Building2,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -26,8 +24,6 @@ import { broadcastLogout, onLogoutBroadcast } from "@/lib/auth-broadcast";
 const navigation = [
   { name: "Overview", href: "/admin/overview", icon: LayoutDashboard },
   { name: "Platform Users", href: "/admin/users", icon: Users },
-  { name: "Subscriptions", href: "/admin/subscriptions", icon: CreditCard },
-  { name: "Workspaces", href: "/admin/workspaces", icon: Building2 },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
