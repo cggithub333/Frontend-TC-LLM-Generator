@@ -107,17 +107,9 @@ export default function LoginPage() {
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password" className="text-sm font-medium">
-              Password
-            </Label>
-            <Link
-              href="#"
-              className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Forgot password?
-            </Link>
-          </div>
+          <Label htmlFor="password" className="text-sm font-medium">
+            Password
+          </Label>
           <div className="relative">
             <Input
               id="password"
@@ -149,14 +141,22 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Checkbox id="remember" />
-          <Label
-            htmlFor="remember"
-            className="text-sm font-normal text-muted-foreground cursor-pointer select-none"
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Checkbox id="remember" />
+            <Label
+              htmlFor="remember"
+              className="text-sm font-normal text-muted-foreground cursor-pointer select-none"
+            >
+              Remember me for 30 days
+            </Label>
+          </div>
+          <Link
+            href="/forgot-password"
+            className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            Remember me for 30 days
-          </Label>
+            Forgot password?
+          </Link>
         </div>
 
         <Button type="submit" className="w-full h-11" disabled={isLoading}>
