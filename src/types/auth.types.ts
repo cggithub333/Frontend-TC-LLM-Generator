@@ -7,6 +7,8 @@ export interface RegisterRequest {
   email: string;
   password: string;
   fullName: string;
+  gender?: string;
+  dateOfBirth?: string;
 }
 
 export interface SignupRequest {
@@ -14,6 +16,8 @@ export interface SignupRequest {
   fullName: string;
   password: string;
   confirmPassword: string;
+  gender?: string;
+  dateOfBirth?: string;
 }
 
 export interface SignupResponse {

@@ -8,6 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Eye,
   EyeOff,
   CheckCircle2,
@@ -58,6 +65,8 @@ function SignUpContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [gender, setGender] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [error, setError] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
@@ -165,8 +174,18 @@ function SignUpContent() {
       return;
     }
 
+    if (dateOfBirth) {
+      const dob = new Date(dateOfBirth);
+      const minAge = new Date();
+      minAge.setFullYear(minAge.getFullYear() - 13);
+      if (dob > minAge) {
+        setError("You must be at least 13 years old to sign up.");
+        return;
+      }
+    }
+
     register.mutate(
-      { email, password, fullName, confirmPassword },
+      { email, password, fullName, confirmPassword, gender: gender || undefined, dateOfBirth: dateOfBirth || undefined },
       {
         onSuccess: handleSignupSuccess,
         onError: (err) => {
@@ -185,7 +204,7 @@ function SignUpContent() {
   const handleResend = () => {
     setError("");
     register.mutate(
-      { email, password, fullName, confirmPassword },
+      { email, password, fullName, confirmPassword, gender: gender || undefined, dateOfBirth: dateOfBirth || undefined },
       {
         onSuccess: handleSignupSuccess,
         onError: (err) => setError(err.message),
@@ -472,6 +491,52 @@ function SignUpContent() {
               clearError();
             }}
           />
+        </div>
+
+        {/* Gender & Date of Birth (optional, side by side) */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="gender" className="text-sm font-medium">
+              Gender{" "}
+              <span className="text-muted-foreground font-normal">(optional)</span>
+            </Label>
+            <Select
+              value={gender}
+              onValueChange={(value) => {
+                setGender(value);
+                clearError();
+              }}
+              disabled={isLoading}
+            >
+              <SelectTrigger id="gender" className="h-11">
+                <SelectValue placeholder="Select gender" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="MALE">Male</SelectItem>
+                <SelectItem value="FEMALE">Female</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="dateOfBirth" className="text-sm font-medium">
+              Date of birth{" "}
+              <span className="text-muted-foreground font-normal">(optional)</span>
+            </Label>
+            <Input
+              id="dateOfBirth"
+              name="dateOfBirth"
+              type="date"
+              disabled={isLoading}
+              className="h-11"
+              max={new Date().toISOString().split("T")[0]}
+              value={dateOfBirth}
+              onChange={(e) => {
+                setDateOfBirth(e.target.value);
+                clearError();
+              }}
+            />
+          </div>
         </div>
 
         {/* Email */}
