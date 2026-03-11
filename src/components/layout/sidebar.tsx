@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -40,7 +40,10 @@ export function Sidebar() {
   const router = useRouter();
   const { isCollapsed, toggleSidebar } = useSidebar();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [popoverPos, setPopoverPos] = useState<React.CSSProperties>({});
   const profileTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
   const logout = useLogout();
   const { data: user } = useCurrentUser();
 
@@ -52,6 +55,17 @@ export function Sidebar() {
     .join("")
     .toUpperCase()
     .slice(0, 2);
+
+  // Calculate popover position for collapsed sidebar
+  useEffect(() => {
+    if (profileOpen && isCollapsed && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setPopoverPos({
+        left: rect.right + 8,
+        bottom: window.innerHeight - rect.bottom,
+      });
+    }
+  }, [profileOpen, isCollapsed]);
 
   const openProfileMenu = () => {
     if (profileTimeoutRef.current) clearTimeout(profileTimeoutRef.current);
@@ -208,53 +222,101 @@ export function Sidebar() {
         onMouseEnter={openProfileMenu}
         onMouseLeave={closeProfileMenu}
       >
-        {/* Popover menu */}
-        <div
-          className={cn(
-            "absolute bottom-full left-2 right-2 mb-2 rounded-xl border border-border bg-popover p-1.5 shadow-lg shadow-black/10 dark:shadow-black/30 transition-all duration-200 origin-bottom",
-            profileOpen
-              ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
-              : "opacity-0 scale-95 translate-y-1 pointer-events-none"
-          )}
-          onMouseEnter={openProfileMenu}
-          onMouseLeave={closeProfileMenu}
-        >
-          <div className="px-3 py-2 mb-1">
-            <p className="text-sm font-semibold truncate">{displayName}</p>
-            <p className="text-xs text-muted-foreground truncate">{displayEmail}</p>
-          </div>
-          <div className="h-px bg-border mx-1.5 mb-1" />
-          <Link
-            href="/settings"
-            className="flex items-center gap-3 px-3 py-2 text-sm rounded-lg text-foreground hover:bg-accent transition-colors"
-          >
-            <User className="h-4 w-4 text-muted-foreground" />
-            View Profile
-          </Link>
-          <Link
-            href="/settings"
-            className="flex items-center gap-3 px-3 py-2 text-sm rounded-lg text-foreground hover:bg-accent transition-colors"
-          >
-            <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-            Preferences
-          </Link>
-          <div className="h-px bg-border mx-1.5 my-1" />
-          <button
-            onClick={handleLogout}
-            disabled={logout.isPending}
-            className="flex w-full items-center gap-3 px-3 py-2 text-sm rounded-lg text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
-          >
-            {logout.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <LogOut className="h-4 w-4" />
+        {/* Popover menu - collapsed: fixed position to escape sidebar, expanded: absolute */}
+        {isCollapsed ? (
+          <div
+            ref={popoverRef}
+            className={cn(
+              "fixed z-[60] rounded-xl border border-border bg-popover p-1.5 shadow-lg shadow-black/10 dark:shadow-black/30 transition-all duration-200 min-w-[220px] origin-left",
+              profileOpen
+                ? "opacity-100 scale-100 pointer-events-auto"
+                : "opacity-0 scale-95 pointer-events-none"
             )}
-            {logout.isPending ? "Logging out..." : "Log out"}
-          </button>
-        </div>
+            style={popoverPos}
+            onMouseEnter={openProfileMenu}
+            onMouseLeave={closeProfileMenu}
+          >
+            <div className="px-3 py-2 mb-1">
+              <p className="text-sm font-semibold truncate">{displayName}</p>
+              <p className="text-xs text-muted-foreground truncate">{displayEmail}</p>
+            </div>
+            <div className="h-px bg-border mx-1.5 mb-1" />
+            <Link
+              href="/settings"
+              className="flex items-center gap-3 px-3 py-2 text-sm rounded-lg text-foreground hover:bg-accent transition-colors"
+            >
+              <User className="h-4 w-4 text-muted-foreground" />
+              View Profile
+            </Link>
+            <Link
+              href="/settings"
+              className="flex items-center gap-3 px-3 py-2 text-sm rounded-lg text-foreground hover:bg-accent transition-colors"
+            >
+              <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+              Preferences
+            </Link>
+            <div className="h-px bg-border mx-1.5 my-1" />
+            <button
+              onClick={handleLogout}
+              disabled={logout.isPending}
+              className="flex w-full items-center gap-3 px-3 py-2 text-sm rounded-lg text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
+            >
+              {logout.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <LogOut className="h-4 w-4" />
+              )}
+              {logout.isPending ? "Logging out..." : "Log out"}
+            </button>
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "absolute bottom-full left-2 right-2 mb-2 rounded-xl border border-border bg-popover p-1.5 shadow-lg shadow-black/10 dark:shadow-black/30 transition-all duration-200 origin-bottom",
+              profileOpen
+                ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
+                : "opacity-0 scale-95 translate-y-1 pointer-events-none"
+            )}
+            onMouseEnter={openProfileMenu}
+            onMouseLeave={closeProfileMenu}
+          >
+            <div className="px-3 py-2 mb-1">
+              <p className="text-sm font-semibold truncate">{displayName}</p>
+              <p className="text-xs text-muted-foreground truncate">{displayEmail}</p>
+            </div>
+            <div className="h-px bg-border mx-1.5 mb-1" />
+            <Link
+              href="/settings"
+              className="flex items-center gap-3 px-3 py-2 text-sm rounded-lg text-foreground hover:bg-accent transition-colors"
+            >
+              <User className="h-4 w-4 text-muted-foreground" />
+              View Profile
+            </Link>
+            <Link
+              href="/settings"
+              className="flex items-center gap-3 px-3 py-2 text-sm rounded-lg text-foreground hover:bg-accent transition-colors"
+            >
+              <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+              Preferences
+            </Link>
+            <div className="h-px bg-border mx-1.5 my-1" />
+            <button
+              onClick={handleLogout}
+              disabled={logout.isPending}
+              className="flex w-full items-center gap-3 px-3 py-2 text-sm rounded-lg text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
+            >
+              {logout.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <LogOut className="h-4 w-4" />
+              )}
+              {logout.isPending ? "Logging out..." : "Log out"}
+            </button>
+          </div>
+        )}
 
         {/* Profile trigger */}
-        <div className="flex items-center gap-3 rounded-xl p-1 cursor-pointer hover:bg-accent/50 transition-colors">
+        <div ref={triggerRef} className="flex items-center gap-3 rounded-xl p-1 cursor-pointer hover:bg-accent/50 transition-colors">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-blue-400 shrink-0 flex items-center justify-center text-[10px] font-bold text-primary-foreground">
             {initials}
           </div>
@@ -272,3 +334,4 @@ export function Sidebar() {
     </aside>
   );
 }
+
