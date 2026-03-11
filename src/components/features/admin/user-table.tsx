@@ -13,14 +13,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 export interface AdminUser {
-  id: string;
-  name: string;
+  userId: string;
+  fullName: string;
   email: string;
-  avatarUrl?: string;
-  isOwner: boolean;
-  projects: number;
-  accountType: "Enterprise" | "Pro" | "Free";
-  status: "Active" | "Suspended";
+  role: string;
+  authProvider: string;
+  status: string;
+  createdAt: string;
 }
 
 interface UserTableProps {
@@ -30,23 +29,28 @@ interface UserTableProps {
   onSuspend?: (user: AdminUser) => void;
 }
 
-const accountTypeStyles: Record<string, string> = {
-  Enterprise:
+const roleStyles: Record<string, string> = {
+  ADMIN:
     "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-  Pro: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  Free: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
+  USER: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+};
+
+const providerStyles: Record<string, string> = {
+  GOOGLE:
+    "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  LOCAL: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
 };
 
 const statusStyles: Record<string, string> = {
-  Active:
+  ACTIVE:
     "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-  Suspended:
+  SUSPENDED:
     "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
 };
 
 const statusDotStyles: Record<string, string> = {
-  Active: "bg-green-500",
-  Suspended: "bg-red-500",
+  ACTIVE: "bg-green-500",
+  SUSPENDED: "bg-red-500",
 };
 
 function getInitials(name: string) {
@@ -71,6 +75,14 @@ function getAvatarColor(index: number) {
   return avatarColors[index % avatarColors.length];
 }
 
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 export function UserTable({ users, onView, onEdit, onSuspend }: UserTableProps) {
   return (
     <div className="bg-card rounded-xl border shadow-sm overflow-hidden">
@@ -81,16 +93,16 @@ export function UserTable({ users, onView, onEdit, onSuspend }: UserTableProps) 
               User Profile
             </TableHead>
             <TableHead className="font-semibold text-xs uppercase tracking-wider">
-              Owner
+              Role
             </TableHead>
             <TableHead className="font-semibold text-xs uppercase tracking-wider">
-              Projects
-            </TableHead>
-            <TableHead className="font-semibold text-xs uppercase tracking-wider">
-              Account Type
+              Provider
             </TableHead>
             <TableHead className="font-semibold text-xs uppercase tracking-wider">
               Status
+            </TableHead>
+            <TableHead className="font-semibold text-xs uppercase tracking-wider">
+              Joined
             </TableHead>
             <TableHead className="font-semibold text-xs uppercase tracking-wider pr-5">
               Actions
@@ -98,113 +110,117 @@ export function UserTable({ users, onView, onEdit, onSuspend }: UserTableProps) 
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user, index) => (
-            <TableRow key={user.id} className="group">
-              {/* User Profile */}
-              <TableCell className="pl-5">
-                <div className="flex items-center gap-3">
-                  {user.avatarUrl ? (
-                    <div
-                      className="w-9 h-9 rounded-full bg-cover bg-center shrink-0 ring-2 ring-white dark:ring-gray-800"
-                      style={{ backgroundImage: `url("${user.avatarUrl}")` }}
-                    />
-                  ) : (
+          {users.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                No users found
+              </TableCell>
+            </TableRow>
+          ) : (
+            users.map((user, index) => (
+              <TableRow key={user.userId} className="group">
+                {/* User Profile */}
+                <TableCell className="pl-5">
+                  <div className="flex items-center gap-3">
                     <div
                       className={cn(
                         "w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-[11px] font-bold text-white ring-2 ring-white dark:ring-gray-800",
                         getAvatarColor(index)
                       )}
                     >
-                      {getInitials(user.name)}
+                      {getInitials(user.fullName)}
                     </div>
-                  )}
-                  <div>
-                    <p className="text-sm font-semibold leading-tight">
-                      {user.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {user.email}
-                    </p>
+                    <div>
+                      <p className="text-sm font-semibold leading-tight">
+                        {user.fullName}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </TableCell>
+                </TableCell>
 
-              {/* Owner */}
-              <TableCell>
-                {user.isOwner ? (
-                  <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 text-[10px] font-bold">
-                    Yes
-                  </Badge>
-                ) : (
-                  <span className="text-xs text-muted-foreground">No</span>
-                )}
-              </TableCell>
-
-              {/* Projects */}
-              <TableCell>
-                <span className="text-sm font-medium">{user.projects}</span>
-              </TableCell>
-
-              {/* Account Type */}
-              <TableCell>
-                <Badge
-                  className={cn(
-                    "text-[10px] font-bold px-2 py-0.5",
-                    accountTypeStyles[user.accountType]
-                  )}
-                >
-                  {user.accountType}
-                </Badge>
-              </TableCell>
-
-              {/* Status */}
-              <TableCell>
-                <Badge
-                  className={cn(
-                    "text-[10px] font-bold px-2 py-0.5 gap-1.5",
-                    statusStyles[user.status]
-                  )}
-                >
-                  <span
+                {/* Role */}
+                <TableCell>
+                  <Badge
                     className={cn(
-                      "w-1.5 h-1.5 rounded-full inline-block",
-                      statusDotStyles[user.status]
+                      "text-[10px] font-bold px-2 py-0.5",
+                      roleStyles[user.role] || roleStyles["USER"]
                     )}
-                  />
-                  {user.status}
-                </Badge>
-              </TableCell>
+                  >
+                    {user.role}
+                  </Badge>
+                </TableCell>
 
-              {/* Actions */}
-              <TableCell className="pr-5">
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => onView?.(user)}
-                    className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                    title="View user"
+                {/* Provider */}
+                <TableCell>
+                  <Badge
+                    className={cn(
+                      "text-[10px] font-bold px-2 py-0.5",
+                      providerStyles[user.authProvider] || providerStyles["LOCAL"]
+                    )}
                   >
-                    <Eye className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => onEdit?.(user)}
-                    className="p-2 rounded-lg text-muted-foreground hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
-                    title="Edit user"
+                    {user.authProvider}
+                  </Badge>
+                </TableCell>
+
+                {/* Status */}
+                <TableCell>
+                  <Badge
+                    className={cn(
+                      "text-[10px] font-bold px-2 py-0.5 gap-1.5",
+                      statusStyles[user.status] || statusStyles["ACTIVE"]
+                    )}
                   >
-                    <Pencil className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => onSuspend?.(user)}
-                    className="p-2 rounded-lg text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                    title={
-                      user.status === "Active" ? "Suspend user" : "Activate user"
-                    }
-                  >
-                    <Ban className="h-4 w-4" />
-                  </button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
+                    <span
+                      className={cn(
+                        "w-1.5 h-1.5 rounded-full inline-block",
+                        statusDotStyles[user.status] || statusDotStyles["ACTIVE"]
+                      )}
+                    />
+                    {user.status}
+                  </Badge>
+                </TableCell>
+
+                {/* Joined */}
+                <TableCell>
+                  <span className="text-sm text-muted-foreground">
+                    {formatDate(user.createdAt)}
+                  </span>
+                </TableCell>
+
+                {/* Actions */}
+                <TableCell className="pr-5">
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => onView?.(user)}
+                      className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                      title="View user"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => onEdit?.(user)}
+                      className="p-2 rounded-lg text-muted-foreground hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                      title="Edit user"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => onSuspend?.(user)}
+                      className="p-2 rounded-lg text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                      title={
+                        user.status === "ACTIVE" ? "Suspend user" : "Activate user"
+                      }
+                    >
+                      <Ban className="h-4 w-4" />
+                    </button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>

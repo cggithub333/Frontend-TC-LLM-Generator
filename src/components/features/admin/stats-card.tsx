@@ -6,8 +6,8 @@ import { TrendingUp, TrendingDown, type LucideIcon } from "lucide-react";
 export interface StatsCardProps {
   title: string;
   value: string;
-  change: string;
-  trend: "up" | "down";
+  change?: string;
+  trend?: "up" | "down";
   icon: LucideIcon;
   iconColor: string;
   iconBg: string;
@@ -27,22 +27,24 @@ export function StatsCard({
       <div className="flex flex-col gap-1">
         <p className="text-sm text-muted-foreground font-medium">{title}</p>
         <p className="text-2xl font-bold tracking-tight">{value}</p>
-        <div className="flex items-center gap-1.5 mt-1">
-          {trend === "up" ? (
-            <TrendingUp className="h-3.5 w-3.5 text-green-500" />
-          ) : (
-            <TrendingDown className="h-3.5 w-3.5 text-red-500" />
-          )}
-          <span
-            className={cn(
-              "text-xs font-semibold",
-              trend === "up" ? "text-green-500" : "text-red-500"
+        {change && trend && (
+          <div className="flex items-center gap-1.5 mt-1">
+            {trend === "up" ? (
+              <TrendingUp className="h-3.5 w-3.5 text-green-500" />
+            ) : (
+              <TrendingDown className="h-3.5 w-3.5 text-red-500" />
             )}
-          >
-            {change}
-          </span>
-          <span className="text-xs text-muted-foreground">vs last month</span>
-        </div>
+            <span
+              className={cn(
+                "text-xs font-semibold",
+                trend === "up" ? "text-green-500" : "text-red-500"
+              )}
+            >
+              {change}
+            </span>
+            <span className="text-xs text-muted-foreground">vs last month</span>
+          </div>
+        )}
       </div>
       <div
         className={cn(
