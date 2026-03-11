@@ -9,6 +9,19 @@ export interface RegisterRequest {
   fullName: string;
 }
 
+export interface SignupRequest {
+  email: string;
+  fullName: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export interface SignupResponse {
+  message: string;
+  expiresInSeconds: number;
+  cooldownSeconds: number;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
@@ -25,3 +38,4 @@ export interface ApiErrorResponse {
   errors?: ApiFieldError[];
   timestamp: string;
 }
+
