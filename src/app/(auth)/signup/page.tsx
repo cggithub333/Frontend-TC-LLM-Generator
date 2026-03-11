@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +16,7 @@ import {
   Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useRegister, useLoginGoogle } from "@/hooks/use-auth";
+import { useRegister } from "@/hooks/use-auth";
 
 const PASSWORD_RULES = [
   { key: "length", label: "At least 8 characters", test: (p: string) => p.length >= 8 },
@@ -37,9 +36,8 @@ export default function SignUpPage() {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const register = useRegister();
-  const loginGoogle = useLoginGoogle();
 
-  const isLoading = register.isPending || loginGoogle.isPending;
+  const isLoading = register.isPending;
   const passwordStrength = PASSWORD_RULES.filter((r) => r.test(password)).length;
   const allRulesPassed = passwordStrength === PASSWORD_RULES.length;
 
@@ -75,19 +73,6 @@ export default function SignUpPage() {
         },
       }
     );
-  };
-
-  const handleGoogleSuccess = (response: CredentialResponse) => {
-    if (!response.credential) {
-      setError("Google sign-up failed — no credential received.");
-      return;
-    }
-
-    setError("");
-    loginGoogle.mutate(response.credential, {
-      onSuccess: () => router.push("/workspaces"),
-      onError: (err) => setError(err.message),
-    });
   };
 
   const clearError = () => {
@@ -341,37 +326,6 @@ export default function SignUpPage() {
           )}
         </Button>
       </form>
-
-      {/* Divider */}
-      <div className="relative my-8">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs">
-          <span className="bg-background px-3 text-muted-foreground font-medium">
-            or continue with
-          </span>
-        </div>
-      </div>
-
-      {/* Google OAuth */}
-      <div className="flex justify-center [&>div]:w-full">
-        {loginGoogle.isPending ? (
-          <Button variant="outline" className="w-full h-11 gap-3" disabled>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Connecting to Google...
-          </Button>
-        ) : (
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => setError("Google sign-up failed. Please try again.")}
-            size="large"
-            width={420}
-            theme="outline"
-            text="signup_with"
-          />
-        )}
-      </div>
 
       {/* Sign in link */}
       <p className="text-center text-sm text-muted-foreground mt-8">
