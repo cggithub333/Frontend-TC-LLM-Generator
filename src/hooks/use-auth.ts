@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   LoginRequest,
-  RegisterRequest,
+  SignupRequest,
+  SignupResponse,
   ApiErrorResponse,
 } from "@/types/auth.types";
 
@@ -53,13 +54,13 @@ export function useLogin() {
 
 export function useRegister() {
   return useMutation({
-    mutationFn: async (input: RegisterRequest) => {
+    mutationFn: async (input: SignupRequest): Promise<SignupResponse> => {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
       });
-      return handleAuthResponse(res);
+      return handleAuthResponse(res) as Promise<SignupResponse>;
     },
   });
 }
