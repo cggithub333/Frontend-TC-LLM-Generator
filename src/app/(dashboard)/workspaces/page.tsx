@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCurrentUser } from "@/hooks/use-auth";
 import { useWorkspaces } from "@/hooks/use-workspaces";
+import { useWebSocket } from "@/hooks/use-websocket";
 import {
   WorkspaceCard,
   CreateWorkspaceDialog,
@@ -16,6 +18,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Workspace } from "@/types/workspace.types";
 
+interface WorkspaceEvent {
+  action: "CREATED" | "UPDATED" | "DELETED";
+  workspace: Workspace | null;
+  workspaceId: string;
+  performedBy: string;
+}
+
 export default function WorkspacesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
@@ -24,12 +33,23 @@ export default function WorkspacesPage() {
   const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null);
 
   const { data: user } = useCurrentUser();
+  const queryClient = useQueryClient();
   const {
     data: workspacesResult,
     isLoading,
     error,
     refetch,
   } = useWorkspaces();
+
+  // Subscribe to real-time workspace events
+  const { status: wsStatus } = useWebSocket<WorkspaceEvent>({
+    topic: "/topic/workspaces",
+    onMessage: (event) => {
+      console.log("[WS] Workspace event:", event.action, event.workspaceId);
+      // Invalidate workspace queries to trigger re-fetch
+      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+    },
+  });
 
   const workspaces = workspacesResult?.items;
 
