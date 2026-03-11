@@ -1,108 +1,118 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { useProjects } from "@/hooks/use-projects";
+import { useState, useCallback, useMemo } from "react";
+import { useCurrentUser } from "@/hooks/use-auth";
 import { useWorkspaces } from "@/hooks/use-workspaces";
-import { filterProjectsByQuery } from "@/lib/utils/project.utils";
-
 import {
-  WorkspaceHeader,
-  ProjectCard,
-  CreateProjectCard,
-  EmptyState,
+  WorkspaceCard,
+  CreateWorkspaceDialog,
+  EditWorkspaceDialog,
+  DeleteWorkspaceDialog,
   LoadingSkeleton,
   ErrorState,
-  CreateProjectDialog,
 } from "@/components/features/workspaces";
+import { Search, Plus, LayoutDashboard } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import type { Workspace } from "@/types/workspace.types";
 
 export default function WorkspacesPage() {
-  const router = useRouter();
-
   const [searchQuery, setSearchQuery] = useState("");
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null);
 
+  const { data: user } = useCurrentUser();
   const {
     data: workspacesResult,
-    isLoading: workspacesLoading,
-    error: workspacesError,
-    refetch: refetchWorkspaces,
+    isLoading,
+    error,
+    refetch,
   } = useWorkspaces();
 
-  const {
-    data: projectsResult,
-    isLoading: projectsLoading,
-    error: projectsError,
-    refetch: refetchProjects,
-  } = useProjects();
+  const workspaces = workspacesResult?.items;
 
-  const currentWorkspace = workspacesResult?.items?.[0];
-  const projects = projectsResult?.items;
-  const isLoading = workspacesLoading || projectsLoading;
-  const hasError = workspacesError || projectsError;
+  const filteredWorkspaces = useMemo(() => {
+    if (!workspaces) return [];
+    if (!searchQuery.trim()) return workspaces;
+    const q = searchQuery.toLowerCase();
+    return workspaces.filter(
+      (ws) =>
+        ws.name.toLowerCase().includes(q) ||
+        ws.description?.toLowerCase().includes(q)
+    );
+  }, [workspaces, searchQuery]);
 
-  const filteredProjects = useMemo(() => {
-    if (!projects) return [];
-    return filterProjectsByQuery(projects, searchQuery);
-  }, [projects, searchQuery]);
-
-  const handleSearchChange = useCallback((query: string) => {
-    setSearchQuery(query);
+  const handleEdit = useCallback((workspace: Workspace) => {
+    setSelectedWorkspace(workspace);
+    setEditOpen(true);
   }, []);
 
-  const handleCreateProject = useCallback(() => {
-    setCreateDialogOpen(true);
+  const handleDelete = useCallback((workspace: Workspace) => {
+    setSelectedWorkspace(workspace);
+    setDeleteOpen(true);
   }, []);
 
-  const handleManageTeam = useCallback(
-    (projectId: string) => {
-      router.push(`/projects/${projectId}/team`);
-    },
-    [router]
-  );
-
-  const handleViewDetails = useCallback((projectId: string) => {
-    router.push(`/projects/${projectId}`);
-  }, [router]);
-
-  const handleMenuClick = useCallback((_projectId: string) => {
-    // TODO: Open project menu
-  }, []);
-
-  const handleRetry = useCallback(() => {
-    refetchWorkspaces();
-    refetchProjects();
-  }, [refetchWorkspaces, refetchProjects]);
+  const handleSuccess = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   let content;
 
-  if (hasError) {
-    content = <ErrorState onRetry={handleRetry} />;
+  if (error) {
+    content = <ErrorState onRetry={refetch} />;
   } else if (isLoading) {
     content = <LoadingSkeleton />;
-  } else if (!filteredProjects || filteredProjects.length === 0) {
-    const isSearching = searchQuery.trim().length > 0;
-    content = isSearching ? (
-      <div className="p-8">
-        <EmptyState onCreateProject={handleCreateProject} />
+  } else if (!filteredWorkspaces || filteredWorkspaces.length === 0) {
+    content = (
+      <div className="flex flex-col items-center justify-center py-16 px-4">
+        <div className="size-20 rounded-full bg-muted flex items-center justify-center mb-6">
+          <LayoutDashboard className="h-10 w-10 text-muted-foreground" />
+        </div>
+        <h3 className="text-xl font-bold mb-2">
+          {searchQuery.trim()
+            ? "No workspaces found"
+            : "No workspaces yet"}
+        </h3>
+        <p className="text-muted-foreground text-center max-w-md mb-6">
+          {searchQuery.trim()
+            ? "Try a different search query."
+            : "Create your first workspace to start organizing your projects and test cases."}
+        </p>
+        {!searchQuery.trim() && (
+          <Button onClick={() => setCreateOpen(true)} size="lg">
+            Create Your First Workspace
+          </Button>
+        )}
       </div>
-    ) : (
-      <EmptyState onCreateProject={handleCreateProject} />
     );
   } else {
     content = (
       <main className="p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredProjects.map((project) => (
-            <ProjectCard
-              key={project.projectId}
-              project={project}
-              onManageTeam={handleManageTeam}
-              onViewDetails={handleViewDetails}
-              onMenuClick={handleMenuClick}
+          {filteredWorkspaces.map((workspace) => (
+            <WorkspaceCard
+              key={workspace.workspaceId}
+              workspace={workspace}
+              isOwner={workspace.ownerUserId === user?.id}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
             />
           ))}
-          <CreateProjectCard onClick={handleCreateProject} />
+          {/* Create Workspace Card */}
+          <button
+            onClick={() => setCreateOpen(true)}
+            className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-card/50 p-6 shadow-sm hover:shadow-md hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer min-h-[220px]"
+            aria-label="Create new workspace"
+          >
+            <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <Plus className="h-6 w-6 text-primary" />
+            </div>
+            <span className="text-sm font-bold text-muted-foreground">
+              Create Workspace
+            </span>
+          </button>
         </div>
       </main>
     );
@@ -110,22 +120,63 @@ export default function WorkspacesPage() {
 
   return (
     <>
-      <WorkspaceHeader
-        workspace={currentWorkspace}
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-        onCreateProject={handleCreateProject}
-      />
+      {/* Header */}
+      <header className="flex items-center justify-between border-b border-border bg-card px-8 py-4 sticky top-0 z-10">
+        <div className="flex flex-col gap-1">
+          <nav className="flex flex-wrap gap-2" aria-label="Breadcrumb">
+            <span className="text-xs font-medium">My Workspaces</span>
+          </nav>
+          <h2 className="text-xl font-bold">Workspaces</h2>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {/* Search */}
+          <label className="flex flex-col min-w-64">
+            <div className="flex w-full items-stretch rounded-lg h-10 border border-input bg-background">
+              <div className="text-muted-foreground flex items-center justify-center pl-3">
+                <Search className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <Input
+                type="search"
+                className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 text-sm"
+                placeholder="Search workspaces..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search workspaces"
+              />
+            </div>
+          </label>
+
+          {/* Create Button */}
+          <Button
+            className="h-10 px-5 gap-2"
+            onClick={() => setCreateOpen(true)}
+          >
+            <Plus className="h-5 w-5" />
+            <span>New Workspace</span>
+          </Button>
+        </div>
+      </header>
 
       {content}
 
-      <CreateProjectDialog
-        open={createDialogOpen}
-        onOpenChange={setCreateDialogOpen}
-        workspaceId={currentWorkspace?.workspaceId || ""}
-        onSuccess={() => {
-          refetchProjects();
-        }}
+      {/* Dialogs */}
+      <CreateWorkspaceDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onSuccess={handleSuccess}
+      />
+      <EditWorkspaceDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        workspace={selectedWorkspace}
+        onSuccess={handleSuccess}
+      />
+      <DeleteWorkspaceDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        workspace={selectedWorkspace}
+        onSuccess={handleSuccess}
       />
     </>
   );

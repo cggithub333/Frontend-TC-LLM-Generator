@@ -13,15 +13,19 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   User,
   SlidersHorizontal,
   LogOut,
   Loader2,
+  Plus,
+  Check,
 } from "lucide-react";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 import { useSidebar } from "@/components/layout/sidebar-context";
 import { useLogout, useCurrentUser } from "@/hooks/use-auth";
 import { broadcastLogout, onLogoutBroadcast } from "@/lib/auth-broadcast";
+import { useWorkspaces } from "@/hooks/use-workspaces";
 
 const navigation = [
   { name: "Workspace", href: "/workspaces", icon: LayoutDashboard },
@@ -34,6 +38,105 @@ const navigation = [
 const adminNav = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
+
+function WorkspaceSwitcher({ isCollapsed }: { isCollapsed: boolean }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const switcherRef = useRef<HTMLDivElement>(null);
+
+  const { data: workspacesResult } = useWorkspaces();
+  const workspaces = workspacesResult?.items ?? [];
+
+  // Extract current workspace ID from URL
+  const currentWorkspaceId = pathname.match(/\/workspaces\/([^/]+)/)?.[1];
+  const currentWorkspace = workspaces.find(
+    (ws) => ws.workspaceId === currentWorkspaceId
+  );
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (switcherRef.current && !switcherRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  if (isCollapsed) {
+    return (
+      <div className="px-3 mt-2">
+        <Link
+          href="/workspaces"
+          className="flex items-center justify-center p-2 rounded-lg hover:bg-accent transition-colors"
+          title="Workspaces"
+        >
+          <LayoutDashboard className="h-5 w-5 text-muted-foreground" />
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-3 mt-2" ref={switcherRef}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-between w-full p-2.5 rounded-lg border border-border bg-background hover:bg-accent/50 transition-colors text-left"
+      >
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="size-6 rounded bg-primary/10 flex items-center justify-center shrink-0">
+            <LayoutDashboard className="h-3.5 w-3.5 text-primary" />
+          </div>
+          <span className="text-sm font-medium truncate">
+            {currentWorkspace?.name || "Select Workspace"}
+          </span>
+        </div>
+        <ChevronDown
+          className={cn(
+            "h-4 w-4 text-muted-foreground transition-transform shrink-0",
+            open && "rotate-180"
+          )}
+        />
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute left-3 right-3 mt-1 z-[60] rounded-lg border border-border bg-popover shadow-lg shadow-black/10 dark:shadow-black/30 max-h-64 overflow-auto">
+          {workspaces.map((ws) => (
+            <button
+              key={ws.workspaceId}
+              onClick={() => {
+                router.push(`/workspaces/${ws.workspaceId}`);
+                setOpen(false);
+              }}
+              className={cn(
+                "flex items-center justify-between w-full px-3 py-2 text-sm hover:bg-accent transition-colors text-left",
+                ws.workspaceId === currentWorkspaceId && "bg-primary/5 text-primary"
+              )}
+            >
+              <span className="truncate">{ws.name}</span>
+              {ws.workspaceId === currentWorkspaceId && (
+                <Check className="h-4 w-4 text-primary shrink-0" />
+              )}
+            </button>
+          ))}
+          <div className="border-t border-border">
+            <Link
+              href="/workspaces"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              Manage Workspaces
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -130,8 +233,11 @@ export function Sidebar() {
         </span>
       </div>
 
+      {/* Workspace Switcher */}
+      <WorkspaceSwitcher isCollapsed={isCollapsed} />
+
       {/* Navigation */}
-      <nav className="flex-1 mt-6 px-3 space-y-2">
+      <nav className="flex-1 mt-4 px-3 space-y-2">
         {navigation.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           return (

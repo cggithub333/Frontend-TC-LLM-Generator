@@ -3,6 +3,7 @@
  * Displays workspace breadcrumb, title, search, and create button
  */
 
+import Link from "next/link";
 import { Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,12 +27,12 @@ export function WorkspaceHeader({
       {/* Left Section - Breadcrumb & Title */}
       <div className="flex flex-col gap-1">
         <nav className="flex flex-wrap gap-2" aria-label="Breadcrumb">
-          <a
-            href="#"
+          <Link
+            href="/workspaces"
             className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
           >
             Workspaces
-          </a>
+          </Link>
           <span className="text-xs font-medium text-muted-foreground" aria-hidden="true">
             /
           </span>
@@ -76,3 +77,4 @@ export function WorkspaceHeader({
     </header>
   );
 }
+
