@@ -3,6 +3,17 @@ import { NextResponse } from "next/server";
 
 const BACKEND_URL = process.env.BACKEND_API_URL || "http://localhost:8080/api/v1";
 
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    const payload = Buffer.from(parts[1], "base64url").toString("utf-8");
+    return JSON.parse(payload);
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -38,7 +49,17 @@ export async function POST(request: Request) {
       maxAge: 60 * 60 * 24 * 7,
     });
 
-    return NextResponse.json({ success: true });
+    // Extract role from JWT to enable role-based redirect on client
+    const claims = decodeJwtPayload(data.accessToken);
+    const roles = claims?.roles;
+    let role = "USER";
+    if (Array.isArray(roles)) {
+      role = (roles[0] as string) || "USER";
+    } else if (typeof roles === "string") {
+      role = roles;
+    }
+
+    return NextResponse.json({ success: true, role });
   } catch {
     return NextResponse.json(
       { success: false, message: "Failed to connect to server" },

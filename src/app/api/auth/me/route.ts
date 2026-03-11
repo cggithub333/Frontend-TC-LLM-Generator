@@ -32,12 +32,25 @@ export async function GET() {
     );
   }
 
+  // Extract role from JWT claims
+  // Backend stores roles as List<String>, e.g. ["USER"] or ["ADMIN"]
+  const roles = claims.roles;
+  let role: string;
+  if (Array.isArray(roles)) {
+    role = (roles[0] as string) || "USER";
+  } else if (typeof roles === "string") {
+    role = roles;
+  } else {
+    role = "USER";
+  }
+
   return NextResponse.json({
     success: true,
     data: {
       id: claims.sub,
       email: claims.email,
       name: claims.name,
+      role,
     },
   });
 }

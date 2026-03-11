@@ -35,7 +35,10 @@ export default function LoginPage() {
     login.mutate(
       { email, password },
       {
-        onSuccess: () => router.push("/workspaces"),
+        onSuccess: (data) => {
+          const dest = data?.role === "ADMIN" ? "/admin/overview" : "/workspaces";
+          router.push(dest);
+        },
         onError: (err) => setError(err.message),
       }
     );
@@ -49,7 +52,10 @@ export default function LoginPage() {
 
     setError("");
     loginGoogle.mutate(response.credential, {
-      onSuccess: () => router.push("/workspaces"),
+      onSuccess: (data) => {
+        const dest = data?.role === "ADMIN" ? "/admin/overview" : "/workspaces";
+        router.push(dest);
+      },
       onError: (err) => setError(err.message),
     });
   };
