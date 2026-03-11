@@ -300,6 +300,8 @@ export default function SignUpPage() {
             I agree to the{" "}
             <Link
               href="/terms"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-primary hover:underline underline-offset-4"
             >
               Terms of Service
@@ -307,6 +309,8 @@ export default function SignUpPage() {
             and{" "}
             <Link
               href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-primary hover:underline underline-offset-4"
             >
               Privacy Policy
