@@ -9,15 +9,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Calendar,
-  Plus,
-  UserPlus,
-  Filter,
-  Layers,
-  AlertCircle,
-  Loader2,
-} from "lucide-react";
+import { UserPlus, Layers, AlertCircle } from "lucide-react";
 import { useProject } from "@/hooks/use-projects";
 import { useStoriesByProject } from "@/hooks/use-stories";
 import { useTestSuitesByProject } from "@/hooks/use-test-suites";
@@ -29,16 +21,6 @@ import type { UserStory } from "@/types/story.types";
 import type { TestSuite } from "@/types/test-suite.types";
 import type { ProjectMember } from "@/types/team.types";
 import type { TestPlan } from "@/types/test-plan.types";
-
-const statusColors: Record<string, string> = {
-  Active:
-    "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-  "AI Processing":
-    "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  Review:
-    "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-  Done: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-};
 
 export default function ProjectDetailPage() {
   const params = useParams();

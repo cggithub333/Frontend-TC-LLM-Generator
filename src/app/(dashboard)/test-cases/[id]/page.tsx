@@ -2,18 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import {
   CheckCircle2,
-  Clock,
   User,
   Calendar,
-  Tag,
-  FileText,
   Save,
   Share2,
-  MoreVertical
+  MoreVertical,
 } from "lucide-react";
 
 const testCase = {
@@ -26,35 +21,35 @@ const testCase = {
   preconditions: [
     "User has a valid Google account",
     "Application OAuth credentials are configured",
-    "User is on the login page"
+    "User is on the login page",
   ],
   steps: [
     {
       step: 1,
       action: "Click on 'Sign in with Google' button",
-      expected: "User is redirected to Google OAuth consent page"
+      expected: "User is redirected to Google OAuth consent page",
     },
     {
       step: 2,
       action: "Select Google account and grant permissions",
-      expected: "User is redirected back to application"
+      expected: "User is redirected back to application",
     },
     {
       step: 3,
       action: "Verify user session is created",
-      expected: "User dashboard is displayed with user profile"
-    }
+      expected: "User dashboard is displayed with user profile",
+    },
   ],
   testData: {
     email: "test@example.com",
-    environment: "staging"
+    environment: "staging",
   },
   assignedTo: "Alex Rivera",
   executedBy: "Maria Kim",
-  executedAt: "Dec 1, 2024 2:30 PM"
+  executedAt: "Dec 1, 2024 2:30 PM",
 };
 
-export default function TestCaseDetailPage({ params }: { params: { id: string } }) {
+export default function TestCaseDetailPage() {
   return (
     <div className="p-8 space-y-8 max-w-5xl mx-auto w-full">
       {/* Header */}
@@ -64,11 +59,13 @@ export default function TestCaseDetailPage({ params }: { params: { id: string } 
             <Badge variant="outline" className="font-mono text-xs">
               {testCase.id}
             </Badge>
-            <Badge className={
-              testCase.type === "Positive"
-                ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-none"
-                : "bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-none"
-            }>
+            <Badge
+              className={
+                testCase.type === "Positive"
+                  ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-none"
+                  : "bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-none"
+              }
+            >
               {testCase.type}
             </Badge>
             <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-none">
@@ -83,7 +80,10 @@ export default function TestCaseDetailPage({ params }: { params: { id: string } 
             {testCase.title}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Related to Story: <a href="#" className="text-primary font-semibold hover:underline">{testCase.storyId}</a>
+            Related to Story:{" "}
+            <a href="#" className="text-primary font-semibold hover:underline">
+              {testCase.storyId}
+            </a>
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -159,7 +159,9 @@ export default function TestCaseDetailPage({ params }: { params: { id: string } 
             Test Data
           </h2>
           <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 font-mono text-sm">
-            <pre className="text-xs">{JSON.stringify(testCase.testData, null, 2)}</pre>
+            <pre className="text-xs">
+              {JSON.stringify(testCase.testData, null, 2)}
+            </pre>
           </div>
         </div>
 

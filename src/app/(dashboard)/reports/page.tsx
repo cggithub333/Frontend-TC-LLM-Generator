@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  TrendingUp,
   FileText,
   CheckCircle2,
   Sparkles,
@@ -33,9 +32,6 @@ export default function ReportsPage() {
   const { data: testSuitesData, isLoading: loadingSuites } = useTestSuites({
     size: 1,
   });
-
-  const isLoading =
-    loadingCases || loadingPlans || loadingStories || loadingSuites;
 
   return (
     <div className="p-8 space-y-8 max-w-[1400px] mx-auto w-full">
