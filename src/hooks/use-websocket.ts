@@ -3,11 +3,21 @@
  * Auto-subscribes on mount and unsubscribes on unmount.
  */
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import type { IMessage, StompSubscription } from "@stomp/stompjs";
 import { getStompClient, fetchAccessToken, disconnect } from "@/lib/websocket";
 
-export type ConnectionStatus = "connecting" | "connected" | "disconnected" | "error";
+export type ConnectionStatus =
+  | "connecting"
+  | "connected"
+  | "disconnected"
+  | "error";
 
 interface UseWebSocketOptions<T> {
   /** STOMP topic to subscribe to, e.g. "/topic/workspaces" */
@@ -20,7 +30,7 @@ interface UseWebSocketOptions<T> {
 
 /**
  * Hook to subscribe to a STOMP WebSocket topic.
- * 
+ *
  * @example
  * ```tsx
  * useWebSocket({
@@ -41,8 +51,10 @@ export function useWebSocket<T = unknown>({
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const onMessageRef = useRef(onMessage);
 
-  // Keep onMessage ref up to date
-  onMessageRef.current = onMessage;
+  // Keep onMessage ref up to date (in layout effect to avoid mutating ref during render)
+  useLayoutEffect(() => {
+    onMessageRef.current = onMessage;
+  });
 
   const handleMessage = useCallback((message: IMessage) => {
     try {
@@ -55,6 +67,7 @@ export function useWebSocket<T = unknown>({
 
   useEffect(() => {
     if (!enabled) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus("disconnected");
       return;
     }
