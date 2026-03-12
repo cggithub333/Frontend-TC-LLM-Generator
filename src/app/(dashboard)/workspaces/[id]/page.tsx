@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useProjectsByWorkspace } from "@/hooks/use-projects";
 import { useWorkspace } from "@/hooks/use-workspaces";
+import { useCurrentUser } from "@/hooks/use-auth";
 import { filterProjectsByQuery } from "@/lib/utils/project.utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWebSocket } from "@/hooks/use-websocket";
@@ -25,7 +26,10 @@ import {
   LoadingSkeleton,
   ErrorState,
   CreateProjectDialog,
+  EditProjectDialog,
+  DeleteProjectDialog,
 } from "@/components/features/workspaces";
+import type { Project } from "@/types/workspace.types";
 
 export default function WorkspaceDetailPage() {
   const router = useRouter();
@@ -34,6 +38,11 @@ export default function WorkspaceDetailPage() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  const { data: user } = useCurrentUser();
 
   const {
     data: workspace,
@@ -77,8 +86,14 @@ export default function WorkspaceDetailPage() {
     setCreateDialogOpen(true);
   }, []);
 
-  const handleMenuClick = useCallback((_projectId: string) => {
-    // TODO: Open project menu
+  const handleEditProject = useCallback((project: Project) => {
+    setSelectedProject(project);
+    setEditDialogOpen(true);
+  }, []);
+
+  const handleDeleteProject = useCallback((project: Project) => {
+    setSelectedProject(project);
+    setDeleteDialogOpen(true);
   }, []);
 
   const handleRetry = useCallback(() => {
@@ -108,7 +123,9 @@ export default function WorkspaceDetailPage() {
             <ProjectCard
               key={project.projectId}
               project={project}
-              onMenuClick={handleMenuClick}
+              isCreator={project.createdByUserId === user?.id}
+              onEdit={handleEditProject}
+              onDelete={handleDeleteProject}
             />
           ))}
           <CreateProjectCard onClick={handleCreateProject} />
@@ -131,9 +148,18 @@ export default function WorkspaceDetailPage() {
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
         workspaceId={workspaceId}
-        onSuccess={() => {
-          refetchProjects();
-        }}
+      />
+
+      <EditProjectDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        project={selectedProject}
+      />
+
+      <DeleteProjectDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        project={selectedProject}
       />
     </>
   );

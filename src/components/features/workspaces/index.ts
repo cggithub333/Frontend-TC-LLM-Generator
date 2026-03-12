@@ -14,3 +14,5 @@ export { CreateProjectDialog } from "./create-project-dialog";
 export { CreateWorkspaceDialog } from "./create-workspace-dialog";
 export { EditWorkspaceDialog } from "./edit-workspace-dialog";
 export { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
+export { EditProjectDialog } from "./edit-project-dialog";
+export { DeleteProjectDialog } from "./delete-project-dialog";

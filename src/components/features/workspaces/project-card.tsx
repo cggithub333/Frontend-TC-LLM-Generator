@@ -1,10 +1,14 @@
-/**
- * ProjectCard Component
- * Displays individual project information with status and key details
- */
+"use client";
 
 import Link from "next/link";
-import { Clock, MoreHorizontal, Layers, KeyRound } from "lucide-react";
+import { Clock, MoreHorizontal, Layers, KeyRound, Pencil, Trash2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { Project } from "@/types/workspace.types";
 import {
   getStatusColors,
@@ -12,19 +16,29 @@ import {
 
 interface ProjectCardProps {
   project: Project;
-  onMenuClick?: (projectId: string) => void;
+  isCreator?: boolean;
+  onEdit?: (project: Project) => void;
+  onDelete?: (project: Project) => void;
 }
 
 export function ProjectCard({
   project,
-  onMenuClick,
+  isCreator = false,
+  onEdit,
+  onDelete,
 }: ProjectCardProps) {
   const statusColors = getStatusColors(project.status);
 
-  const handleMenuClick = (e: React.MouseEvent) => {
+  const handleEdit = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    onMenuClick?.(project.projectId);
+    onEdit?.(project);
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onDelete?.(project);
   };
 
   const formattedDate = project.updatedAt
@@ -59,13 +73,34 @@ export function ProjectCard({
               </div>
             </div>
           </div>
-          <button
-            className="text-muted-foreground hover:text-foreground p-1 rounded-full hover:bg-muted transition-colors"
-            onClick={handleMenuClick}
-            aria-label={`More options for ${project.name}`}
-          >
-            <MoreHorizontal className="h-5 w-5" />
-          </button>
+          
+          {isCreator && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="text-muted-foreground hover:text-foreground p-1 rounded-full hover:bg-muted transition-colors"
+                  onClick={(e) => e.preventDefault()}
+                  aria-label={`More options for ${project.name}`}
+                >
+                  <MoreHorizontal className="h-5 w-5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={handleEdit}>
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Edit Project
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleDelete}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Project
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
 
         {/* Stats */}
