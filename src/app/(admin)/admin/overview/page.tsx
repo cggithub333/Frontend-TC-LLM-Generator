@@ -9,7 +9,6 @@ import {
   Calendar,
   Bell,
   Filter,
-
 } from "lucide-react";
 import { StatsCard } from "@/components/features/admin/stats-card";
 import { useAdminOverview } from "@/hooks/use-admin-overview";
@@ -35,7 +34,7 @@ ChartJS.register(
   ArcElement,
   Tooltip,
   Legend,
-  Filler
+  Filler,
 );
 
 function formatTimeAgo(timestamp: string): string {
@@ -52,13 +51,23 @@ function formatTimeAgo(timestamp: string): string {
   return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
 }
 
-function UserGrowthChart({ data }: { data: { date: string; count: number }[] }) {
+function UserGrowthChart({
+  data,
+}: {
+  data: { date: string; count: number }[];
+}) {
   const chartRef = useRef<ChartJS<"line">>(null);
 
   // Simplify labels: show DAY 1, DAY 7, DAY 14, DAY 21, DAY 30
   const labels = data.map((_, i) => {
     const day = i + 1;
-    if (day === 1 || day === 7 || day === 14 || day === 21 || day === data.length) {
+    if (
+      day === 1 ||
+      day === 7 ||
+      day === 14 ||
+      day === 21 ||
+      day === data.length
+    ) {
       return `DAY ${day}`;
     }
     return "";
@@ -75,7 +84,12 @@ function UserGrowthChart({ data }: { data: { date: string; count: number }[] }) 
           const chart = context.chart;
           const { ctx, chartArea } = chart;
           if (!chartArea) return "rgba(59, 130, 246, 0.1)";
-          const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+          const gradient = ctx.createLinearGradient(
+            0,
+            chartArea.top,
+            0,
+            chartArea.bottom,
+          );
           gradient.addColorStop(0, "rgba(59, 130, 246, 0.2)");
           gradient.addColorStop(1, "rgba(59, 130, 246, 0.0)");
           return gradient;
@@ -186,7 +200,9 @@ function RoleDistributionChart({ data }: { data: Record<string, number> }) {
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="text-center">
             <p className="text-2xl font-bold">{total > 0 ? "100%" : "0%"}</p>
-            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Total</p>
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+              Total
+            </p>
           </div>
         </div>
       </div>
@@ -236,7 +252,10 @@ export default function AdminOverviewPage() {
           <div className="max-w-[1600px] mx-auto space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="bg-card rounded-xl border shadow-sm p-5 h-[100px] animate-pulse" />
+                <div
+                  key={i}
+                  className="bg-card rounded-xl border shadow-sm p-5 h-[100px] animate-pulse"
+                />
               ))}
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -314,8 +333,18 @@ export default function AdminOverviewPage() {
           <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-border rounded-lg bg-card hover:bg-accent transition-colors">
             <Calendar className="h-4 w-4 text-muted-foreground" />
             {period}
-            <svg className="h-3 w-3 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            <svg
+              className="h-3 w-3 text-muted-foreground"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </button>
           {/* Notification bell */}
@@ -388,7 +417,9 @@ export default function AdminOverviewPage() {
             {/* Recent System Activity */}
             <div className="lg:col-span-2 bg-card rounded-xl border shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-base font-semibold">Recent System Activity</h2>
+                <h2 className="text-base font-semibold">
+                  Recent System Activity
+                </h2>
                 <button className="p-1.5 rounded-lg hover:bg-accent transition-colors">
                   <Filter className="h-4 w-4 text-muted-foreground" />
                 </button>
@@ -414,8 +445,13 @@ export default function AdminOverviewPage() {
                   <tbody>
                     {data && data.recentActivities.length > 0 ? (
                       data.recentActivities.map((activity, i) => (
-                        <tr key={i} className="border-b border-border/50 last:border-0">
-                          <td className="py-3.5 pr-4 text-sm font-medium">{activity.event}</td>
+                        <tr
+                          key={i}
+                          className="border-b border-border/50 last:border-0"
+                        >
+                          <td className="py-3.5 pr-4 text-sm font-medium">
+                            {activity.event}
+                          </td>
                           <td className="py-3.5 pr-4 text-sm text-muted-foreground">
                             {activity.userEmail}
                           </td>
@@ -431,7 +467,10 @@ export default function AdminOverviewPage() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={4} className="py-8 text-center text-sm text-muted-foreground">
+                        <td
+                          colSpan={4}
+                          className="py-8 text-center text-sm text-muted-foreground"
+                        >
                           No recent activity
                         </td>
                       </tr>
@@ -455,9 +494,12 @@ export default function AdminOverviewPage() {
                         {ws.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold truncate">{ws.name}</p>
+                        <p className="text-sm font-semibold truncate">
+                          {ws.name}
+                        </p>
                         <p className="text-xs text-muted-foreground">
-                          {ws.memberCount} member{ws.memberCount !== 1 ? "s" : ""}
+                          {ws.memberCount} member
+                          {ws.memberCount !== 1 ? "s" : ""}
                         </p>
                       </div>
                       <div className="text-right shrink-0">

@@ -1,16 +1,14 @@
 "use client";
 
-import Link from "next/link";
-import { Bell, Search, User } from "lucide-react";
+import { Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export function Header() {
   return (
     <header className="h-20 border-b border-border bg-card px-8 flex items-center justify-between sticky top-0 z-40">
       <h1 className="text-2xl font-bold">Workspaces</h1>
-      
+
       <div className="flex items-center gap-6">
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative">

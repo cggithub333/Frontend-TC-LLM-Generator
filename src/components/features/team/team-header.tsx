@@ -6,6 +6,7 @@
 import { Search, UserPlus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import type { Project } from "@/types/workspace.types";
 
 interface TeamHeaderProps {
@@ -26,34 +27,36 @@ export function TeamHeader({
       <div className="flex flex-col gap-1">
         {/* Breadcrumb */}
         <nav className="flex flex-wrap gap-2" aria-label="Breadcrumb">
-          <a
+          <Link
             href="/workspaces"
             className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
           >
             Workspace
-          </a>
-          <span className="text-xs font-medium text-muted-foreground" aria-hidden="true">
+          </Link>
+          <span
+            className="text-xs font-medium text-muted-foreground"
+            aria-hidden="true"
+          >
             /
           </span>
-          <a
+          <Link
             href={`/projects/${project.projectId}`}
             className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
           >
             {project.name}
-          </a>
-          <span className="text-xs font-medium text-muted-foreground" aria-hidden="true">
+          </Link>
+          <span
+            className="text-xs font-medium text-muted-foreground"
+            aria-hidden="true"
+          >
             /
           </span>
-          <span className="text-xs font-medium">
-            Team
-          </span>
+          <span className="text-xs font-medium">Team</span>
         </nav>
 
         {/* Title */}
         <div className="flex items-center gap-2">
-          <h2 className="text-xl font-bold">
-            Project Team Management
-          </h2>
+          <h2 className="text-xl font-bold">Project Team Management</h2>
         </div>
       </div>
 

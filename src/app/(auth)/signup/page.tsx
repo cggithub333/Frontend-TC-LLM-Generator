@@ -90,6 +90,7 @@ function SignUpContent() {
     const verifiedParam = searchParams.get("verified");
 
     if (verifiedParam === "true") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPageState("verified");
       router.replace("/signup", { scroll: false });
     } else if (errorParam === "expired") {
@@ -185,7 +186,14 @@ function SignUpContent() {
     }
 
     register.mutate(
-      { email, password, fullName, confirmPassword, gender: gender || undefined, dateOfBirth: dateOfBirth || undefined },
+      {
+        email,
+        password,
+        fullName,
+        confirmPassword,
+        gender: gender || undefined,
+        dateOfBirth: dateOfBirth || undefined,
+      },
       {
         onSuccess: handleSignupSuccess,
         onError: (err) => {
@@ -204,7 +212,14 @@ function SignUpContent() {
   const handleResend = () => {
     setError("");
     register.mutate(
-      { email, password, fullName, confirmPassword, gender: gender || undefined, dateOfBirth: dateOfBirth || undefined },
+      {
+        email,
+        password,
+        fullName,
+        confirmPassword,
+        gender: gender || undefined,
+        dateOfBirth: dateOfBirth || undefined,
+      },
       {
         onSuccess: handleSignupSuccess,
         onError: (err) => setError(err.message),
@@ -498,7 +513,9 @@ function SignUpContent() {
           <div className="space-y-2">
             <Label htmlFor="gender" className="text-sm font-medium">
               Gender{" "}
-              <span className="text-muted-foreground font-normal">(optional)</span>
+              <span className="text-muted-foreground font-normal">
+                (optional)
+              </span>
             </Label>
             <Select
               value={gender}
@@ -521,7 +538,9 @@ function SignUpContent() {
           <div className="space-y-2">
             <Label htmlFor="dateOfBirth" className="text-sm font-medium">
               Date of birth{" "}
-              <span className="text-muted-foreground font-normal">(optional)</span>
+              <span className="text-muted-foreground font-normal">
+                (optional)
+              </span>
             </Label>
             <Input
               id="dateOfBirth"

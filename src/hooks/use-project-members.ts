@@ -1,16 +1,33 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "@/lib/axios";
-import type { ProjectMember, AddProjectMemberInput, UpdateProjectMemberInput } from "@/types/team.types";
-import type { PagedResponse, PaginatedResult, PaginationParams } from "@/types/pagination.types";
+import type {
+  ProjectMember,
+  AddProjectMemberInput,
+  UpdateProjectMemberInput,
+} from "@/types/team.types";
+import type {
+  PagedResponse,
+  PaginatedResult,
+  PaginationParams,
+} from "@/types/pagination.types";
 import { extractPage } from "@/types/pagination.types";
 
-export function useProjectMembers(projectId: string, params?: PaginationParams) {
+export function useProjectMembers(
+  projectId: string,
+  params?: PaginationParams,
+) {
   return useQuery({
     queryKey: ["project-members", projectId, params],
     queryFn: async (): Promise<PaginatedResult<ProjectMember>> => {
       const { data } = await axios.get<PagedResponse<ProjectMember>>(
         `/project-members/project/${projectId}`,
-        { params: { page: params?.page ?? 0, size: params?.size ?? 20, sort: params?.sort } }
+        {
+          params: {
+            page: params?.page ?? 0,
+            size: params?.size ?? 20,
+            sort: params?.sort,
+          },
+        },
       );
       return extractPage(data);
     },
@@ -23,7 +40,10 @@ export function useAddProjectMember() {
 
   return useMutation({
     mutationFn: async (input: AddProjectMemberInput) => {
-      const { data } = await axios.post<ProjectMember>("/project-members", input);
+      const { data } = await axios.post<ProjectMember>(
+        "/project-members",
+        input,
+      );
       return data;
     },
     onSuccess: (_, variables) => {
@@ -39,13 +59,14 @@ export function useUpdateProjectMember() {
 
   return useMutation({
     mutationFn: async ({
-      projectId,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      projectId: _projectId,
       memberId,
       ...updates
     }: UpdateProjectMemberInput & { projectId: string; memberId: string }) => {
       const { data } = await axios.put<ProjectMember>(
         `/project-members/${memberId}`,
-        updates
+        updates,
       );
       return data;
     },

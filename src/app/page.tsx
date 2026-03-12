@@ -199,16 +199,28 @@ export default function HomePage() {
 
           {/* Nav Links - Desktop */}
           <div className="hidden items-center gap-8 md:flex">
-            <a href="#features" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+            <a
+              href="#features"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
               Features
             </a>
-            <a href="#how-it-works" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+            <a
+              href="#how-it-works"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
               How It Works
             </a>
-            <a href="#testimonials" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+            <a
+              href="#testimonials"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
               Testimonials
             </a>
-            <a href="#faq" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+            <a
+              href="#faq"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
               FAQ
             </a>
           </div>
@@ -249,16 +261,32 @@ export default function HomePage() {
         {mobileMenuOpen && (
           <div className="border-t border-border bg-background px-6 pb-6 pt-4 md:hidden">
             <div className="flex flex-col gap-4">
-              <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+              <a
+                href="#features"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
                 Features
               </a>
-              <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+              <a
+                href="#how-it-works"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
                 How It Works
               </a>
-              <a href="#testimonials" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+              <a
+                href="#testimonials"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
                 Testimonials
               </a>
-              <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+              <a
+                href="#faq"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
                 FAQ
               </a>
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
@@ -305,15 +333,19 @@ export default function HomePage() {
             <AnimatedSection delay={200}>
               <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
                 Generate comprehensive test cases from user stories in seconds.
-                QA Artifacts combines AI intelligence with structured QA workflows
-                so your team can focus on building, not writing tests.
+                QA Artifacts combines AI intelligence with structured QA
+                workflows so your team can focus on building, not writing tests.
               </p>
             </AnimatedSection>
 
             {/* CTA Buttons */}
             <AnimatedSection delay={300}>
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                <Button size="lg" className="shadow-lg shadow-primary/25" asChild>
+                <Button
+                  size="lg"
+                  className="shadow-lg shadow-primary/25"
+                  asChild
+                >
                   <Link href="/workspaces">
                     Start Free
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -332,14 +364,18 @@ export default function HomePage() {
             <AnimatedSection delay={400}>
               <div className="mt-12 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
                 <div className="flex -space-x-2">
-                  {["bg-blue-500", "bg-green-500", "bg-purple-500", "bg-orange-500", "bg-pink-500"].map(
-                    (color, i) => (
-                      <div
-                        key={i}
-                        className={`h-8 w-8 rounded-full border-2 border-background ${color}`}
-                      />
-                    )
-                  )}
+                  {[
+                    "bg-blue-500",
+                    "bg-green-500",
+                    "bg-purple-500",
+                    "bg-orange-500",
+                    "bg-pink-500",
+                  ].map((color, i) => (
+                    <div
+                      key={i}
+                      className={`h-8 w-8 rounded-full border-2 border-background ${color}`}
+                    />
+                  ))}
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="flex">
@@ -363,7 +399,10 @@ export default function HomePage() {
           </div>
 
           {/* Hero visual - Dashboard screenshot */}
-          <AnimatedSection delay={500} className="relative mx-auto mt-16 max-w-5xl">
+          <AnimatedSection
+            delay={500}
+            className="relative mx-auto mt-16 max-w-5xl"
+          >
             <div className="rounded-2xl border border-border bg-card p-2 shadow-2xl shadow-black/5 dark:shadow-black/20">
               <div className="overflow-hidden rounded-xl border border-border">
                 {/* Browser bar */}
@@ -451,7 +490,10 @@ export default function HomePage() {
       </section>
 
       {/* ─── How It Works ─── */}
-      <section id="how-it-works" className="border-t border-border bg-muted/30 py-24">
+      <section
+        id="how-it-works"
+        className="border-t border-border bg-muted/30 py-24"
+      >
         <div className="mx-auto max-w-7xl px-6">
           <AnimatedSection>
             <div className="mx-auto max-w-2xl text-center">
@@ -500,7 +542,7 @@ export default function HomePage() {
           <AnimatedSection>
             <div className="rounded-3xl border border-border bg-card p-10 shadow-sm sm:p-14">
               <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
-                {stats.map((stat, idx) => (
+                {stats.map((stat) => (
                   <div key={stat.label} className="text-center">
                     <AnimatedCounter
                       value={stat.value}
@@ -518,7 +560,10 @@ export default function HomePage() {
       </section>
 
       {/* ─── Testimonials ─── */}
-      <section id="testimonials" className="border-t border-border bg-muted/30 py-24">
+      <section
+        id="testimonials"
+        className="border-t border-border bg-muted/30 py-24"
+      >
         <div className="mx-auto max-w-7xl px-6">
           <AnimatedSection>
             <div className="mx-auto max-w-2xl text-center">
@@ -724,16 +769,15 @@ export default function HomePage() {
                   { label: "Terms of Service", href: "/terms" },
                   { label: "Security", href: "#" },
                 ].map((item) => (
-                    <li key={item.label}>
-                      <a
-                        href={item.href}
-                        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                      >
-                        {item.label}
-                      </a>
-                    </li>
-                  )
-                )}
+                  <li key={item.label}>
+                    <a
+                      href={item.href}
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>

@@ -24,30 +24,55 @@ export function GenerationModal({
   open,
   onOpenChange,
   storyTitle = "User Authentication with OAuth2",
-  acceptanceCriteriaCount = 3
 }: GenerationModalProps) {
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState("Analyzing requirements...");
   const [generatedCounts, setGeneratedCounts] = useState({
     positive: 0,
     negative: 0,
-    boundary: 0
+    boundary: 0,
   });
 
   useEffect(() => {
     if (open) {
       // Reset
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setProgress(0);
       setCurrentStep("Analyzing requirements...");
       setGeneratedCounts({ positive: 0, negative: 0, boundary: 0 });
 
       // Simulate AI generation
       const steps = [
-        { delay: 500, progress: 20, step: "Analyzing requirements...", counts: { positive: 0, negative: 0, boundary: 0 } },
-        { delay: 1500, progress: 40, step: "Generating positive test cases...", counts: { positive: 8, negative: 0, boundary: 0 } },
-        { delay: 2500, progress: 65, step: "Generating negative test cases...", counts: { positive: 8, negative: 5, boundary: 0 } },
-        { delay: 3500, progress: 85, step: "Generating boundary test cases...", counts: { positive: 8, negative: 5, boundary: 3 } },
-        { delay: 4500, progress: 100, step: "Finalizing test cases...", counts: { positive: 8, negative: 5, boundary: 3 } }
+        {
+          delay: 500,
+          progress: 20,
+          step: "Analyzing requirements...",
+          counts: { positive: 0, negative: 0, boundary: 0 },
+        },
+        {
+          delay: 1500,
+          progress: 40,
+          step: "Generating positive test cases...",
+          counts: { positive: 8, negative: 0, boundary: 0 },
+        },
+        {
+          delay: 2500,
+          progress: 65,
+          step: "Generating negative test cases...",
+          counts: { positive: 8, negative: 5, boundary: 0 },
+        },
+        {
+          delay: 3500,
+          progress: 85,
+          step: "Generating boundary test cases...",
+          counts: { positive: 8, negative: 5, boundary: 3 },
+        },
+        {
+          delay: 4500,
+          progress: 100,
+          step: "Finalizing test cases...",
+          counts: { positive: 8, negative: 5, boundary: 3 },
+        },
       ];
 
       steps.forEach(({ delay, progress, step, counts }) => {
@@ -60,7 +85,10 @@ export function GenerationModal({
     }
   }, [open]);
 
-  const totalGenerated = generatedCounts.positive + generatedCounts.negative + generatedCounts.boundary;
+  const totalGenerated =
+    generatedCounts.positive +
+    generatedCounts.negative +
+    generatedCounts.boundary;
   const isComplete = progress === 100;
 
   return (
@@ -72,9 +100,14 @@ export function GenerationModal({
               <Sparkles className="h-6 w-6" />
             </div>
             <div>
-              <DialogTitle className="text-2xl">AI Test Case Generation</DialogTitle>
+              <DialogTitle className="text-2xl">
+                AI Test Case Generation
+              </DialogTitle>
               <DialogDescription>
-                Generating test cases for: <span className="font-semibold text-foreground">{storyTitle}</span>
+                Generating test cases for:{" "}
+                <span className="font-semibold text-foreground">
+                  {storyTitle}
+                </span>
               </DialogDescription>
             </div>
           </div>
@@ -84,7 +117,9 @@ export function GenerationModal({
           {/* Progress Bar */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-semibold text-muted-foreground">{currentStep}</span>
+              <span className="font-semibold text-muted-foreground">
+                {currentStep}
+              </span>
               <span className="font-bold text-primary">{progress}%</span>
             </div>
             <Progress value={progress} className="h-3" />
@@ -106,7 +141,9 @@ export function GenerationModal({
                 <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center text-green-600 dark:text-green-400 mx-auto mb-2">
                   <CheckCircle2 className="h-5 w-5" />
                 </div>
-                <p className="text-2xl font-black">{generatedCounts.positive}</p>
+                <p className="text-2xl font-black">
+                  {generatedCounts.positive}
+                </p>
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   Positive
                 </p>
@@ -116,7 +153,9 @@ export function GenerationModal({
                 <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-2">
                   <CheckCircle2 className="h-5 w-5" />
                 </div>
-                <p className="text-2xl font-black">{generatedCounts.negative}</p>
+                <p className="text-2xl font-black">
+                  {generatedCounts.negative}
+                </p>
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   Negative
                 </p>
@@ -126,7 +165,9 @@ export function GenerationModal({
                 <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400 mx-auto mb-2">
                   <CheckCircle2 className="h-5 w-5" />
                 </div>
-                <p className="text-2xl font-black">{generatedCounts.boundary}</p>
+                <p className="text-2xl font-black">
+                  {generatedCounts.boundary}
+                </p>
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   Boundary
                 </p>

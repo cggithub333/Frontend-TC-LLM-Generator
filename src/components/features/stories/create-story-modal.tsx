@@ -64,7 +64,7 @@ export function CreateStoryModal({
       ...formData,
       acceptanceCriteria: [
         ...formData.acceptanceCriteria,
-        { id: Date.now().toString(), description: "" },
+        { id: crypto.randomUUID(), description: "" },
       ],
     });
   };

@@ -33,19 +33,16 @@ export default function WorkspacesPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null);
+  const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(
+    null,
+  );
 
   const { data: user } = useCurrentUser();
   const queryClient = useQueryClient();
-  const {
-    data: workspacesResult,
-    isLoading,
-    error,
-    refetch,
-  } = useWorkspaces();
+  const { data: workspacesResult, isLoading, error, refetch } = useWorkspaces();
 
   // Subscribe to real-time workspace events
-  const { status: wsStatus } = useWebSocket<EntityEvent>({
+  useWebSocket<EntityEvent>({
     topic: "/topic/workspaces",
     onMessage: (event) => {
       console.log("[WS] Workspace event:", event.action, event.entityId);
@@ -63,7 +60,7 @@ export default function WorkspacesPage() {
     return workspaces.filter(
       (ws) =>
         ws.name.toLowerCase().includes(q) ||
-        ws.description?.toLowerCase().includes(q)
+        ws.description?.toLowerCase().includes(q),
     );
   }, [workspaces, searchQuery]);
 
@@ -94,9 +91,7 @@ export default function WorkspacesPage() {
           <LayoutDashboard className="h-10 w-10 text-muted-foreground" />
         </div>
         <h3 className="text-xl font-bold mb-2">
-          {searchQuery.trim()
-            ? "No workspaces found"
-            : "No workspaces yet"}
+          {searchQuery.trim() ? "No workspaces found" : "No workspaces yet"}
         </h3>
         <p className="text-muted-foreground text-center max-w-md mb-6">
           {searchQuery.trim()

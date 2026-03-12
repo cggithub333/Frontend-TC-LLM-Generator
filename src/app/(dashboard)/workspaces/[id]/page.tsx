@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useProjectsByWorkspace } from "@/hooks/use-projects";
 import { useWorkspace } from "@/hooks/use-workspaces";
 import { useCurrentUser } from "@/hooks/use-auth";
@@ -32,7 +32,6 @@ import {
 import type { Project } from "@/types/workspace.types";
 
 export default function WorkspaceDetailPage() {
-  const router = useRouter();
   const params = useParams();
   const workspaceId = params.id as string;
 
@@ -54,7 +53,6 @@ export default function WorkspaceDetailPage() {
     data: projectsResult,
     isLoading: projectsLoading,
     error: projectsError,
-    refetch: refetchProjects,
   } = useProjectsByWorkspace(workspaceId);
 
   const queryClient = useQueryClient();
@@ -65,7 +63,9 @@ export default function WorkspaceDetailPage() {
     onMessage: (event) => {
       console.log("[WS] Project event:", event.action, event.entityId);
       // Invalidate project queries to trigger re-fetch
-      queryClient.invalidateQueries({ queryKey: ["projects", "workspace", workspaceId] });
+      queryClient.invalidateQueries({
+        queryKey: ["projects", "workspace", workspaceId],
+      });
     },
   });
 
