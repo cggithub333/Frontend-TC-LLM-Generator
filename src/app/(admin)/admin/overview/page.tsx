@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import {
   Users,
   FolderKanban,
@@ -9,8 +9,7 @@ import {
   Calendar,
   Bell,
   Filter,
-  Loader2,
-  TrendingUp,
+
 } from "lucide-react";
 import { StatsCard } from "@/components/features/admin/stats-card";
 import { useAdminOverview } from "@/hooks/use-admin-overview";
