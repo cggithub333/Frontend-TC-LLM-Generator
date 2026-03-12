@@ -40,7 +40,7 @@ export default function ProjectStoriesPage() {
   // Listen to realtime story events
   useWebSocket({
     topic: `/topic/projects/${projectId}/stories`,
-    onMessage: (message: any) => {
+    onMessage: (message: unknown) => {
       console.log("Realtime story update:", message);
       queryClient.invalidateQueries({
         queryKey: ["stories", "project", projectId],
