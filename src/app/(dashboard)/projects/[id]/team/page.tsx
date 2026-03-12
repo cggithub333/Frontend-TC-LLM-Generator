@@ -7,6 +7,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { useProjectMembers } from "@/hooks/use-project-members";
 import { useProjects } from "@/hooks/use-projects";
 import { filterMembersByQuery } from "@/lib/utils/member.utils";
@@ -41,7 +42,7 @@ export default function TeamManagementPage() {
 
   const currentProject = useMemo(
     () => projectsResult?.items.find((p) => p.projectId === projectId),
-    [projectsResult, projectId]
+    [projectsResult, projectId],
   );
 
   const filteredMembers = useMemo(() => {
@@ -52,7 +53,10 @@ export default function TeamManagementPage() {
   const totalMembers = filteredMembers.length;
   const totalPages = Math.ceil(totalMembers / DEFAULT_MEMBERS_PER_PAGE);
   const startIndex = (currentPage - 1) * DEFAULT_MEMBERS_PER_PAGE + 1;
-  const endIndex = Math.min(currentPage * DEFAULT_MEMBERS_PER_PAGE, totalMembers);
+  const endIndex = Math.min(
+    currentPage * DEFAULT_MEMBERS_PER_PAGE,
+    totalMembers,
+  );
 
   const paginatedMembers = useMemo(() => {
     const start = (currentPage - 1) * DEFAULT_MEMBERS_PER_PAGE;
@@ -106,12 +110,12 @@ export default function TeamManagementPage() {
       <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
         <div className="text-center">
           <p className="text-destructive mb-4 font-medium">Project not found</p>
-          <a
+          <Link
             href="/workspaces"
             className="text-primary hover:text-primary/80 font-medium"
           >
             Back to Workspaces
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -144,9 +148,7 @@ export default function TeamManagementPage() {
         <main className="p-8">
           <TeamStatsCards stats={teamStats} />
           <div className="text-center py-12">
-            <p className="text-muted-foreground mb-4">
-              No team members yet
-            </p>
+            <p className="text-muted-foreground mb-4">No team members yet</p>
             <button
               onClick={handleInviteMember}
               className="text-primary hover:text-primary/80 font-medium"
