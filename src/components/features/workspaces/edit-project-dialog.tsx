@@ -19,7 +19,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertCircle, Link as LinkIcon } from "lucide-react";
-import type { UpdateProjectInput, ProjectFormErrors } from "@/types/project.types";
+import type {
+  UpdateProjectInput,
+  ProjectFormErrors,
+} from "@/types/project.types";
 import {
   validateProjectName,
   validateJiraSiteId,
@@ -56,6 +59,7 @@ export function EditProjectDialog({
 
   useEffect(() => {
     if (project && open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         name: project.name,
         description: project.description || "",
@@ -73,7 +77,7 @@ export function EditProjectDialog({
       setTouched((prev) => ({ ...prev, [field]: true }));
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     },
-    []
+    [],
   );
 
   const handleFieldBlur = useCallback(
@@ -91,7 +95,7 @@ export function EditProjectDialog({
         case "jiraProjectKey":
           error = validateJiraProjectKey(
             formData.jiraProjectKey || "",
-            formData.jiraSiteId || ""
+            formData.jiraSiteId || "",
           );
           break;
       }
@@ -100,7 +104,7 @@ export function EditProjectDialog({
         setErrors((prev) => ({ ...prev, [field]: error }));
       }
     },
-    [formData]
+    [formData],
   );
 
   const handleSubmit = useCallback(
@@ -111,7 +115,7 @@ export function EditProjectDialog({
       const jiraSiteError = validateJiraSiteId(formData.jiraSiteId || "");
       const jiraProjectError = validateJiraProjectKey(
         formData.jiraProjectKey || "",
-        formData.jiraSiteId || ""
+        formData.jiraSiteId || "",
       );
 
       const formErrors: ProjectFormErrors = {
@@ -142,7 +146,7 @@ export function EditProjectDialog({
         console.error("Failed to update project:", error);
       }
     },
-    [formData, project, updateProject, onOpenChange, onSuccess]
+    [formData, project, updateProject, onOpenChange, onSuccess],
   );
 
   const handleClose = useCallback(() => {
@@ -171,7 +175,10 @@ export function EditProjectDialog({
             {/* Project Name */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center">
-                <Label htmlFor="edit-project-name" className="text-sm font-semibold">
+                <Label
+                  htmlFor="edit-project-name"
+                  className="text-sm font-semibold"
+                >
                   Project Name <span className="text-destructive">*</span>
                 </Label>
               </div>
@@ -183,7 +190,7 @@ export function EditProjectDialog({
                 placeholder="e.g. Mobile App Testing"
                 className={cn(
                   "transition-all bg-background",
-                  touched.name && errors.name && "border-destructive"
+                  touched.name && errors.name && "border-destructive",
                 )}
                 disabled={updateProject.isPending}
                 autoFocus
@@ -207,7 +214,9 @@ export function EditProjectDialog({
               <Textarea
                 id="edit-project-description"
                 value={formData.description}
-                onChange={(e) => handleFieldChange("description", e.target.value)}
+                onChange={(e) =>
+                  handleFieldChange("description", e.target.value)
+                }
                 rows={3}
                 placeholder="Brief description of this project..."
                 className="resize-none bg-background transition-colors focus-visible:ring-1"
@@ -240,14 +249,16 @@ export function EditProjectDialog({
                   <Input
                     id="edit-jira-site-id"
                     value={formData.jiraSiteId}
-                    onChange={(e) => handleFieldChange("jiraSiteId", e.target.value)}
+                    onChange={(e) =>
+                      handleFieldChange("jiraSiteId", e.target.value)
+                    }
                     onBlur={() => handleFieldBlur("jiraSiteId")}
                     placeholder="e.g. https://your-domain.atlassian.net"
                     className={cn(
                       "h-9 text-sm bg-background",
                       touched.jiraSiteId &&
                         errors.jiraSiteId &&
-                        "border-destructive"
+                        "border-destructive",
                     )}
                     disabled={updateProject.isPending}
                   />
@@ -272,7 +283,7 @@ export function EditProjectDialog({
                     onChange={(e) =>
                       handleFieldChange(
                         "jiraProjectKey",
-                        e.target.value.toUpperCase()
+                        e.target.value.toUpperCase(),
                       )
                     }
                     onBlur={() => handleFieldBlur("jiraProjectKey")}
@@ -281,7 +292,7 @@ export function EditProjectDialog({
                       "h-9 text-sm uppercase bg-background",
                       touched.jiraProjectKey &&
                         errors.jiraProjectKey &&
-                        "border-destructive"
+                        "border-destructive",
                     )}
                     disabled={updateProject.isPending}
                   />

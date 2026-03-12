@@ -45,6 +45,7 @@ export function EditWorkspaceDialog({
 
   useEffect(() => {
     if (workspace && open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setName(workspace.name);
       setDescription(workspace.description || "");
       setErrors({});
@@ -82,7 +83,7 @@ export function EditWorkspaceDialog({
         console.error("Failed to update workspace:", error);
       }
     },
-    [name, description, workspace, updateWorkspace, onOpenChange, onSuccess]
+    [name, description, workspace, updateWorkspace, onOpenChange, onSuccess],
   );
 
   const handleClose = useCallback(() => {
@@ -106,7 +107,10 @@ export function EditWorkspaceDialog({
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {/* Workspace Name */}
           <div className="space-y-1.5">
-            <Label htmlFor="edit-workspace-name" className="text-sm font-semibold">
+            <Label
+              htmlFor="edit-workspace-name"
+              className="text-sm font-semibold"
+            >
               Workspace Name <span className="text-destructive">*</span>
             </Label>
             <Input
@@ -120,7 +124,7 @@ export function EditWorkspaceDialog({
               placeholder="e.g. Mobile App Testing"
               className={cn(
                 "transition-all",
-                touched.name && errors.name && "border-destructive"
+                touched.name && errors.name && "border-destructive",
               )}
               disabled={updateWorkspace.isPending}
               autoFocus

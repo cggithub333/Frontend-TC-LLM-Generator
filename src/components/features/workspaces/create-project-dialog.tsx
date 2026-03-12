@@ -65,11 +65,13 @@ export function CreateProjectDialog({
   useEffect(() => {
     if (formData.name && !touched.projectKey) {
       const generatedKey = generateProjectKey(formData.name);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData((prev) => ({ ...prev, projectKey: generatedKey }));
     }
   }, [formData.name, touched.projectKey]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFormData((prev) => ({ ...prev, workspaceId }));
   }, [workspaceId]);
 
@@ -79,7 +81,7 @@ export function CreateProjectDialog({
       setTouched((prev) => ({ ...prev, [field]: true }));
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     },
-    []
+    [],
   );
 
   const handleFieldBlur = useCallback(
@@ -100,7 +102,7 @@ export function CreateProjectDialog({
         case "jiraProjectKey":
           error = validateJiraProjectKey(
             formData.jiraProjectKey || "",
-            formData.jiraSiteId
+            formData.jiraSiteId,
           );
           break;
       }
@@ -109,7 +111,7 @@ export function CreateProjectDialog({
         setErrors((prev) => ({ ...prev, [field]: error }));
       }
     },
-    [formData, projectKeyValidation]
+    [formData, projectKeyValidation],
   );
 
   const validateForm = useCallback((): boolean => {
@@ -127,7 +129,7 @@ export function CreateProjectDialog({
 
     const jiraKeyError = validateJiraProjectKey(
       formData.jiraProjectKey || "",
-      formData.jiraSiteId
+      formData.jiraSiteId,
     );
     if (jiraKeyError) newErrors.jiraProjectKey = jiraKeyError;
 
@@ -148,7 +150,10 @@ export function CreateProjectDialog({
       });
 
       if (!formData.workspaceId) {
-        setErrors((prev) => ({ ...prev, name: "No workspace available. Please create a workspace first." }));
+        setErrors((prev) => ({
+          ...prev,
+          name: "No workspace available. Please create a workspace first.",
+        }));
         return;
       }
 
@@ -176,7 +181,14 @@ export function CreateProjectDialog({
         console.error("Failed to create project:", error);
       }
     },
-    [validateForm, createProject, formData, onOpenChange, onSuccess, workspaceId]
+    [
+      validateForm,
+      createProject,
+      formData,
+      onOpenChange,
+      onSuccess,
+      workspaceId,
+    ],
   );
 
   const handleClose = useCallback(() => {
@@ -212,7 +224,7 @@ export function CreateProjectDialog({
                 placeholder="e.g. Web Dashboard V2"
                 className={cn(
                   "transition-all",
-                  touched.name && errors.name && "border-destructive"
+                  touched.name && errors.name && "border-destructive",
                 )}
                 disabled={createProject.isPending}
               />
@@ -235,7 +247,7 @@ export function CreateProjectDialog({
                   onChange={(e) =>
                     handleFieldChange(
                       "projectKey",
-                      e.target.value.toUpperCase()
+                      e.target.value.toUpperCase(),
                     )
                   }
                   onBlur={() => handleFieldBlur("projectKey")}
@@ -246,7 +258,7 @@ export function CreateProjectDialog({
                       "border-green-500 bg-green-50/30 dark:bg-green-900/10",
                     !projectKeyValidation.isValid &&
                       touched.projectKey &&
-                      "border-destructive bg-destructive/5"
+                      "border-destructive bg-destructive/5",
                   )}
                   maxLength={10}
                   disabled={createProject.isPending}
@@ -314,7 +326,7 @@ export function CreateProjectDialog({
                   className={cn(
                     touched.jiraSiteId &&
                       errors.jiraSiteId &&
-                      "border-destructive"
+                      "border-destructive",
                   )}
                   disabled={createProject.isPending}
                 />
@@ -340,7 +352,7 @@ export function CreateProjectDialog({
                     onChange={(e) =>
                       handleFieldChange(
                         "jiraProjectKey",
-                        e.target.value.toUpperCase()
+                        e.target.value.toUpperCase(),
                       )
                     }
                     onBlur={() => handleFieldBlur("jiraProjectKey")}
@@ -349,7 +361,7 @@ export function CreateProjectDialog({
                       "uppercase",
                       touched.jiraProjectKey &&
                         errors.jiraProjectKey &&
-                        "border-destructive bg-destructive/5"
+                        "border-destructive bg-destructive/5",
                     )}
                     disabled={createProject.isPending}
                   />
