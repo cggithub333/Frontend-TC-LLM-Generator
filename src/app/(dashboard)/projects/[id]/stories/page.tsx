@@ -9,6 +9,7 @@ import {
 } from "@/hooks/use-stories";
 import { useUpdateAcceptanceCriteria } from "@/hooks/use-acceptance-criteria";
 import { CreateStoryModal } from "@/components/features/stories/create-story-modal";
+import type { StoryFormData } from "@/components/features/stories/create-story-modal";
 import type { AcceptanceCriteria } from "@/types/story.types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -71,19 +72,14 @@ export default function ProjectStoriesPage() {
     );
   };
 
-  const handleCreateStory = async (formData: {
-    asA: string;
-    iWantTo: string;
-    soThat: string;
-    acceptanceCriteria: { id: string; description: string }[];
-  }) => {
+  const handleCreateStory = async (formData: StoryFormData) => {
     try {
       const titleStr =
         formData.iWantTo.slice(0, 50) +
         (formData.iWantTo.length > 50 ? "..." : "");
 
       await createStory.mutateAsync({
-        projectId,
+        projectId: formData.projectId || projectId,
         title: titleStr,
         asA: formData.asA,
         iWantTo: formData.iWantTo,
@@ -367,6 +363,7 @@ export default function ProjectStoriesPage() {
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
         onCreateStory={handleCreateStory}
+        defaultProjectId={projectId}
       />
     </div>
   );

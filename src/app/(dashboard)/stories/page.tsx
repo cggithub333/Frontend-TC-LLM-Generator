@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { CreateStoryModal } from "@/components/features/stories/create-story-modal";
+import type { StoryFormData } from "@/components/features/stories/create-story-modal";
 import { useStories, useCreateStory } from "@/hooks/use-stories";
 import { useUpdateAcceptanceCriteria } from "@/hooks/use-acceptance-criteria";
 import { extractPage } from "@/types/pagination.types";
@@ -61,14 +62,9 @@ export default function StoriesPage() {
     return { completed, total: criteria.length };
   };
 
-  const handleCreateStory = (formData: {
-    asA: string;
-    iWantTo: string;
-    soThat: string;
-    acceptanceCriteria: { id: string; description: string }[];
-  }) => {
+  const handleCreateStory = (formData: StoryFormData) => {
     createStory.mutate({
-      projectId: stories[0]?.projectId ?? "",
+      projectId: formData.projectId,
       title: formData.iWantTo.slice(0, 50) || "Untitled Story",
       asA: formData.asA,
       iWantTo: formData.iWantTo,
