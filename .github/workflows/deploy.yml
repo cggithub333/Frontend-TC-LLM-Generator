@@ -24,7 +24,7 @@ jobs:
         run: |
           cat > .env << EOF
           BACKEND_API_URL=${{ vars.BACKEND_API_URL }}
-          NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ vars.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
+          NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
           NEXT_PUBLIC_WS_URL=${{ vars.NEXT_PUBLIC_WS_URL }}
           EOF
 
@@ -38,7 +38,7 @@ jobs:
         run: npm run build
         env:
           BACKEND_API_URL: ${{ vars.BACKEND_API_URL }}
-          NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${{ vars.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
+          NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
           NEXT_PUBLIC_WS_URL: ${{ vars.NEXT_PUBLIC_WS_URL }}
 
       - name: Deploy (restart container)
@@ -52,6 +52,6 @@ jobs:
             --restart unless-stopped \
             -p 3000:3000 \
             -e BACKEND_API_URL=${{ vars.BACKEND_API_URL }} \
-            -e NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ vars.NEXT_PUBLIC_GOOGLE_CLIENT_ID }} \
+            -e NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }} \
             -e NEXT_PUBLIC_WS_URL=${{ vars.NEXT_PUBLIC_WS_URL }} \
             frontend-tc-llm-generator:latest
