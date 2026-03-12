@@ -11,22 +11,15 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Save,
-  Search,
-  Folder,
-  Plus,
-  CheckCircle2
-} from "lucide-react";
+import { Save, Search, Folder, Plus, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const existingSuites = [
   { id: "TS-AUTH-001", name: "Authentication Module", testCases: 24 },
   { id: "TS-PAYMENT-001", name: "Payment Processing", testCases: 18 },
   { id: "TS-CHECKOUT-001", name: "Checkout Flow", testCases: 32 },
-  { id: "TS-ADMIN-001", name: "Admin Dashboard", testCases: 15 }
+  { id: "TS-ADMIN-001", name: "Admin Dashboard", testCases: 15 },
 ];
 
 interface SaveTestCaseModalProps {
@@ -38,16 +31,17 @@ interface SaveTestCaseModalProps {
 export function SaveTestCaseModal({
   open,
   onOpenChange,
-  testCaseTitle = "Verify Google OAuth Login Flow"
+  testCaseTitle = "Verify Google OAuth Login Flow",
 }: SaveTestCaseModalProps) {
   const [selectedSuite, setSelectedSuite] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [newSuiteName, setNewSuiteName] = useState("");
 
-  const filteredSuites = existingSuites.filter(suite =>
-    suite.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    suite.id.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredSuites = existingSuites.filter(
+    (suite) =>
+      suite.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      suite.id.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleSave = () => {
@@ -59,9 +53,14 @@ export function SaveTestCaseModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Save Test Case to Suite</DialogTitle>
+          <DialogTitle className="text-2xl">
+            Save Test Case to Suite
+          </DialogTitle>
           <DialogDescription>
-            Select an existing suite or create a new one for: <span className="font-semibold text-foreground">{testCaseTitle}</span>
+            Select an existing suite or create a new one for:{" "}
+            <span className="font-semibold text-foreground">
+              {testCaseTitle}
+            </span>
           </DialogDescription>
         </DialogHeader>
 
@@ -88,7 +87,9 @@ export function SaveTestCaseModal({
                 </div>
                 <div>
                   <h3 className="font-bold">Create New Suite</h3>
-                  <p className="text-xs text-muted-foreground">Enter a name for your new test suite</p>
+                  <p className="text-xs text-muted-foreground">
+                    Enter a name for your new test suite
+                  </p>
                 </div>
               </div>
               <Input
@@ -148,7 +149,7 @@ export function SaveTestCaseModal({
                           "p-4 rounded-xl border-2 cursor-pointer transition-all hover:border-primary/40 hover:bg-accent/50",
                           selectedSuite === suite.id
                             ? "border-primary bg-primary/5"
-                            : "border-border bg-card"
+                            : "border-border bg-card",
                         )}
                         onClick={() => setSelectedSuite(suite.id)}
                       >
@@ -165,7 +166,9 @@ export function SaveTestCaseModal({
                                 <CheckCircle2 className="h-4 w-4 text-primary" />
                               )}
                             </div>
-                            <h4 className="font-bold text-sm truncate">{suite.name}</h4>
+                            <h4 className="font-bold text-sm truncate">
+                              {suite.name}
+                            </h4>
                             <p className="text-xs text-muted-foreground">
                               {suite.testCases} test cases
                             </p>
