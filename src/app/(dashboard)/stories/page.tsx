@@ -39,13 +39,13 @@ export default function StoriesPage() {
 
   const toggleExpand = (id: string) => {
     setExpandedStories((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
     );
   };
 
   const toggleSelect = (id: string) => {
     setSelectedStories((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
     );
   };
 
@@ -107,7 +107,12 @@ export default function StoriesPage() {
     <div className="p-8 space-y-6 max-w-5xl mx-auto w-full">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/workspaces" className="hover:text-foreground cursor-pointer">Workspaces</Link>
+        <Link
+          href="/workspaces"
+          className="hover:text-foreground cursor-pointer"
+        >
+          Workspaces
+        </Link>
         <ChevronRight className="h-4 w-4" />
         <span className="text-foreground font-semibold">All User Stories</span>
       </div>
@@ -121,18 +126,25 @@ export default function StoriesPage() {
             </div>
             <div>
               <h3 className="font-bold text-lg mb-1">Repository</h3>
-              <p className="text-sm text-muted-foreground">View and manage test assets</p>
+              <p className="text-sm text-muted-foreground">
+                View and manage test assets
+              </p>
             </div>
           </div>
         </div>
-        <Link href="/test-plans" className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-colors cursor-pointer">
+        <Link
+          href="/test-plans"
+          className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-colors cursor-pointer"
+        >
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center">
               <ClipboardList className="h-6 w-6 text-slate-600 dark:text-slate-400" />
             </div>
             <div>
               <h3 className="font-bold text-lg mb-1">Test Plans</h3>
-              <p className="text-sm text-muted-foreground">Structure your testing strategy</p>
+              <p className="text-sm text-muted-foreground">
+                Structure your testing strategy
+              </p>
             </div>
           </div>
         </Link>
@@ -141,10 +153,7 @@ export default function StoriesPage() {
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search user stories..."
-          className="pl-12"
-        />
+        <Input placeholder="Search user stories..." className="pl-12" />
       </div>
 
       {/* Stories List */}
@@ -152,7 +161,9 @@ export default function StoriesPage() {
         <div className="text-center py-16 text-muted-foreground">
           <ListChecks className="h-12 w-12 mx-auto mb-4 opacity-50" />
           <p className="text-lg font-medium">No user stories yet</p>
-          <p className="text-sm mt-1">Create your first user story to get started.</p>
+          <p className="text-sm mt-1">
+            Create your first user story to get started.
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -173,15 +184,21 @@ export default function StoriesPage() {
                     onCheckedChange={() => toggleSelect(story.userStoryId)}
                     className="mt-1"
                   />
-                  <Link href={`/stories/${story.userStoryId}`} className="flex-1 min-w-0 cursor-pointer">
+                  <Link
+                    href={`/stories/${story.userStoryId}`}
+                    className="flex-1 min-w-0 cursor-pointer"
+                  >
                     <div className="flex items-center gap-3 mb-1">
                       <Badge
                         variant="outline"
                         className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 font-semibold"
                       >
-                        {story.jiraIssueKey ?? story.userStoryId.slice(0, 8).toUpperCase()}
+                        {story.jiraIssueKey ??
+                          story.userStoryId.slice(0, 8).toUpperCase()}
                       </Badge>
-                      <h3 className="font-bold text-lg hover:text-primary transition-colors">{story.title}</h3>
+                      <h3 className="font-bold text-lg hover:text-primary transition-colors">
+                        {story.title}
+                      </h3>
                     </div>
                     {!isExpanded && (
                       <div className="flex items-center gap-4 mt-2">
@@ -193,7 +210,9 @@ export default function StoriesPage() {
                         <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
                           <div className="flex items-center gap-1">
                             <ListChecks className="h-4 w-4" />
-                            <span>{(story.acceptanceCriteria ?? []).length} ACs</span>
+                            <span>
+                              {(story.acceptanceCriteria ?? []).length} ACs
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -228,13 +247,21 @@ export default function StoriesPage() {
                             <span className="font-medium">{story.asA}</span>,
                           </p>
                           <p>
-                            <span className="text-muted-foreground">I WANT TO</span>{" "}
-                            <span className="font-medium">{story.iWantTo}</span>,
+                            <span className="text-muted-foreground">
+                              I WANT TO
+                            </span>{" "}
+                            <span className="font-medium">{story.iWantTo}</span>
+                            ,
                           </p>
                           {story.soThat && (
                             <p>
-                              <span className="text-muted-foreground">SO THAT</span>{" "}
-                              <span className="font-medium">{story.soThat}</span>.
+                              <span className="text-muted-foreground">
+                                SO THAT
+                              </span>{" "}
+                              <span className="font-medium">
+                                {story.soThat}
+                              </span>
+                              .
                             </p>
                           )}
                         </div>
@@ -269,7 +296,9 @@ export default function StoriesPage() {
                                     : "border-2 border-muted-foreground/30 group-hover:border-primary/50"
                                 }`}
                               >
-                                {criteria.completed && <Check className="h-3 w-3" />}
+                                {criteria.completed && (
+                                  <Check className="h-3 w-3" />
+                                )}
                               </div>
                               <p
                                 className={

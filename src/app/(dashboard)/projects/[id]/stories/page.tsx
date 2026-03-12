@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { useStoriesByProject, useCreateStory, useDeleteStory } from "@/hooks/use-stories";
+import {
+  useStoriesByProject,
+  useCreateStory,
+  useDeleteStory,
+} from "@/hooks/use-stories";
 import { useUpdateAcceptanceCriteria } from "@/hooks/use-acceptance-criteria";
 import { CreateStoryModal } from "@/components/features/stories/create-story-modal";
 import type { AcceptanceCriteria } from "@/types/story.types";
@@ -37,12 +41,14 @@ export default function ProjectStoriesPage() {
     topic: `/topic/projects/${projectId}/stories`,
     onMessage: (message: any) => {
       console.log("Realtime story update:", message);
-      queryClient.invalidateQueries({ queryKey: ["stories", "project", projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ["stories", "project", projectId],
+      });
     },
   });
 
   const { data: storiesData, isLoading } = useStoriesByProject(projectId);
-  
+
   const createStory = useCreateStory();
   const deleteStory = useDeleteStory();
 
@@ -55,13 +61,13 @@ export default function ProjectStoriesPage() {
 
   const toggleExpand = (id: string) => {
     setExpandedStories((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
     );
   };
 
   const toggleSelect = (id: string) => {
     setSelectedStories((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
     );
   };
 
@@ -72,7 +78,9 @@ export default function ProjectStoriesPage() {
     acceptanceCriteria: { id: string; description: string }[];
   }) => {
     try {
-      const titleStr = formData.iWantTo.slice(0, 50) + (formData.iWantTo.length > 50 ? "..." : "");
+      const titleStr =
+        formData.iWantTo.slice(0, 50) +
+        (formData.iWantTo.length > 50 ? "..." : "");
 
       await createStory.mutateAsync({
         projectId,
@@ -107,10 +115,10 @@ export default function ProjectStoriesPage() {
   }
 
   const filteredStories = stories.filter(
-    (story) => 
+    (story) =>
       story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       story.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      story.jiraIssueKey?.toLowerCase().includes(searchQuery.toLowerCase())
+      story.jiraIssueKey?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -124,18 +132,25 @@ export default function ProjectStoriesPage() {
             </div>
             <div>
               <h3 className="font-bold text-lg mb-1">Repository</h3>
-              <p className="text-sm text-muted-foreground">View and manage test assets</p>
+              <p className="text-sm text-muted-foreground">
+                View and manage test assets
+              </p>
             </div>
           </div>
         </div>
-        <Link href={`/projects/${projectId}/test-plans`} className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-colors cursor-pointer">
+        <Link
+          href={`/projects/${projectId}/test-plans`}
+          className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-colors cursor-pointer"
+        >
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center">
               <ClipboardList className="h-6 w-6 text-slate-600 dark:text-slate-400" />
             </div>
             <div>
               <h3 className="font-bold text-lg mb-1">Test Plans</h3>
-              <p className="text-sm text-muted-foreground">Structure your testing strategy</p>
+              <p className="text-sm text-muted-foreground">
+                Structure your testing strategy
+              </p>
             </div>
           </div>
         </Link>
@@ -157,9 +172,12 @@ export default function ProjectStoriesPage() {
         {filteredStories.map((story) => {
           const isExpanded = expandedStories.includes(story.userStoryId);
           const isSelected = selectedStories.includes(story.userStoryId);
-          
+
           const acs = story.acceptanceCriteria || [];
-          const stats = { completed: acs.filter(ac => ac.completed).length, total: acs.length };
+          const stats = {
+            completed: acs.filter((ac) => ac.completed).length,
+            total: acs.length,
+          };
 
           return (
             <div
@@ -173,20 +191,26 @@ export default function ProjectStoriesPage() {
                   onCheckedChange={() => toggleSelect(story.userStoryId)}
                   className="mt-1"
                 />
-                <div className="flex-1 min-w-0 cursor-pointer" onClick={() => toggleExpand(story.userStoryId)}>
+                <div
+                  className="flex-1 min-w-0 cursor-pointer"
+                  onClick={() => toggleExpand(story.userStoryId)}
+                >
                   <div className="flex items-center gap-3 mb-1">
                     <Badge
                       variant="outline"
                       className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 font-semibold"
                     >
-                      {story.jiraIssueKey || 'US'}
+                      {story.jiraIssueKey || "US"}
                     </Badge>
-                    <h3 className="font-bold text-lg hover:text-primary transition-colors">{story.title}</h3>
+                    <h3 className="font-bold text-lg hover:text-primary transition-colors">
+                      {story.title}
+                    </h3>
                   </div>
                   {!isExpanded && (
                     <div className="flex items-center gap-4 mt-2">
                       <p className="text-sm text-muted-foreground line-clamp-1 flex-1">
-                        As a {story.asA}, I want to {story.iWantTo} so that {story.soThat}...
+                        As a {story.asA}, I want to {story.iWantTo} so that{" "}
+                        {story.soThat}...
                       </p>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
                         <div className="flex items-center gap-1">
@@ -262,7 +286,9 @@ export default function ProjectStoriesPage() {
                                 : "border-2 border-muted-foreground/30 group-hover:border-primary/50"
                             }`}
                           >
-                            {criteria.completed && <Check className="h-3 w-3" />}
+                            {criteria.completed && (
+                              <Check className="h-3 w-3" />
+                            )}
                           </div>
                           <p
                             className={
@@ -283,13 +309,15 @@ export default function ProjectStoriesPage() {
                     <Sparkles className="h-4 w-4" />
                     Generate Tests
                   </Button>
-                  
+
                   {/* Delete Button */}
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className="w-full text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                     onClick={async () => {
-                      if (confirm('Are you sure you want to delete this story?')) {
+                      if (
+                        confirm("Are you sure you want to delete this story?")
+                      ) {
                         await deleteStory.mutateAsync(story.userStoryId);
                       }
                     }}

@@ -1,4 +1,9 @@
-export type StoryStatus = "DRAFT" | "READY" | "IN_PROGRESS" | "DONE" | "ARCHIVED";
+export type StoryStatus =
+  | "DRAFT"
+  | "READY"
+  | "IN_PROGRESS"
+  | "DONE"
+  | "ARCHIVED";
 
 export interface AcceptanceCriteria {
   acceptanceCriteriaId: string;

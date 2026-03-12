@@ -28,7 +28,8 @@ const mockDiscussion = [
     author: "Sarah Adams",
     initials: "SA",
     color: "bg-indigo-100 text-indigo-600",
-    message: "Should we support Apple Calendar in this first iteration as well? Many users requested it during the beta.",
+    message:
+      "Should we support Apple Calendar in this first iteration as well? Many users requested it during the beta.",
     time: "2h ago",
   },
   {
@@ -36,7 +37,8 @@ const mockDiscussion = [
     author: "Mike K.",
     initials: "MK",
     color: "bg-amber-100 text-amber-600",
-    message: "Let's stick to Google and Outlook for MVP. Apple requires a separate CalDAV implementation which is planned for US-105.",
+    message:
+      "Let's stick to Google and Outlook for MVP. Apple requires a separate CalDAV implementation which is planned for US-105.",
     time: "1h ago",
   },
 ];
@@ -64,7 +66,7 @@ export default function StoryDetailPage() {
 
   const toggleCriteria = (id: string) => {
     setSelectedCriteria((prev) =>
-      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
     );
   };
 
@@ -81,9 +83,19 @@ export default function StoryDetailPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Breadcrumb */}
           <nav className="flex items-center text-sm font-medium text-muted-foreground">
-            <Link href="/workspaces" className="hover:text-primary transition-colors">Workspaces</Link>
+            <Link
+              href="/workspaces"
+              className="hover:text-primary transition-colors"
+            >
+              Workspaces
+            </Link>
             <ChevronRight className="h-4 w-4 mx-2" />
-            <Link href="/stories" className="hover:text-primary transition-colors">{story.projectName}</Link>
+            <Link
+              href="/stories"
+              className="hover:text-primary transition-colors"
+            >
+              {story.projectName}
+            </Link>
             <ChevronRight className="h-4 w-4 mx-2" />
             <span className="text-foreground font-semibold">{storyId}</span>
           </nav>
@@ -115,7 +127,9 @@ export default function StoryDetailPage() {
                   Created {story.createdAt}
                 </span>
               </div>
-              <h1 className="text-4xl font-extrabold tracking-tight">Story Details</h1>
+              <h1 className="text-4xl font-extrabold tracking-tight">
+                Story Details
+              </h1>
             </div>
 
             {/* Tabs */}
@@ -128,7 +142,7 @@ export default function StoryDetailPage() {
                     "px-8 py-2 rounded-lg text-sm font-semibold transition-all",
                     activeTab === tab.id
                       ? "bg-card shadow-sm text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {tab.label}
@@ -152,7 +166,10 @@ export default function StoryDetailPage() {
                     <span className="h-2 w-2 bg-white rounded-full mr-2.5 animate-pulse" />
                     {story.status}
                   </Badge>
-                  <Badge variant="outline" className="bg-white/10 backdrop-blur-md text-white border-white/20">
+                  <Badge
+                    variant="outline"
+                    className="bg-white/10 backdrop-blur-md text-white border-white/20"
+                  >
                     # {story.jiraIssueKey || storyId}
                   </Badge>
                 </div>
@@ -175,15 +192,21 @@ export default function StoryDetailPage() {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 bg-muted/30 rounded-2xl p-8 border">
                 <div className="md:col-span-3">
-                  <span className="text-xs font-black text-primary uppercase tracking-tighter">As a</span>
+                  <span className="text-xs font-black text-primary uppercase tracking-tighter">
+                    As a
+                  </span>
                   <div className="text-xl font-bold mt-1">{story.asA}</div>
                 </div>
                 <div className="md:col-span-4">
-                  <span className="text-xs font-black text-primary uppercase tracking-tighter">I want to</span>
+                  <span className="text-xs font-black text-primary uppercase tracking-tighter">
+                    I want to
+                  </span>
                   <div className="text-xl font-bold mt-1">{story.iWantTo}</div>
                 </div>
                 <div className="md:col-span-5">
-                  <span className="text-xs font-black text-primary uppercase tracking-tighter">So that</span>
+                  <span className="text-xs font-black text-primary uppercase tracking-tighter">
+                    So that
+                  </span>
                   <div className="text-xl font-bold mt-1">{story.soThat}</div>
                 </div>
               </div>
@@ -196,21 +219,29 @@ export default function StoryDetailPage() {
                   <MessageSquare className="h-5 w-5 text-primary" />
                   Discussion ({mockDiscussion.length})
                 </h3>
-                <Button variant="link" className="text-sm text-primary p-0">View all</Button>
+                <Button variant="link" className="text-sm text-primary p-0">
+                  View all
+                </Button>
               </div>
 
               <div className="space-y-8">
                 {mockDiscussion.map((comment) => (
                   <div key={comment.id} className="flex gap-4">
-                    <div className={`h-10 w-10 rounded-full ${comment.color} flex items-center justify-center font-bold text-sm shrink-0`}>
+                    <div
+                      className={`h-10 w-10 rounded-full ${comment.color} flex items-center justify-center font-bold text-sm shrink-0`}
+                    >
                       {comment.initials}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-bold">{comment.author}</span>
-                        <span className="text-xs text-muted-foreground">{comment.time}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {comment.time}
+                        </span>
                       </div>
-                      <p className="text-muted-foreground leading-relaxed">{comment.message}</p>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {comment.message}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -237,7 +268,10 @@ export default function StoryDetailPage() {
             <div className="bg-card border rounded-xl p-8 shadow-sm">
               <div className="flex items-center justify-between mb-8">
                 <h3 className="text-xl font-bold">Acceptance Criteria</h3>
-                <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs font-bold">
+                <Badge
+                  variant="secondary"
+                  className="bg-muted text-muted-foreground text-xs font-bold"
+                >
                   {acs.length} Items
                 </Badge>
               </div>
@@ -249,8 +283,12 @@ export default function StoryDetailPage() {
                     className="flex items-start p-4 bg-muted/30 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors border border-transparent hover:border-border"
                   >
                     <Checkbox
-                      checked={selectedCriteria.includes(ac.acceptanceCriteriaId)}
-                      onCheckedChange={() => toggleCriteria(ac.acceptanceCriteriaId)}
+                      checked={selectedCriteria.includes(
+                        ac.acceptanceCriteriaId,
+                      )}
+                      onCheckedChange={() =>
+                        toggleCriteria(ac.acceptanceCriteriaId)
+                      }
                       className="mt-0.5"
                     />
                     <span className="ml-4 text-sm font-medium leading-relaxed">
@@ -261,7 +299,10 @@ export default function StoryDetailPage() {
               </div>
 
               <div className="pt-6 border-t">
-                <Button className="w-full gap-2 shadow-lg shadow-primary/20 py-6" size="lg">
+                <Button
+                  className="w-full gap-2 shadow-lg shadow-primary/20 py-6"
+                  size="lg"
+                >
                   <Sparkles className="h-5 w-5" />
                   Generate AI Test Cases
                 </Button>
@@ -278,12 +319,17 @@ export default function StoryDetailPage() {
               </h4>
               <div className="space-y-6">
                 {mockAssignedTeam.map((member, index) => (
-                  <div key={index} className="flex items-center justify-between">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between"
+                  >
                     <div className="flex flex-col">
                       <span className="text-[10px] font-bold text-primary uppercase tracking-tighter">
                         {member.role}
                       </span>
-                      <span className="text-sm font-bold mt-0.5">{member.name}</span>
+                      <span className="text-sm font-bold mt-0.5">
+                        {member.name}
+                      </span>
                     </div>
                     <div className="h-9 w-9 rounded-full bg-muted border flex items-center justify-center text-muted-foreground">
                       {member.role.includes("Developer") ? (
@@ -307,13 +353,22 @@ export default function StoryDetailPage() {
             © 2024 QA Artifacts Platform. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <Link href="#" className="text-sm text-muted-foreground hover:text-primary font-medium transition-colors">
+            <Link
+              href="#"
+              className="text-sm text-muted-foreground hover:text-primary font-medium transition-colors"
+            >
               Privacy Policy
             </Link>
-            <Link href="#" className="text-sm text-muted-foreground hover:text-primary font-medium transition-colors">
+            <Link
+              href="#"
+              className="text-sm text-muted-foreground hover:text-primary font-medium transition-colors"
+            >
               Terms of Service
             </Link>
-            <Link href="#" className="text-sm text-muted-foreground hover:text-primary font-medium transition-colors">
+            <Link
+              href="#"
+              className="text-sm text-muted-foreground hover:text-primary font-medium transition-colors"
+            >
               Support
             </Link>
           </div>

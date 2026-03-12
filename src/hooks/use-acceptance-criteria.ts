@@ -11,7 +11,7 @@ export function useAcceptanceCriteriaByStory(storyId: string) {
     queryKey: ["acceptance-criteria", "story", storyId],
     queryFn: async () => {
       const { data } = await axios.get<AcceptanceCriteria[]>(
-        `/user-stories/${storyId}/acceptance-criteria`
+        `/user-stories/${storyId}/acceptance-criteria`,
       );
       return data;
     },
@@ -26,12 +26,14 @@ export function useCreateAcceptanceCriteria(storyId: string) {
     mutationFn: async (input: CreateAcceptanceCriteriaInput) => {
       const { data } = await axios.post<AcceptanceCriteria>(
         `/user-stories/${storyId}/acceptance-criteria`,
-        input
+        input,
       );
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["acceptance-criteria", "story", storyId] });
+      queryClient.invalidateQueries({
+        queryKey: ["acceptance-criteria", "story", storyId],
+      });
       queryClient.invalidateQueries({ queryKey: ["stories"] });
     },
   });
@@ -44,12 +46,14 @@ export function useBatchCreateAcceptanceCriteria(storyId: string) {
     mutationFn: async (inputs: CreateAcceptanceCriteriaInput[]) => {
       const { data } = await axios.post<AcceptanceCriteria[]>(
         `/user-stories/${storyId}/acceptance-criteria/batch`,
-        inputs
+        inputs,
       );
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["acceptance-criteria", "story", storyId] });
+      queryClient.invalidateQueries({
+        queryKey: ["acceptance-criteria", "story", storyId],
+      });
       queryClient.invalidateQueries({ queryKey: ["stories"] });
     },
   });
@@ -59,10 +63,13 @@ export function useUpdateAcceptanceCriteria() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, ...updates }: UpdateAcceptanceCriteriaInput & { id: string }) => {
+    mutationFn: async ({
+      id,
+      ...updates
+    }: UpdateAcceptanceCriteriaInput & { id: string }) => {
       const { data } = await axios.put<AcceptanceCriteria>(
         `/acceptance-criteria/${id}`,
-        updates
+        updates,
       );
       return data;
     },

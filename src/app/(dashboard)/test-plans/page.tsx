@@ -78,13 +78,18 @@ export default function TestPlansPage() {
             <div>
               {/* Breadcrumb */}
               <nav className="flex items-center text-sm text-muted-foreground mb-1">
-                <Link href="/workspaces" className="hover:text-primary transition-colors">Workspaces</Link>
+                <Link
+                  href="/workspaces"
+                  className="hover:text-primary transition-colors"
+                >
+                  Workspaces
+                </Link>
                 <ChevronRight className="h-4 w-4 mx-1" />
                 <span>Test Plans</span>
               </nav>
               <h1 className="text-2xl font-bold">Test Plans</h1>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <Button variant="outline" size="icon">
                 <Bell className="h-5 w-5 text-muted-foreground" />
@@ -106,7 +111,7 @@ export default function TestPlansPage() {
                   "pb-3 border-b-2 font-semibold px-1 transition-colors",
                   activeTab === tab.id
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground",
                 )}
               >
                 {tab.label}
@@ -157,7 +162,9 @@ export default function TestPlansPage() {
           <div className="text-center py-16 text-muted-foreground">
             <FlaskConical className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p className="text-lg font-medium">No test plans yet</p>
-            <p className="text-sm mt-1">Create your first test plan to get started.</p>
+            <p className="text-sm mt-1">
+              Create your first test plan to get started.
+            </p>
           </div>
         )}
 
@@ -170,16 +177,22 @@ export default function TestPlansPage() {
                 href={`/test-plans/${plan.testPlanId}`}
                 className={cn(
                   "bg-card border rounded-2xl p-5 hover:shadow-lg transition-all group cursor-pointer",
-                  "hover:border-primary/30"
+                  "hover:border-primary/30",
                 )}
               >
                 {/* Header */}
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     {getStatusBadge(plan.status)}
-                    <h3 className="font-bold text-lg leading-tight mt-2">{plan.name}</h3>
+                    <h3 className="font-bold text-lg leading-tight mt-2">
+                      {plan.name}
+                    </h3>
                   </div>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                  >
                     <MoreHorizontal className="h-5 w-5" />
                   </Button>
                 </div>

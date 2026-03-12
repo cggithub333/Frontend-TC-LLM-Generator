@@ -51,7 +51,10 @@ function getStatusBadge(status: string) {
     );
   }
   return (
-    <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider">
+    <Badge
+      variant="outline"
+      className="text-[10px] font-bold uppercase tracking-wider"
+    >
       {status?.toUpperCase() ?? "UNKNOWN"}
     </Badge>
   );
@@ -60,7 +63,7 @@ function getStatusBadge(status: string) {
 export default function TestPlanDetailPage() {
   const params = useParams();
   const planId = params.id as string;
-  
+
   const [activeTab, setActiveTab] = useState("test-plan");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -79,7 +82,10 @@ export default function TestPlanDetailPage() {
       <div className="flex flex-col items-center justify-center min-h-screen">
         <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
         <p className="text-lg font-medium">Failed to load test plan</p>
-        <Link href="/test-plans" className="mt-4 text-primary hover:underline text-sm">
+        <Link
+          href="/test-plans"
+          className="mt-4 text-primary hover:underline text-sm"
+        >
           ← Back to Test Plans
         </Link>
       </div>
@@ -119,7 +125,7 @@ export default function TestPlanDetailPage() {
                 "pb-4 text-sm font-semibold transition-colors relative",
                 activeTab === tab.id
                   ? "text-primary border-b-2 border-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               {tab.label}
@@ -131,7 +137,10 @@ export default function TestPlanDetailPage() {
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-8">
         {/* Back link */}
-        <Link href="/test-plans" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
+        <Link
+          href="/test-plans"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6"
+        >
           <ArrowLeft className="h-4 w-4" />
           Back to Test Plans
         </Link>
@@ -157,7 +166,11 @@ export default function TestPlanDetailPage() {
                     </span>
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" className="text-muted-foreground">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground"
+                >
                   <MoreVertical className="h-5 w-5" />
                 </Button>
               </div>
@@ -169,10 +182,14 @@ export default function TestPlanDetailPage() {
               {plan.description ? (
                 <div className="mb-6">
                   <p className="text-sm font-bold mb-2">Description</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{plan.description}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {plan.description}
+                  </p>
                 </div>
               ) : (
-                <div className="mb-6 text-sm text-muted-foreground italic">No description provided.</div>
+                <div className="mb-6 text-sm text-muted-foreground italic">
+                  No description provided.
+                </div>
               )}
 
               {/* AI Suggestion */}
@@ -181,9 +198,12 @@ export default function TestPlanDetailPage() {
                   <Brain className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-purple-700 dark:text-purple-300 font-bold text-sm">AI Suggestion</p>
+                  <p className="text-purple-700 dark:text-purple-300 font-bold text-sm">
+                    AI Suggestion
+                  </p>
                   <p className="text-sm text-purple-600 dark:text-purple-400 mt-1">
-                    Generate test cases from user stories linked to this plan using AI.
+                    Generate test cases from user stories linked to this plan
+                    using AI.
                   </p>
                 </div>
               </div>
@@ -198,19 +218,28 @@ export default function TestPlanDetailPage() {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Status</span>
-                  <span className="font-medium">{plan.status?.toUpperCase().replace("_", " ")}</span>
+                  <span className="font-medium">
+                    {plan.status?.toUpperCase().replace("_", " ")}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Created</span>
-                  <span className="font-medium">{new Date(plan.createdAt).toLocaleDateString()}</span>
+                  <span className="font-medium">
+                    {new Date(plan.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Created by</span>
-                  <span className="font-medium">{plan.createdByUserFullName}</span>
+                  <span className="font-medium">
+                    {plan.createdByUserFullName}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Project</span>
-                  <Link href={`/projects/${plan.projectId}`} className="font-medium text-primary hover:underline">
+                  <Link
+                    href={`/projects/${plan.projectId}`}
+                    className="font-medium text-primary hover:underline"
+                  >
                     View Project
                   </Link>
                 </div>

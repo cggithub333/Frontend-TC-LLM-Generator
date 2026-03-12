@@ -31,9 +31,12 @@ import type { ProjectMember } from "@/types/team.types";
 import type { TestPlan } from "@/types/test-plan.types";
 
 const statusColors: Record<string, string> = {
-  Active: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-  "AI Processing": "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  Review: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  Active:
+    "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  "AI Processing":
+    "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+  Review:
+    "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
   Done: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
 };
 
@@ -47,9 +50,13 @@ export default function ProjectDetailPage() {
   const { data: membersData } = useProjectMembers(projectId, { size: 10 });
   const { data: plansData } = useTestPlansByProject(projectId, { size: 1 });
 
-  const userStories = storiesData ? extractPage<UserStory>(storiesData).items : [];
+  const userStories = storiesData
+    ? extractPage<UserStory>(storiesData).items
+    : [];
   const testSuites = suitesData ? extractPage<TestSuite>(suitesData).items : [];
-  const teamMembers = membersData ? extractPage<ProjectMember>(membersData).items : [];
+  const teamMembers = membersData
+    ? extractPage<ProjectMember>(membersData).items
+    : [];
   const testPlans = plansData ? extractPage<TestPlan>(plansData).items : [];
   const currentPlan = testPlans[0];
 
@@ -59,7 +66,13 @@ export default function ProjectDetailPage() {
         <div className="h-16 bg-muted animate-pulse rounded-xl mb-6" />
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className={cn("h-64 bg-muted animate-pulse rounded-xl", i % 3 === 0 ? "xl:col-span-2" : "")} />
+            <div
+              key={i}
+              className={cn(
+                "h-64 bg-muted animate-pulse rounded-xl",
+                i % 3 === 0 ? "xl:col-span-2" : "",
+              )}
+            />
           ))}
         </div>
       </div>
@@ -71,7 +84,9 @@ export default function ProjectDetailPage() {
       <div className="flex-1 flex flex-col items-center justify-center min-h-[400px]">
         <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
         <h2 className="text-xl font-bold mb-2">Project Not Found</h2>
-        <p className="text-muted-foreground mb-4">The project you&apos;re looking for doesn&apos;t exist.</p>
+        <p className="text-muted-foreground mb-4">
+          The project you&apos;re looking for doesn&apos;t exist.
+        </p>
         <Button asChild>
           <Link href="/workspaces">Back to Workspaces</Link>
         </Button>
@@ -84,16 +99,22 @@ export default function ProjectDetailPage() {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-8">
         <div className="max-w-[1600px] mx-auto grid grid-cols-1 xl:grid-cols-3 gap-6 pb-10">
-
           {/* Test Suites Card */}
           <div className="xl:col-span-1 bg-card rounded-xl border shadow-sm p-5 flex flex-col">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-lg">Test Suites</h3>
-              <Link href={`/projects/${projectId}/test-suites`} className="text-primary text-sm font-bold hover:underline">View All</Link>
+              <Link
+                href={`/projects/${projectId}/test-suites`}
+                className="text-primary text-sm font-bold hover:underline"
+              >
+                View All
+              </Link>
             </div>
             <div className="space-y-3 flex-1">
               {testSuites.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-4 text-center">No test suites yet</p>
+                <p className="text-sm text-muted-foreground py-4 text-center">
+                  No test suites yet
+                </p>
               ) : (
                 testSuites.map((suite) => (
                   <div
@@ -106,7 +127,9 @@ export default function ProjectDetailPage() {
                       </div>
                       <div>
                         <p className="text-sm font-bold">{suite.name}</p>
-                        <p className="text-xs text-muted-foreground">{suite.description || "No description"}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {suite.description || "No description"}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -127,20 +150,27 @@ export default function ProjectDetailPage() {
                     </Badge>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground">{currentPlan?.name ?? "No test plans yet"}</p>
+                <p className="text-sm text-muted-foreground">
+                  {currentPlan?.name ?? "No test plans yet"}
+                </p>
               </div>
               {currentPlan && (
                 <div className="text-right">
                   <p className="text-xs text-muted-foreground font-medium">
-                    Created {new Date(currentPlan.createdAt).toLocaleDateString()}
+                    Created{" "}
+                    {new Date(currentPlan.createdAt).toLocaleDateString()}
                   </p>
                 </div>
               )}
             </div>
             {currentPlan ? (
-              <p className="text-sm text-muted-foreground">{currentPlan.description || "No description provided."}</p>
+              <p className="text-sm text-muted-foreground">
+                {currentPlan.description || "No description provided."}
+              </p>
             ) : (
-              <p className="text-sm text-muted-foreground text-center py-8">Create a test plan to track your sprint progress.</p>
+              <p className="text-sm text-muted-foreground text-center py-8">
+                Create a test plan to track your sprint progress.
+              </p>
             )}
           </div>
 
@@ -149,11 +179,18 @@ export default function ProjectDetailPage() {
             <div className="p-5 border-b flex justify-between items-center">
               <h3 className="font-bold text-lg">Recent User Stories</h3>
               <div className="flex gap-2">
-                <Link href={`/projects/${projectId}/stories`} className="text-primary text-sm font-bold hover:underline">View All</Link>
+                <Link
+                  href={`/projects/${projectId}/stories`}
+                  className="text-primary text-sm font-bold hover:underline"
+                >
+                  View All
+                </Link>
               </div>
             </div>
             {userStories.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">No user stories yet</p>
+              <p className="text-sm text-muted-foreground py-8 text-center">
+                No user stories yet
+              </p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
@@ -166,23 +203,37 @@ export default function ProjectDetailPage() {
                   </thead>
                   <tbody className="text-sm divide-y">
                     {userStories.map((story) => (
-                      <tr key={story.userStoryId} className="hover:bg-muted/30 transition-colors">
+                      <tr
+                        key={story.userStoryId}
+                        className="hover:bg-muted/30 transition-colors"
+                      >
                         <td className="px-5 py-3 font-medium">
-                          <Link href={`/stories/${story.userStoryId}`} className="hover:text-primary">
+                          <Link
+                            href={`/stories/${story.userStoryId}`}
+                            className="hover:text-primary"
+                          >
                             {story.title}
                           </Link>
                         </td>
                         <td className="px-5 py-3">
-                          <Badge variant="outline" className={cn(
-                            "text-xs font-bold",
-                            story.status === "DONE" && "bg-green-50 text-green-700 dark:bg-green-900/20",
-                            story.status === "IN_PROGRESS" && "bg-blue-50 text-blue-700 dark:bg-blue-900/20",
-                            story.status === "DRAFT" && "bg-slate-50 text-slate-600 dark:bg-slate-800",
-                          )}>
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              "text-xs font-bold",
+                              story.status === "DONE" &&
+                                "bg-green-50 text-green-700 dark:bg-green-900/20",
+                              story.status === "IN_PROGRESS" &&
+                                "bg-blue-50 text-blue-700 dark:bg-blue-900/20",
+                              story.status === "DRAFT" &&
+                                "bg-slate-50 text-slate-600 dark:bg-slate-800",
+                            )}
+                          >
                             {story.status}
                           </Badge>
                         </td>
-                        <td className="px-5 py-3 text-muted-foreground">{(story.acceptanceCriteria ?? []).length}</td>
+                        <td className="px-5 py-3 text-muted-foreground">
+                          {(story.acceptanceCriteria ?? []).length}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -201,17 +252,26 @@ export default function ProjectDetailPage() {
             </div>
             <div className="space-y-4 flex-1">
               {teamMembers.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-4 text-center">No members yet</p>
+                <p className="text-sm text-muted-foreground py-4 text-center">
+                  No members yet
+                </p>
               ) : (
                 teamMembers.map((member) => (
-                  <div key={member.projectMemberId} className="flex items-center justify-between">
+                  <div
+                    key={member.projectMemberId}
+                    className="flex items-center justify-between"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="size-10 rounded-full flex items-center justify-center font-bold text-sm ring-2 ring-white dark:ring-gray-800 bg-primary/10 text-primary">
                         {member.userFullName?.slice(0, 2).toUpperCase() ?? "??"}
                       </div>
                       <div>
-                        <p className="text-sm font-bold">{member.userFullName}</p>
-                        <p className="text-xs text-muted-foreground">{member.role}</p>
+                        <p className="text-sm font-bold">
+                          {member.userFullName}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {member.role}
+                        </p>
                       </div>
                     </div>
                     <span className="text-xs font-semibold text-muted-foreground bg-muted px-2 py-1 rounded">
@@ -221,11 +281,14 @@ export default function ProjectDetailPage() {
                 ))
               )}
             </div>
-            <Button variant="outline" className="w-full mt-6 border-primary text-primary hover:bg-primary/5" asChild>
+            <Button
+              variant="outline"
+              className="w-full mt-6 border-primary text-primary hover:bg-primary/5"
+              asChild
+            >
               <Link href={`/projects/${projectId}/team`}>Manage Access</Link>
             </Button>
           </div>
-
         </div>
       </div>
     </>
