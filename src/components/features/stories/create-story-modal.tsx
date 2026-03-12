@@ -11,12 +11,22 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Sparkles, X, Plus } from "lucide-react";
+import { useProjects } from "@/hooks/use-projects";
 
 interface CreateStoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreateStory?: (story: StoryFormData) => void;
+  /** Pre-selected project ID (e.g. from project-scoped pages) */
+  defaultProjectId?: string;
 }
 
 interface AcceptanceCriterion {
@@ -24,7 +34,8 @@ interface AcceptanceCriterion {
   description: string;
 }
 
-interface StoryFormData {
+export interface StoryFormData {
+  projectId: string;
   asA: string;
   iWantTo: string;
   soThat: string;
@@ -35,8 +46,13 @@ export function CreateStoryModal({
   open,
   onOpenChange,
   onCreateStory,
+  defaultProjectId,
 }: CreateStoryModalProps) {
+  const { data: projectsData } = useProjects({ size: 100 });
+  const projects = projectsData?.items ?? [];
+
   const [formData, setFormData] = useState<StoryFormData>({
+    projectId: defaultProjectId ?? "",
     asA: "",
     iWantTo: "",
     soThat: "",
@@ -57,7 +73,7 @@ export function CreateStoryModal({
     setFormData({
       ...formData,
       acceptanceCriteria: formData.acceptanceCriteria.map((c) =>
-        c.id === id ? { ...c, description } : c
+        c.id === id ? { ...c, description } : c,
       ),
     });
   };
@@ -66,17 +82,21 @@ export function CreateStoryModal({
     if (formData.acceptanceCriteria.length > 1) {
       setFormData({
         ...formData,
-        acceptanceCriteria: formData.acceptanceCriteria.filter((c) => c.id !== id),
+        acceptanceCriteria: formData.acceptanceCriteria.filter(
+          (c) => c.id !== id,
+        ),
       });
     }
   };
 
   const handleSubmit = () => {
+    if (!formData.projectId) return;
     if (onCreateStory) {
       onCreateStory(formData);
     }
     // Reset form
     setFormData({
+      projectId: defaultProjectId ?? "",
       asA: "",
       iWantTo: "",
       soThat: "",
@@ -88,7 +108,9 @@ export function CreateStoryModal({
   const handleKeyDown = (e: React.KeyboardEvent, id: string) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      const currentIndex = formData.acceptanceCriteria.findIndex((c) => c.id === id);
+      const currentIndex = formData.acceptanceCriteria.findIndex(
+        (c) => c.id === id,
+      );
       if (currentIndex === formData.acceptanceCriteria.length - 1) {
         addCriterion();
       }
@@ -99,10 +121,41 @@ export function CreateStoryModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[95vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">Create New User Story</DialogTitle>
+          <DialogTitle className="text-xl font-bold">
+            Create New User Story
+          </DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto py-4 space-y-5">
+          {/* Project Selector */}
+          {!defaultProjectId && (
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                Project <span className="text-destructive">*</span>
+              </label>
+              <Select
+                value={formData.projectId}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, projectId: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a project..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.map((project) => (
+                    <SelectItem
+                      key={project.projectId}
+                      value={project.projectId}
+                    >
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           {/* User Role */}
           <div className="space-y-2">
             <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider">
@@ -116,7 +169,9 @@ export function CreateStoryModal({
                 className="pl-20 pt-3 min-h-[68px] resize-none"
                 placeholder="e.g. returning customer"
                 value={formData.asA}
-                onChange={(e) => setFormData({ ...formData, asA: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, asA: e.target.value })
+                }
               />
             </div>
           </div>
@@ -134,7 +189,9 @@ export function CreateStoryModal({
                 className="pl-28 pt-3 min-h-[96px] resize-none"
                 placeholder="e.g. view my previous order history"
                 value={formData.iWantTo}
-                onChange={(e) => setFormData({ ...formData, iWantTo: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, iWantTo: e.target.value })
+                }
               />
             </div>
           </div>
@@ -152,7 +209,9 @@ export function CreateStoryModal({
                 className="pl-24 pt-3 min-h-[68px] resize-none"
                 placeholder="e.g. I can reorder my favorite items easily"
                 value={formData.soThat}
-                onChange={(e) => setFormData({ ...formData, soThat: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, soThat: e.target.value })
+                }
               />
             </div>
           </div>
@@ -174,7 +233,10 @@ export function CreateStoryModal({
             </div>
             <div className="space-y-3 bg-muted/30 rounded-xl p-4 border">
               {formData.acceptanceCriteria.map((criterion, index) => (
-                <div key={criterion.id} className="flex items-start gap-3 group">
+                <div
+                  key={criterion.id}
+                  className="flex items-start gap-3 group"
+                >
                   <div className="mt-3 w-1.5 h-1.5 rounded-full bg-muted-foreground/50 shrink-0" />
                   <Input
                     className="flex-1 bg-transparent border-0 border-b border-transparent focus:border-border rounded-none px-0 focus-visible:ring-0"
@@ -184,7 +246,9 @@ export function CreateStoryModal({
                         : "Add another..."
                     }
                     value={criterion.description}
-                    onChange={(e) => updateCriterion(criterion.id, e.target.value)}
+                    onChange={(e) =>
+                      updateCriterion(criterion.id, e.target.value)
+                    }
                     onKeyDown={(e) => handleKeyDown(e, criterion.id)}
                   />
                   {formData.acceptanceCriteria.length > 1 && (
@@ -219,7 +283,11 @@ export function CreateStoryModal({
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} className="shadow-lg shadow-primary/25">
+          <Button
+            onClick={handleSubmit}
+            disabled={!formData.projectId}
+            className="shadow-lg shadow-primary/25"
+          >
             Create Story
           </Button>
         </DialogFooter>
