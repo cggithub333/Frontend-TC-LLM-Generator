@@ -45,7 +45,7 @@ async function refreshTokens(): Promise<string | null> {
 async function forwardRequest(
   request: NextRequest,
   path: string,
-  token: string | undefined
+  token: string | undefined,
 ): Promise<Response> {
   const url = new URL(`${getBackendApiUrl()}/${path}`);
   request.nextUrl.searchParams.forEach((value, key) => {
@@ -79,12 +79,12 @@ async function forwardRequest(
 
 async function handleProxy(
   request: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> }
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
   const { path } = await params;
   const joinedPath = path.join("/");
   const cookieStore = await cookies();
-  let accessToken = cookieStore.get("accessToken")?.value;
+  const accessToken = cookieStore.get("accessToken")?.value;
 
   let res = await forwardRequest(request, joinedPath, accessToken);
 
@@ -97,7 +97,7 @@ async function handleProxy(
       cookieStore.delete("refreshToken");
       return NextResponse.json(
         { success: false, message: "Session expired" },
-        { status: 401 }
+        { status: 401 },
       );
     }
   }
@@ -119,4 +119,3 @@ export const POST = handleProxy;
 export const PUT = handleProxy;
 export const PATCH = handleProxy;
 export const DELETE = handleProxy;
-
