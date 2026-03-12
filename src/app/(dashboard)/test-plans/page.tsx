@@ -16,9 +16,14 @@ import {
   Calendar,
   CheckCircle,
   Bell,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useTestPlans } from "@/hooks/use-test-plans";
+import { extractPage } from "@/types/pagination.types";
+import type { TestPlan } from "@/types/test-plan.types";
 
 const tabs = [
   { id: "test-plans", label: "Test Plans" },
@@ -26,101 +31,42 @@ const tabs = [
   { id: "test-cases", label: "Test Cases" },
 ];
 
-const testPlans = [
-  {
-    id: "1",
-    name: "Sprint 24 - Biometric Auth",
-    status: "in-progress",
-    progress: 65,
-    testCount: 24,
-    date: "Oct 24",
-    avatars: [
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuD1PY9j0MLiP8sMZLGcbX1ScHZUJu7zcR9tf4DuRb9VVgWVH_ea-0H5RZBhjNDi4KXd3cdrxIce4pphOSEQ5IAl-6z9fBNNr2xud2MqPzvsjMgHWr6i1DVixFgTTRYEqIH8xj0fOuC5aIhngtDVelp-YU_qpV6okGXUpE5IHkZfdyj4nkEx4WA61OwirDfNqNAWRUGNIc8b5pbKz2oEdR7g487DG7IsuyZhbWWPLyfD1CC7LubTUxXzSpk5Kq1ozWsplmUIj6-zOmIo",
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCSUMSTKYmh8tu4tYnrcXMMkOYnUSMk0c0SIj7BjJF9YatXYekBvK3IPNdPipisRh6gSDErO2L7jLjm1Mf9ZY7ZhwNz0ghHvRV5Y4kMEvuaKmOSLnLJtx_MX_35gbcQrg00H9dYU53xRmfG0jXjjqc1NhDl7CIPQhLvTBLoIlTpaz1W2mWjZY76r8D_0K6h_v4ODS7FkUlfIYB8syYxdlttL5fOmrKOzpIphzmIIXsRB1Aflqj1VQ8tNu3LsoHGT3TJ6dU6J3AKMD-W",
-    ],
-    action: "run",
-  },
-  {
-    id: "2",
-    name: "Regression Pack v2.1",
-    status: "draft",
-    progress: 0,
-    testCount: 156,
-    date: "Nov 01",
-    avatars: [
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuArBuQTeuNSAp-C8cBwhm8LXL78qgcFpTXsP0DxrXKnQozwkZYR6TLDVYl2YglCf6glPOhYbdh47TbHvJCzV0ypsua8ybp4PeKfuauIz6yFFmC4rOUYM3KY3LIYrkdRhh9OPHPF8toeSr4_v_QwYcpM_APDoeZ93cIT20VZUrtIZIz6NzTZ0H-6T8SRNPqcqWye908zBIhMZ1-ZBGswZkL42SUbP44SQwBiDh702DZGwHz_SsQb0_Tj7vxPYXwihkrQREIyEZEbgYY9",
-    ],
-    action: "edit",
-  },
-  {
-    id: "3",
-    name: "Payment Gateway Integration",
-    status: "completed",
-    progress: 100,
-    testCount: 32,
-    passed: true,
-    avatars: [
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBxTj7z4QPeQFmtGJKy6iQEQTNIdj8aLB-gAybEU113DYHKz98yuCzKluEE5F0OzimzFcZih4EmJBlC77WgmhrFGNy3vRinuWzbqF2ClEkIroV4twZpcuy3FIGx74reSZJLB3XYlRGz3BI4eoQygQf6KZSja8-NBLZXHM6NB4QMn5-4vySZugB8RdSD2i4e63MSsvHYaXJVrxoT3XxH6WgP0WS3QP3zRq7mLIyXkf5pFvSfRbeHPkPbSO7i4UsX1FYdX4PNfXVTdZir",
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDWlFSmtSca_h5SeW58hFllnLAN8R3yaeQVlJHABNuzcQGY4W-6pT9EfgzThzv1fqPRpSqLckPrsMznvi_pxNnYWWlsmxBYuDRqI5bpPLfwAufxtsuhhi7JoLduVder6_4v3XrZufLXopc1YoI4kiDD-UnvDTTOaAZhSkPOVR19Nvo0gijhF_GadK-w5H92gtUxyWElmJX-6dIKh4nbS_rmkBHsxHYkSeKkHBAB7IqZdf1qnf14mwoF2Pb0wgx8To3GCFuz1L5-1oqq",
-    ],
-    extraCount: 1,
-    action: "report",
-  },
-  {
-    id: "4",
-    name: "Mobile V2 - Smoke Test",
-    status: "in-progress",
-    progress: 32,
-    testCount: 8,
-    date: "Today",
-    avatars: [
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCxqNoOo0Q2_9OFDgXz6Vri_QqVc3mvu1hE5AHpliFY-4DgpTy_7a5GKujZED3BTMXRGgQI8Yn2Y8rZ8_Me-u9lKCMXnkP11PyJMoKZbTs-Pmu0bFGUvz7hybwIAKo8jN1m7B2I4xeJkHVwBRgxabH3sd9tlSJ2hMtGVwQYPai8WgLYeOtuxkZLeW8mDflA1Hv6Mu9N2Qb7FoRtiUw2tyrbWzuXkVsQCnz_t7gvmO3OvA6qRoa8psZ_ZlO2DO3WVbHL_jfic0hiH79U",
-    ],
-    action: "run",
-  },
-];
-
 function getStatusBadge(status: string) {
-  switch (status) {
-    case "in-progress":
-      return (
-        <Badge className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-800 font-bold text-xs">
-          IN PROGRESS
-        </Badge>
-      );
-    case "draft":
-      return (
-        <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-bold text-xs">
-          DRAFT
-        </Badge>
-      );
-    case "completed":
-      return (
-        <Badge className="bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-100 dark:border-green-800 font-bold text-xs">
-          COMPLETED
-        </Badge>
-      );
-    default:
-      return null;
+  const s = status?.toLowerCase();
+  if (s === "in_progress" || s === "in-progress" || s === "active") {
+    return (
+      <Badge className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-800 font-bold text-xs">
+        {status.toUpperCase().replace("_", " ")}
+      </Badge>
+    );
   }
-}
-
-function getProgressBarColor(status: string) {
-  switch (status) {
-    case "in-progress":
-      return "bg-primary";
-    case "draft":
-      return "bg-slate-300 dark:bg-slate-700";
-    case "completed":
-      return "bg-green-500";
-    default:
-      return "bg-primary";
+  if (s === "draft") {
+    return (
+      <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-bold text-xs">
+        DRAFT
+      </Badge>
+    );
   }
+  if (s === "completed" || s === "done") {
+    return (
+      <Badge className="bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-100 dark:border-green-800 font-bold text-xs">
+        COMPLETED
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="outline" className="font-bold text-xs">
+      {status?.toUpperCase() ?? "UNKNOWN"}
+    </Badge>
+  );
 }
 
 export default function TestPlansPage() {
   const [activeTab, setActiveTab] = useState("test-plans");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const { data: plansData, isLoading, error } = useTestPlans();
+  const testPlans = plansData ? extractPage<TestPlan>(plansData).items : [];
 
   return (
     <div className="min-h-screen">
@@ -134,7 +80,7 @@ export default function TestPlansPage() {
               <nav className="flex items-center text-sm text-muted-foreground mb-1">
                 <Link href="/workspaces" className="hover:text-primary transition-colors">Workspaces</Link>
                 <ChevronRight className="h-4 w-4 mx-1" />
-                <span>Mobile Redesign V2</span>
+                <span>Test Plans</span>
               </nav>
               <h1 className="text-2xl font-bold">Test Plans</h1>
             </div>
@@ -193,105 +139,70 @@ export default function TestPlansPage() {
           </Button>
         </div>
 
-        {/* Test Plan Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testPlans.map((plan) => (
-            <Link
-              key={plan.id}
-              href={`/test-plans/${plan.id}`}
-              className={cn(
-                "bg-card border rounded-2xl p-5 hover:shadow-lg transition-all group cursor-pointer",
-                plan.status === "in-progress" && "hover:border-blue-200 dark:hover:border-blue-900/50",
-                plan.status === "completed" && "hover:border-green-200 dark:hover:border-green-900/50",
-                plan.status === "draft" && "hover:border-slate-300 dark:hover:border-slate-700"
-              )}
-            >
-              {/* Header */}
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  {getStatusBadge(plan.status)}
-                  <h3 className="font-bold text-lg leading-tight mt-2">{plan.name}</h3>
-                </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-                  <MoreHorizontal className="h-5 w-5" />
-                </Button>
-              </div>
+        {/* Loading / Error / Empty */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        )}
 
-              {/* Progress Section */}
-              <div className="mb-6 space-y-3">
-                <div className="flex justify-between text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  <span>Progress</span>
-                  <span className={cn(
-                    plan.status === "completed" ? "text-green-600 dark:text-green-400 font-bold" : "text-foreground"
-                  )}>
-                    {plan.progress}%
+        {error && (
+          <div className="flex flex-col items-center justify-center py-16">
+            <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
+            <p className="text-lg font-medium">Failed to load test plans</p>
+          </div>
+        )}
+
+        {!isLoading && !error && testPlans.length === 0 && (
+          <div className="text-center py-16 text-muted-foreground">
+            <FlaskConical className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p className="text-lg font-medium">No test plans yet</p>
+            <p className="text-sm mt-1">Create your first test plan to get started.</p>
+          </div>
+        )}
+
+        {/* Test Plan Cards Grid */}
+        {!isLoading && !error && testPlans.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {testPlans.map((plan) => (
+              <Link
+                key={plan.testPlanId}
+                href={`/test-plans/${plan.testPlanId}`}
+                className={cn(
+                  "bg-card border rounded-2xl p-5 hover:shadow-lg transition-all group cursor-pointer",
+                  "hover:border-primary/30"
+                )}
+              >
+                {/* Header */}
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    {getStatusBadge(plan.status)}
+                    <h3 className="font-bold text-lg leading-tight mt-2">{plan.name}</h3>
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                    <MoreHorizontal className="h-5 w-5" />
+                  </Button>
+                </div>
+
+                {/* Description */}
+                <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+                  {plan.description || "No description"}
+                </p>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between border-t pt-4 mt-auto">
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4" />
+                    <span>{new Date(plan.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    by {plan.createdByUserFullName}
                   </span>
                 </div>
-                <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                  <div
-                    className={cn("h-2 rounded-full", getProgressBarColor(plan.status))}
-                    style={{ width: `${plan.progress}%` }}
-                  />
-                </div>
-                <div className="flex gap-4 pt-1 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1.5">
-                    <FlaskConical className="h-4 w-4" />
-                    <span>{plan.testCount} Tests</span>
-                  </div>
-                  {plan.passed ? (
-                    <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400 font-medium">
-                      <CheckCircle className="h-4 w-4" />
-                      <span>Passed</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="h-4 w-4" />
-                      <span>{plan.date}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="flex items-center justify-between border-t pt-4 mt-auto">
-                {/* Avatars */}
-                <div className="flex -space-x-2">
-                  {plan.avatars.map((avatar, idx) => (
-                    <img
-                      key={idx}
-                      src={avatar}
-                      alt="Team member"
-                      className="w-8 h-8 rounded-full border-2 border-card bg-muted object-cover"
-                    />
-                  ))}
-                  {plan.extraCount && (
-                    <div className="w-8 h-8 rounded-full border-2 border-card bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground">
-                      +{plan.extraCount}
-                    </div>
-                  )}
-                </div>
-
-                {/* Action */}
-                {plan.action === "run" && (
-                  <button className="text-primary font-semibold text-sm hover:text-blue-700 dark:hover:text-blue-400 flex items-center gap-1 transition-colors">
-                    Run
-                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                )}
-                {plan.action === "edit" && (
-                  <button className="text-muted-foreground font-semibold text-sm hover:text-foreground flex items-center gap-1 transition-colors">
-                    Edit Details
-                  </button>
-                )}
-                {plan.action === "report" && (
-                  <button className="text-primary font-semibold text-sm hover:text-blue-700 dark:hover:text-blue-400 flex items-center gap-1 transition-colors">
-                    View Report
-                  </button>
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

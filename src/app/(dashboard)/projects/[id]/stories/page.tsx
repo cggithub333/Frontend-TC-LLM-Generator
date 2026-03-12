@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState } from "react";
 import { useParams } from "next/navigation";
-import { useStoriesByProject, useCreateStory, useUpdateStory, useDeleteStory } from "@/hooks/use-stories";
-import { useProject } from "@/hooks/use-projects";
+import { useStoriesByProject, useCreateStory, useDeleteStory } from "@/hooks/use-stories";
+import { useUpdateAcceptanceCriteria } from "@/hooks/use-acceptance-criteria";
 import { CreateStoryModal } from "@/components/features/stories/create-story-modal";
+import type { AcceptanceCriteria } from "@/types/story.types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -19,10 +20,8 @@ import {
   ClipboardList,
   Plus,
   ListChecks,
-  FileCheck,
 } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { LoadingSkeleton } from "@/components/features/workspaces/loading-skeleton";
 
 import { useWebSocket } from "@/hooks/use-websocket";
@@ -42,11 +41,9 @@ export default function ProjectStoriesPage() {
     },
   });
 
-  const { data: project } = useProject(projectId);
-  const { data: storiesData, isLoading, refetch } = useStoriesByProject(projectId);
+  const { data: storiesData, isLoading } = useStoriesByProject(projectId);
   
   const createStory = useCreateStory();
-  const updateStory = useUpdateStory();
   const deleteStory = useDeleteStory();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -68,51 +65,41 @@ export default function ProjectStoriesPage() {
     );
   };
 
-  const handleCreateStory = async (formData: any) => {
+  const handleCreateStory = async (formData: {
+    asA: string;
+    iWantTo: string;
+    soThat: string;
+    acceptanceCriteria: { id: string; description: string }[];
+  }) => {
     try {
-      // Map form data to our API structure
-      // Format the description as Markdown text
-      const description = `**AS A** ${formData.asA}\n**I WANT TO** ${formData.iWantTo}\n**SO THAT** ${formData.soThat}\n\n**Acceptance Criteria:**\n${formData.acceptanceCriteria.map((ac: any) => `- [ ] ${ac.description}`).join('\n')}`;
-      
       const titleStr = formData.iWantTo.slice(0, 50) + (formData.iWantTo.length > 50 ? "..." : "");
 
       await createStory.mutateAsync({
         projectId,
         title: titleStr,
-        description: description,
-        status: "To Do"
+        asA: formData.asA,
+        iWantTo: formData.iWantTo,
+        soThat: formData.soThat,
+        status: "DRAFT",
+        acceptanceCriteria: formData.acceptanceCriteria
+          .filter((ac) => ac.description.trim())
+          .map((ac, index) => ({
+            content: ac.description,
+            orderNo: index + 1,
+          })),
       });
-      refetch();
     } catch (err) {
       console.error("Failed to create user story", err);
     }
   };
 
-  // Basic parser for description
-  const parseDescription = (desc?: string) => {
-    if (!desc) return { asA: "", iWantTo: "", soThat: "", acs: [] as {desc: string, completed: boolean}[] };
-    
-    let asA = "";
-    let iWantTo = "";
-    let soThat = "";
-    const acs: {desc: string, completed: boolean}[] = [];
+  const updateAcceptanceCriteria = useUpdateAcceptanceCriteria();
 
-    const lines = desc.split("\n");
-    let parsingAc = false;
-
-    lines.forEach(line => {
-      if (line.startsWith("**AS A** ")) asA = line.replace("**AS A** ", "");
-      else if (line.startsWith("**I WANT TO** ")) iWantTo = line.replace("**I WANT TO** ", "");
-      else if (line.startsWith("**SO THAT** ")) soThat = line.replace("**SO THAT** ", "");
-      else if (line.startsWith("**Acceptance Criteria:**")) parsingAc = true;
-      else if (parsingAc && line.startsWith("- [")) {
-        const completed = line.startsWith("- [x]") || line.startsWith("- [X]");
-        const content = line.replace(/^- \[(x|X| )\] /, "");
-        acs.push({ desc: content, completed });
-      }
+  const toggleACCompletion = (ac: AcceptanceCriteria) => {
+    updateAcceptanceCriteria.mutate({
+      id: ac.acceptanceCriteriaId,
+      completed: !ac.completed,
     });
-
-    return { asA, iWantTo, soThat, acs };
   };
 
   if (isLoading) {
@@ -171,8 +158,8 @@ export default function ProjectStoriesPage() {
           const isExpanded = expandedStories.includes(story.userStoryId);
           const isSelected = selectedStories.includes(story.userStoryId);
           
-          const parsedDesc = parseDescription(story.description);
-          const stats = { completed: parsedDesc.acs.filter(ac => ac.completed).length, total: parsedDesc.acs.length };
+          const acs = story.acceptanceCriteria || [];
+          const stats = { completed: acs.filter(ac => ac.completed).length, total: acs.length };
 
           return (
             <div
@@ -199,12 +186,12 @@ export default function ProjectStoriesPage() {
                   {!isExpanded && (
                     <div className="flex items-center gap-4 mt-2">
                       <p className="text-sm text-muted-foreground line-clamp-1 flex-1">
-                        As a {parsedDesc.asA}, I want to {parsedDesc.iWantTo} so that {parsedDesc.soThat}...
+                        As a {story.asA}, I want to {story.iWantTo} so that {story.soThat}...
                       </p>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
                         <div className="flex items-center gap-1">
                           <ListChecks className="h-4 w-4" />
-                          <span>{parsedDesc.acs.length} ACs</span>
+                          <span>{acs.length} ACs</span>
                         </div>
                       </div>
                     </div>
@@ -235,15 +222,15 @@ export default function ProjectStoriesPage() {
                     <div className="text-sm space-y-1">
                       <p>
                         <span className="text-muted-foreground">AS A</span>{" "}
-                        <span className="font-medium">{parsedDesc.asA}</span>,
+                        <span className="font-medium">{story.asA}</span>,
                       </p>
                       <p>
                         <span className="text-muted-foreground">I WANT TO</span>{" "}
-                        <span className="font-medium">{parsedDesc.iWantTo}</span>,
+                        <span className="font-medium">{story.iWantTo}</span>,
                       </p>
                       <p>
                         <span className="text-muted-foreground">SO THAT</span>{" "}
-                        <span className="font-medium">{parsedDesc.soThat}</span>.
+                        <span className="font-medium">{story.soThat}</span>.
                       </p>
                     </div>
                   </div>
@@ -262,10 +249,11 @@ export default function ProjectStoriesPage() {
                       </Badge>
                     </div>
                     <div className="space-y-2">
-                      {parsedDesc.acs.map((criteria, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-start gap-3 w-full text-left group hover:bg-muted/30 p-2 -m-2 rounded-lg transition-colors"
+                      {acs.map((criteria) => (
+                        <button
+                          key={criteria.acceptanceCriteriaId}
+                          onClick={() => toggleACCompletion(criteria)}
+                          className="flex items-start gap-3 text-sm w-full text-left group hover:bg-muted/30 p-2 -m-2 rounded-lg transition-colors"
                         >
                           <div
                             className={`mt-0.5 w-5 h-5 flex items-center justify-center rounded shrink-0 transition-all ${
@@ -283,9 +271,9 @@ export default function ProjectStoriesPage() {
                                 : "text-muted-foreground group-hover:text-foreground transition-colors"
                             }
                           >
-                            {criteria.desc}
+                            {criteria.content}
                           </p>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   </div>

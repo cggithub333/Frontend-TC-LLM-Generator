@@ -16,125 +16,26 @@ import {
   ClipboardList,
   Plus,
   ListChecks,
-  FileCheck,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { CreateStoryModal } from "@/components/features/stories/create-story-modal";
-
-interface AcceptanceCriterion {
-  id: string;
-  description: string;
-  completed: boolean;
-}
-
-interface Story {
-  id: string;
-  code: string;
-  title: string;
-  asA: string;
-  iWantTo: string;
-  soThat: string;
-  acceptanceCriteria: AcceptanceCriterion[];
-  testCases: number;
-}
-
-// Initial mock data
-const initialStories: Story[] = [
-  {
-    id: "US-204",
-    code: "US-204",
-    title: "Biometric Authentication",
-    asA: "returning user",
-    iWantTo: "log in with biometric authentication",
-    soThat: "I can access my account faster",
-    acceptanceCriteria: [
-      {
-        id: "AC-1",
-        description: "Show biometric prompt on app launch if enabled in settings.",
-        completed: true,
-      },
-      {
-        id: "AC-2",
-        description: "Fallback to PIN entry if biometric fails after 3 attempts.",
-        completed: true,
-      },
-      {
-        id: "AC-3",
-        description: "Provide toggle in Profile settings to enable/disable feature.",
-        completed: false,
-      },
-    ],
-    testCases: 8,
-  },
-  {
-    id: "US-205",
-    code: "US-205",
-    title: "App Feature Walkthrough",
-    asA: "new user",
-    iWantTo: "see a walkthrough of the app features",
-    soThat: "I understand how to use the application effectively",
-    acceptanceCriteria: [
-      {
-        id: "AC-1",
-        description: "Display interactive tutorial on first app launch.",
-        completed: false,
-      },
-      {
-        id: "AC-2",
-        description: "Allow users to skip the walkthrough.",
-        completed: false,
-      },
-      {
-        id: "AC-3",
-        description: "Provide option to replay walkthrough from settings.",
-        completed: false,
-      },
-      {
-        id: "AC-4",
-        description: "Track completion status in user profile.",
-        completed: false,
-      },
-      {
-        id: "AC-5",
-        description: "Include tooltips for key features.",
-        completed: false,
-      },
-    ],
-    testCases: 12,
-  },
-  {
-    id: "US-208",
-    code: "US-208",
-    title: "Dark Mode Support",
-    asA: "mobile user",
-    iWantTo: "switch between light and dark themes",
-    soThat: "I can use the app comfortably in different lighting conditions",
-    acceptanceCriteria: [
-      {
-        id: "AC-1",
-        description: "Implement theme toggle in settings.",
-        completed: true,
-      },
-      {
-        id: "AC-2",
-        description: "Persist theme preference across sessions.",
-        completed: true,
-      },
-      {
-        id: "AC-3",
-        description: "Support system theme detection.",
-        completed: true,
-      },
-    ],
-    testCases: 6,
-  },
-];
+import { useStories, useCreateStory } from "@/hooks/use-stories";
+import { useUpdateAcceptanceCriteria } from "@/hooks/use-acceptance-criteria";
+import { extractPage } from "@/types/pagination.types";
+import type { UserStory, AcceptanceCriteria } from "@/types/story.types";
 
 export default function StoriesPage() {
-  const [stories, setStories] = useState<Story[]>(initialStories);
-  const [expandedStories, setExpandedStories] = useState<string[]>(["US-204"]);
+  const [expandedStories, setExpandedStories] = useState<string[]>([]);
   const [selectedStories, setSelectedStories] = useState<string[]>([]);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+
+  const { data: storiesData, isLoading, error } = useStories();
+  const createStory = useCreateStory();
+  const updateAC = useUpdateAcceptanceCriteria();
+
+  const stories = storiesData ? extractPage<UserStory>(storiesData).items : [];
 
   const toggleExpand = (id: string) => {
     setExpandedStories((prev) =>
@@ -148,22 +49,14 @@ export default function StoriesPage() {
     );
   };
 
-  const toggleACCompletion = (storyId: string, acId: string) => {
-    setStories((prevStories) =>
-      prevStories.map((story) =>
-        story.id === storyId
-          ? {
-              ...story,
-              acceptanceCriteria: story.acceptanceCriteria.map((ac) =>
-                ac.id === acId ? { ...ac, completed: !ac.completed } : ac
-              ),
-            }
-          : story
-      )
-    );
+  const toggleACCompletion = (ac: AcceptanceCriteria) => {
+    updateAC.mutate({
+      id: ac.acceptanceCriteriaId,
+      completed: !ac.completed,
+    });
   };
 
-  const getCompletionStats = (criteria: AcceptanceCriterion[]) => {
+  const getCompletionStats = (criteria: AcceptanceCriteria[]) => {
     const completed = criteria.filter((c) => c.completed).length;
     return { completed, total: criteria.length };
   };
@@ -174,37 +67,49 @@ export default function StoriesPage() {
     soThat: string;
     acceptanceCriteria: { id: string; description: string }[];
   }) => {
-    const newId = `US-${210 + stories.length}`;
-    const newStory: Story = {
-      id: newId,
-      code: newId,
-      title: formData.iWantTo.slice(0, 30) + (formData.iWantTo.length > 30 ? "..." : ""),
+    createStory.mutate({
+      projectId: stories[0]?.projectId ?? "",
+      title: formData.iWantTo.slice(0, 50) || "Untitled Story",
       asA: formData.asA,
       iWantTo: formData.iWantTo,
       soThat: formData.soThat,
+      status: "DRAFT",
       acceptanceCriteria: formData.acceptanceCriteria
         .filter((ac) => ac.description.trim())
         .map((ac, index) => ({
-          id: `AC-${index + 1}`,
-          description: ac.description,
+          content: ac.description,
+          orderNo: index + 1,
           completed: false,
         })),
-      testCases: 0,
-    };
-    setStories([...stories, newStory]);
-    setExpandedStories([...expandedStories, newId]);
+    });
+    setCreateModalOpen(false);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center min-h-[400px]">
+        <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
+        <h2 className="text-xl font-bold mb-2">Failed to load stories</h2>
+        <p className="text-muted-foreground">Please try again later.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 space-y-6 max-w-5xl mx-auto w-full">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <span className="hover:text-foreground cursor-pointer">Workspaces</span>
+        <Link href="/workspaces" className="hover:text-foreground cursor-pointer">Workspaces</Link>
         <ChevronRight className="h-4 w-4" />
-        <span className="text-foreground font-semibold">Mobile Redesign V2</span>
-        <Badge className="ml-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30">
-          ACTIVE SPRINT
-        </Badge>
+        <span className="text-foreground font-semibold">All User Stories</span>
       </div>
 
       {/* Action Cards */}
@@ -243,144 +148,156 @@ export default function StoriesPage() {
       </div>
 
       {/* Stories List */}
-      <div className="space-y-4">
-        {stories.map((story) => {
-          const isExpanded = expandedStories.includes(story.id);
-          const isSelected = selectedStories.includes(story.id);
-          const stats = getCompletionStats(story.acceptanceCriteria);
+      {stories.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground">
+          <ListChecks className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <p className="text-lg font-medium">No user stories yet</p>
+          <p className="text-sm mt-1">Create your first user story to get started.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {stories.map((story) => {
+            const isExpanded = expandedStories.includes(story.userStoryId);
+            const isSelected = selectedStories.includes(story.userStoryId);
+            const stats = getCompletionStats(story.acceptanceCriteria ?? []);
 
-          return (
-            <div
-              key={story.id}
-              className="bg-card border border-border rounded-xl overflow-hidden"
-            >
-              {/* Story Header */}
-              <div className="p-4 flex items-start gap-3">
-                <Checkbox
-                  checked={isSelected}
-                  onCheckedChange={() => toggleSelect(story.id)}
-                  className="mt-1"
-                />
-                <Link href={`/stories/${story.id}`} className="flex-1 min-w-0 cursor-pointer">
-                  <div className="flex items-center gap-3 mb-1">
-                    <Badge
-                      variant="outline"
-                      className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 font-semibold"
-                    >
-                      {story.code}
-                    </Badge>
-                    <h3 className="font-bold text-lg hover:text-primary transition-colors">{story.title}</h3>
-                  </div>
-                  {!isExpanded && (
-                    <div className="flex items-center gap-4 mt-2">
-                      <p className="text-sm text-muted-foreground line-clamp-1 flex-1">
-                        As a {story.asA}, I want to {story.iWantTo} so that {story.soThat}...
-                      </p>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
-                        <div className="flex items-center gap-1">
-                          <ListChecks className="h-4 w-4" />
-                          <span>{story.acceptanceCriteria.length} ACs</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <FileCheck className="h-4 w-4" />
-                          <span>{story.testCases} Tests</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => toggleExpand(story.id)}
-                  className="shrink-0"
-                >
-                  {isExpanded ? (
-                    <ChevronUp className="h-5 w-5" />
-                  ) : (
-                    <ChevronDown className="h-5 w-5" />
-                  )}
-                </Button>
-              </div>
-
-              {/* Expanded Content */}
-              {isExpanded && (
-                <div className="px-4 pb-4 space-y-6">
-                  {/* User Story */}
-                  <div className="bg-muted/30 rounded-lg p-4 space-y-2">
-                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                      User Story
-                    </p>
-                    <div className="text-sm space-y-1">
-                      <p>
-                        <span className="text-muted-foreground">AS A</span>{" "}
-                        <span className="font-medium">{story.asA}</span>,
-                      </p>
-                      <p>
-                        <span className="text-muted-foreground">I WANT TO</span>{" "}
-                        <span className="font-medium">{story.iWantTo}</span>,
-                      </p>
-                      <p>
-                        <span className="text-muted-foreground">SO THAT</span>{" "}
-                        <span className="font-medium">{story.soThat}</span>.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Acceptance Criteria - Interactive */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                        Acceptance Criteria
-                      </p>
+            return (
+              <div
+                key={story.userStoryId}
+                className="bg-card border border-border rounded-xl overflow-hidden"
+              >
+                {/* Story Header */}
+                <div className="p-4 flex items-start gap-3">
+                  <Checkbox
+                    checked={isSelected}
+                    onCheckedChange={() => toggleSelect(story.userStoryId)}
+                    className="mt-1"
+                  />
+                  <Link href={`/stories/${story.userStoryId}`} className="flex-1 min-w-0 cursor-pointer">
+                    <div className="flex items-center gap-3 mb-1">
                       <Badge
                         variant="outline"
-                        className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 font-semibold"
+                        className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 font-semibold"
                       >
-                        {stats.completed}/{stats.total} DONE
+                        {story.jiraIssueKey ?? story.userStoryId.slice(0, 8).toUpperCase()}
                       </Badge>
+                      <h3 className="font-bold text-lg hover:text-primary transition-colors">{story.title}</h3>
                     </div>
-                    <div className="space-y-2">
-                      {story.acceptanceCriteria.map((criteria) => (
-                        <button
-                          key={criteria.id}
-                          onClick={() => toggleACCompletion(story.id, criteria.id)}
-                          className="flex items-start gap-3 text-sm w-full text-left group hover:bg-muted/30 p-2 -m-2 rounded-lg transition-colors"
-                        >
-                          <div
-                            className={`mt-0.5 w-5 h-5 flex items-center justify-center rounded shrink-0 transition-all ${
-                              criteria.completed
-                                ? "bg-primary text-white"
-                                : "border-2 border-muted-foreground/30 group-hover:border-primary/50"
-                            }`}
-                          >
-                            {criteria.completed && <Check className="h-3 w-3" />}
+                    {!isExpanded && (
+                      <div className="flex items-center gap-4 mt-2">
+                        <p className="text-sm text-muted-foreground line-clamp-1 flex-1">
+                          {story.asA && story.iWantTo
+                            ? `As a ${story.asA}, I want to ${story.iWantTo}${story.soThat ? ` so that ${story.soThat}` : ""}...`
+                            : story.description || "No description"}
+                        </p>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
+                          <div className="flex items-center gap-1">
+                            <ListChecks className="h-4 w-4" />
+                            <span>{(story.acceptanceCriteria ?? []).length} ACs</span>
                           </div>
-                          <p
-                            className={
-                              criteria.completed
-                                ? "text-foreground"
-                                : "text-muted-foreground group-hover:text-foreground transition-colors"
-                            }
-                          >
-                            {criteria.description}
-                          </p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Generate Button */}
-                  <Button className="w-full gap-2 bg-primary shadow-lg shadow-primary/20">
-                    <Sparkles className="h-4 w-4" />
-                    Generate Tests
+                        </div>
+                      </div>
+                    )}
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => toggleExpand(story.userStoryId)}
+                    className="shrink-0"
+                  >
+                    {isExpanded ? (
+                      <ChevronUp className="h-5 w-5" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5" />
+                    )}
                   </Button>
                 </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+
+                {/* Expanded Content */}
+                {isExpanded && (
+                  <div className="px-4 pb-4 space-y-6">
+                    {/* User Story */}
+                    {story.asA && story.iWantTo && (
+                      <div className="bg-muted/30 rounded-lg p-4 space-y-2">
+                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                          User Story
+                        </p>
+                        <div className="text-sm space-y-1">
+                          <p>
+                            <span className="text-muted-foreground">AS A</span>{" "}
+                            <span className="font-medium">{story.asA}</span>,
+                          </p>
+                          <p>
+                            <span className="text-muted-foreground">I WANT TO</span>{" "}
+                            <span className="font-medium">{story.iWantTo}</span>,
+                          </p>
+                          {story.soThat && (
+                            <p>
+                              <span className="text-muted-foreground">SO THAT</span>{" "}
+                              <span className="font-medium">{story.soThat}</span>.
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Acceptance Criteria - Interactive */}
+                    {(story.acceptanceCriteria ?? []).length > 0 && (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                            Acceptance Criteria
+                          </p>
+                          <Badge
+                            variant="outline"
+                            className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 font-semibold"
+                          >
+                            {stats.completed}/{stats.total} DONE
+                          </Badge>
+                        </div>
+                        <div className="space-y-2">
+                          {(story.acceptanceCriteria ?? []).map((criteria) => (
+                            <button
+                              key={criteria.acceptanceCriteriaId}
+                              onClick={() => toggleACCompletion(criteria)}
+                              className="flex items-start gap-3 text-sm w-full text-left group hover:bg-muted/30 p-2 -m-2 rounded-lg transition-colors"
+                            >
+                              <div
+                                className={`mt-0.5 w-5 h-5 flex items-center justify-center rounded shrink-0 transition-all ${
+                                  criteria.completed
+                                    ? "bg-primary text-white"
+                                    : "border-2 border-muted-foreground/30 group-hover:border-primary/50"
+                                }`}
+                              >
+                                {criteria.completed && <Check className="h-3 w-3" />}
+                              </div>
+                              <p
+                                className={
+                                  criteria.completed
+                                    ? "text-foreground"
+                                    : "text-muted-foreground group-hover:text-foreground transition-colors"
+                                }
+                              >
+                                {criteria.content}
+                              </p>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Generate Button */}
+                    <Button className="w-full gap-2 bg-primary shadow-lg shadow-primary/20">
+                      <Sparkles className="h-4 w-4" />
+                      Generate Tests
+                    </Button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Floating Action Bar */}
       {selectedStories.length > 0 && (
