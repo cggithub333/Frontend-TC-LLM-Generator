@@ -14,7 +14,6 @@ import {
   Trash2,
   LayoutDashboard,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -141,15 +140,6 @@ export function WorkspaceCard({
             </div>
           </div>
         </div>
-
-        {/* Action Button */}
-        <Button
-          variant="default"
-          className="w-full h-10 bg-primary/10 hover:bg-primary/20 text-primary"
-          onClick={(e) => e.preventDefault()}
-        >
-          Open Workspace
-        </Button>
       </article>
     </Link>
   );

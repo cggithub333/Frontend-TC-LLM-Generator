@@ -4,8 +4,7 @@
  */
 
 import Link from "next/link";
-import { Search, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import type { Workspace } from "@/types/workspace.types";
 
@@ -13,14 +12,12 @@ interface WorkspaceHeaderProps {
   workspace?: Workspace;
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  onCreateProject: () => void;
 }
 
 export function WorkspaceHeader({
   workspace,
   searchQuery,
   onSearchChange,
-  onCreateProject,
 }: WorkspaceHeaderProps) {
   return (
     <header className="flex items-center justify-between border-b border-border bg-card px-8 py-4 sticky top-0 z-10">
@@ -64,15 +61,6 @@ export function WorkspaceHeader({
           </div>
         </label>
 
-        {/* Create Project Button */}
-        <Button
-          className="h-10 px-5 gap-2"
-          onClick={onCreateProject}
-          aria-label="Create new project"
-        >
-          <Plus className="h-5 w-5" aria-hidden="true" />
-          <span>Create Project</span>
-        </Button>
       </div>
     </header>
   );

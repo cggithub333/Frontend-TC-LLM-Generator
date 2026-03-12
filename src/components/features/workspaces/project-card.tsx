@@ -5,40 +5,21 @@
 
 import Link from "next/link";
 import { Clock, MoreHorizontal, Layers, KeyRound } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import type { Project } from "@/types/workspace.types";
 import {
   getStatusColors,
-  getProjectActionLabel,
-  isProjectArchived,
 } from "@/lib/utils/project.utils";
 
 interface ProjectCardProps {
   project: Project;
-  onManageTeam?: (projectId: string) => void;
-  onViewDetails?: (projectId: string) => void;
   onMenuClick?: (projectId: string) => void;
 }
 
 export function ProjectCard({
   project,
-  onManageTeam,
-  onViewDetails,
   onMenuClick,
 }: ProjectCardProps) {
   const statusColors = getStatusColors(project.status);
-  const actionLabel = getProjectActionLabel(project.status);
-  const archived = isProjectArchived(project.status);
-
-  const handleActionClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (archived && onViewDetails) {
-      onViewDetails(project.projectId);
-    } else if (!archived && onManageTeam) {
-      onManageTeam(project.projectId);
-    }
-  };
 
   const handleMenuClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -116,20 +97,6 @@ export function ProjectCard({
           </p>
         )}
 
-        {/* Action Button */}
-        <div className="mt-auto">
-          <Button
-            variant={archived ? "secondary" : "default"}
-            className={`w-full h-10 ${
-              archived
-                ? "bg-muted hover:bg-muted/80 text-muted-foreground"
-                : "bg-primary/10 hover:bg-primary/20 text-primary"
-            }`}
-            onClick={handleActionClick}
-          >
-            {actionLabel}
-          </Button>
-        </div>
       </article>
     </Link>
   );

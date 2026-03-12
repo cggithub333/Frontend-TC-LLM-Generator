@@ -18,10 +18,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Workspace } from "@/types/workspace.types";
 
-interface WorkspaceEvent {
+/** Generic entity event from the centralized WebSocket broadcaster */
+interface EntityEvent {
+  entityType: string;
   action: "CREATED" | "UPDATED" | "DELETED";
-  workspace: Workspace | null;
-  workspaceId: string;
+  entityId: string;
+  parentId?: string;
+  payload?: unknown;
   performedBy: string;
 }
 
@@ -42,10 +45,10 @@ export default function WorkspacesPage() {
   } = useWorkspaces();
 
   // Subscribe to real-time workspace events
-  const { status: wsStatus } = useWebSocket<WorkspaceEvent>({
+  const { status: wsStatus } = useWebSocket<EntityEvent>({
     topic: "/topic/workspaces",
     onMessage: (event) => {
-      console.log("[WS] Workspace event:", event.action, event.workspaceId);
+      console.log("[WS] Workspace event:", event.action, event.entityId);
       // Invalidate workspace queries to trigger re-fetch
       queryClient.invalidateQueries({ queryKey: ["workspaces"] });
     },
@@ -166,15 +169,6 @@ export default function WorkspacesPage() {
               />
             </div>
           </label>
-
-          {/* Create Button */}
-          <Button
-            className="h-10 px-5 gap-2"
-            onClick={() => setCreateOpen(true)}
-          >
-            <Plus className="h-5 w-5" />
-            <span>New Workspace</span>
-          </Button>
         </div>
       </header>
 

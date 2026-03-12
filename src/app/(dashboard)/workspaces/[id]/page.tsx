@@ -5,6 +5,17 @@ import { useParams, useRouter } from "next/navigation";
 import { useProjectsByWorkspace } from "@/hooks/use-projects";
 import { useWorkspace } from "@/hooks/use-workspaces";
 import { filterProjectsByQuery } from "@/lib/utils/project.utils";
+import { useQueryClient } from "@tanstack/react-query";
+import { useWebSocket } from "@/hooks/use-websocket";
+
+interface EntityEvent {
+  entityType: string;
+  action: "CREATED" | "UPDATED" | "DELETED";
+  entityId: string;
+  parentId?: string;
+  payload?: unknown;
+  performedBy: string;
+}
 
 import {
   WorkspaceHeader,
@@ -37,6 +48,18 @@ export default function WorkspaceDetailPage() {
     refetch: refetchProjects,
   } = useProjectsByWorkspace(workspaceId);
 
+  const queryClient = useQueryClient();
+
+  // Subscribe to real-time project events for this workspace
+  useWebSocket<EntityEvent>({
+    topic: `/topic/workspaces/${workspaceId}/projects`,
+    onMessage: (event) => {
+      console.log("[WS] Project event:", event.action, event.entityId);
+      // Invalidate project queries to trigger re-fetch
+      queryClient.invalidateQueries({ queryKey: ["projects", "workspace", workspaceId] });
+    },
+  });
+
   const projects = projectsResult?.items;
   const isLoading = workspaceLoading || projectsLoading;
   const hasError = workspaceError || projectsError;
@@ -53,20 +76,6 @@ export default function WorkspaceDetailPage() {
   const handleCreateProject = useCallback(() => {
     setCreateDialogOpen(true);
   }, []);
-
-  const handleManageTeam = useCallback(
-    (projectId: string) => {
-      router.push(`/projects/${projectId}/team`);
-    },
-    [router]
-  );
-
-  const handleViewDetails = useCallback(
-    (projectId: string) => {
-      router.push(`/projects/${projectId}`);
-    },
-    [router]
-  );
 
   const handleMenuClick = useCallback((_projectId: string) => {
     // TODO: Open project menu
@@ -99,8 +108,6 @@ export default function WorkspaceDetailPage() {
             <ProjectCard
               key={project.projectId}
               project={project}
-              onManageTeam={handleManageTeam}
-              onViewDetails={handleViewDetails}
               onMenuClick={handleMenuClick}
             />
           ))}
@@ -116,7 +123,6 @@ export default function WorkspaceDetailPage() {
         workspace={workspace}
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
-        onCreateProject={handleCreateProject}
       />
 
       {content}
