@@ -104,40 +104,9 @@ export default function ProjectDetailPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-muted/30">
-      {/* Header */}
-      <header className="flex items-center justify-between border-b bg-card px-8 py-5 shrink-0">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 p-1.5 rounded-md">
-              <Layers className="h-5 w-5" />
-            </div>
-            <h2 className="text-xl font-bold">{project.name}</h2>
-            <Badge className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ml-2", statusColors[project.status] || statusColors["Active"])}>
-              {project.status}
-            </Badge>
-            {project.projectKey && (
-              <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded ml-1">
-                {project.projectKey}
-              </span>
-            )}
-          </div>
-          <p className="text-muted-foreground text-xs font-medium pl-10">Project Dashboard</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" className="gap-2">
-            <Calendar className="h-4 w-4" />
-            <span>Oct 24 - Nov 24</span>
-          </Button>
-          <Button size="sm" className="gap-2 shadow-md shadow-primary/30">
-            <Plus className="h-4 w-4" />
-            <span>New Item</span>
-          </Button>
-        </div>
-      </header>
-
+    <>
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto p-8">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-8">
         <div className="max-w-[1600px] mx-auto grid grid-cols-1 xl:grid-cols-3 gap-6 pb-10">
 
           {/* Test Suites Card */}
@@ -358,6 +327,6 @@ export default function ProjectDetailPage() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
