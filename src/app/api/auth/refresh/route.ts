@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { getBackendApiUrl } from "@/lib/env";
 
-const BACKEND_URL = process.env.BACKEND_API_URL || "http://localhost:8080/api/v1";
 
 export async function POST() {
   const cookieStore = await cookies();
@@ -15,7 +15,7 @@ export async function POST() {
   }
 
   try {
-    const res = await fetch(`${BACKEND_URL}/auth/refresh`, {
+    const res = await fetch(`${getBackendApiUrl()}/auth/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),

@@ -25,6 +25,8 @@ COPY . .
 # Pass public env vars as build args (Next.js inlines NEXT_PUBLIC_* at build time)
 ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
 ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ARG NEXT_PUBLIC_WS_URL
+ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
 
 # Set Next.js to produce a standalone output
 ENV NEXT_TELEMETRY_DISABLED=1

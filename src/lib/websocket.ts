@@ -7,10 +7,8 @@ import { Client, type IMessage, type StompSubscription } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
 // Backend WebSocket URL — connect directly to backend, not through Next.js proxy
-const WS_URL =
-  typeof window !== "undefined"
-    ? (process.env.NEXT_PUBLIC_WS_URL || "http://localhost:8080/ws")
-    : "";
+// NEXT_PUBLIC_ vars must be read directly for Next.js to inline them at build time
+const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "";
 
 let stompClient: Client | null = null;
 let connectionPromise: Promise<Client> | null = null;
@@ -20,6 +18,12 @@ let connectionPromise: Promise<Client> | null = null;
  * Authenticates using the JWT access token from cookies.
  */
 export function getStompClient(token?: string): Promise<Client> {
+  if (!WS_URL) {
+    return Promise.reject(
+      new Error("[WebSocket] NEXT_PUBLIC_WS_URL is not configured. Check your .env file.")
+    );
+  }
+
   if (stompClient?.connected) {
     return Promise.resolve(stompClient);
   }

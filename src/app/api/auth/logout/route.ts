@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { getBackendApiUrl } from "@/lib/env";
 
-const BACKEND_URL = process.env.BACKEND_API_URL || "http://localhost:8080/api/v1";
 
 export async function POST() {
   const cookieStore = await cookies();
@@ -9,7 +9,7 @@ export async function POST() {
 
   if (accessToken) {
     try {
-      await fetch(`${BACKEND_URL}/auth/logout`, {
+      await fetch(`${getBackendApiUrl()}/auth/logout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

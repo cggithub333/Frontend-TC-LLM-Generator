@@ -372,7 +372,7 @@ export default function HomePage() {
                   <div className="h-3 w-3 rounded-full bg-yellow-400" />
                   <div className="h-3 w-3 rounded-full bg-green-400" />
                   <div className="ml-3 flex h-7 flex-1 items-center rounded-md bg-background px-3 text-xs text-muted-foreground">
-                    localhost:3000/workspaces
+                    quraex.com/workspaces
                   </div>
                 </div>
                 {/* Screenshot */}

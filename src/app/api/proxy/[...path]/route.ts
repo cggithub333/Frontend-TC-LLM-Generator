@@ -1,8 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-
-const BACKEND_URL =
-  process.env.BACKEND_API_URL || "http://localhost:8080/api/v1";
+import { getBackendApiUrl } from "@/lib/env";
 
 async function refreshTokens(): Promise<string | null> {
   const cookieStore = await cookies();
@@ -11,7 +9,7 @@ async function refreshTokens(): Promise<string | null> {
   if (!refreshToken) return null;
 
   try {
-    const res = await fetch(`${BACKEND_URL}/auth/refresh`, {
+    const res = await fetch(`${getBackendApiUrl()}/auth/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),
@@ -49,7 +47,7 @@ async function forwardRequest(
   path: string,
   token: string | undefined
 ): Promise<Response> {
-  const url = new URL(`${BACKEND_URL}/${path}`);
+  const url = new URL(`${getBackendApiUrl()}/${path}`);
   request.nextUrl.searchParams.forEach((value, key) => {
     url.searchParams.set(key, value);
   });
@@ -121,3 +119,4 @@ export const POST = handleProxy;
 export const PUT = handleProxy;
 export const PATCH = handleProxy;
 export const DELETE = handleProxy;
+
