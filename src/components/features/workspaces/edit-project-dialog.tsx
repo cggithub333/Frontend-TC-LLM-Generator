@@ -18,15 +18,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { AlertCircle, Link as LinkIcon } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import type {
   UpdateProjectInput,
   ProjectFormErrors,
 } from "@/types/project.types";
 import {
   validateProjectName,
-  validateJiraSiteId,
-  validateJiraProjectKey,
 } from "@/lib/utils/validation.utils";
 import { useUpdateProject } from "@/hooks/use-projects";
 import { cn } from "@/lib/utils";
@@ -48,8 +46,6 @@ export function EditProjectDialog({
   const [formData, setFormData] = useState<UpdateProjectInput>({
     name: "",
     description: "",
-    jiraSiteId: "",
-    jiraProjectKey: "",
   });
 
   const [errors, setErrors] = useState<ProjectFormErrors>({});
@@ -63,8 +59,6 @@ export function EditProjectDialog({
       setFormData({
         name: project.name,
         description: project.description || "",
-        jiraSiteId: project.jiraSiteId || "",
-        jiraProjectKey: project.jiraProjectKey || "",
       });
       setErrors({});
       setTouched({});
@@ -89,15 +83,6 @@ export function EditProjectDialog({
         case "name":
           error = validateProjectName(formData.name || "");
           break;
-        case "jiraSiteId":
-          error = validateJiraSiteId(formData.jiraSiteId || "");
-          break;
-        case "jiraProjectKey":
-          error = validateJiraProjectKey(
-            formData.jiraProjectKey || "",
-            formData.jiraSiteId || "",
-          );
-          break;
       }
 
       if (error) {
@@ -112,16 +97,9 @@ export function EditProjectDialog({
       e.preventDefault();
 
       const nameError = validateProjectName(formData.name || "");
-      const jiraSiteError = validateJiraSiteId(formData.jiraSiteId || "");
-      const jiraProjectError = validateJiraProjectKey(
-        formData.jiraProjectKey || "",
-        formData.jiraSiteId || "",
-      );
 
       const formErrors: ProjectFormErrors = {
         ...(nameError && { name: nameError }),
-        ...(jiraSiteError && { jiraSiteId: jiraSiteError }),
-        ...(jiraProjectError && { jiraProjectKey: jiraProjectError }),
       };
 
       if (Object.keys(formErrors).length > 0) {
@@ -136,8 +114,6 @@ export function EditProjectDialog({
           id: project.projectId,
           name: formData.name?.trim(),
           description: formData.description?.trim() || undefined,
-          jiraSiteId: formData.jiraSiteId?.trim() || undefined,
-          jiraProjectKey: formData.jiraProjectKey?.trim() || undefined,
         });
 
         onOpenChange(false);
@@ -224,87 +200,7 @@ export function EditProjectDialog({
               />
             </div>
 
-            {/* Optional: Jira Integration */}
-            <div className="pt-4 border-t border-border/50">
-              <div className="flex items-center justify-between mb-4">
-                <div className="space-y-0.5">
-                  <h4 className="text-sm font-semibold flex items-center gap-2">
-                    <LinkIcon className="h-4 w-4 text-muted-foreground" />
-                    Jira Integration
-                  </h4>
-                  <p className="text-[11px] text-muted-foreground">
-                    Optional: Link project to Jira site
-                  </p>
-                </div>
-              </div>
 
-              <div className="space-y-4 ml-1 pl-4 border-l-2 border-primary/20">
-                <div className="space-y-1.5">
-                  <Label
-                    htmlFor="edit-jira-site-id"
-                    className="text-xs font-semibold text-muted-foreground"
-                  >
-                    Jira Site ID
-                  </Label>
-                  <Input
-                    id="edit-jira-site-id"
-                    value={formData.jiraSiteId}
-                    onChange={(e) =>
-                      handleFieldChange("jiraSiteId", e.target.value)
-                    }
-                    onBlur={() => handleFieldBlur("jiraSiteId")}
-                    placeholder="e.g. https://your-domain.atlassian.net"
-                    className={cn(
-                      "h-9 text-sm bg-background",
-                      touched.jiraSiteId &&
-                        errors.jiraSiteId &&
-                        "border-destructive",
-                    )}
-                    disabled={updateProject.isPending}
-                  />
-                  {touched.jiraSiteId && errors.jiraSiteId && (
-                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
-                      <AlertCircle className="h-3 w-3" />
-                      {errors.jiraSiteId}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label
-                    htmlFor="edit-jira-project-key"
-                    className="text-xs font-semibold text-muted-foreground"
-                  >
-                    Jira Project Key
-                  </Label>
-                  <Input
-                    id="edit-jira-project-key"
-                    value={formData.jiraProjectKey}
-                    onChange={(e) =>
-                      handleFieldChange(
-                        "jiraProjectKey",
-                        e.target.value.toUpperCase(),
-                      )
-                    }
-                    onBlur={() => handleFieldBlur("jiraProjectKey")}
-                    placeholder="e.g. TC"
-                    className={cn(
-                      "h-9 text-sm uppercase bg-background",
-                      touched.jiraProjectKey &&
-                        errors.jiraProjectKey &&
-                        "border-destructive",
-                    )}
-                    disabled={updateProject.isPending}
-                  />
-                  {touched.jiraProjectKey && errors.jiraProjectKey && (
-                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
-                      <AlertCircle className="h-3 w-3" />
-                      {errors.jiraProjectKey}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
           </div>
 
           <DialogFooter className="px-6 py-4 bg-card border-t shrink-0">
