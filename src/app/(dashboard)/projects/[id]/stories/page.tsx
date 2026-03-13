@@ -77,7 +77,7 @@ function AcItemWithTestCases({
             >
               {criteria.content}
             </p>
-            {testCasesCount > 0 && (
+            {testCasesCount > 0 ? (
               <Badge
                 variant="secondary"
                 className="mt-1 text-[10px] py-0 cursor-pointer hover:bg-secondary/80"
@@ -93,13 +93,17 @@ function AcItemWithTestCases({
                   <ChevronDown className="inline w-3 h-3 ml-1" />
                 )}
               </Badge>
+            ) : (
+              <span className="mt-1 text-[10px] text-muted-foreground/60 italic">
+                No tests yet
+              </span>
             )}
           </div>
         </button>
         <Button
           variant="ghost"
           size="icon"
-          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="h-6 w-6 opacity-40 group-hover:opacity-100 transition-opacity"
           title="Add Test Case for this AC"
           onClick={(e) => {
             e.stopPropagation();
@@ -426,19 +430,20 @@ export default function ProjectStoriesPage() {
                   </Button>
 
                   {/* Delete Button */}
-                  <Button
-                    variant="ghost"
-                    className="w-full text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                    onClick={async () => {
-                      if (
-                        confirm("Are you sure you want to delete this story?")
-                      ) {
-                        await deleteStory.mutateAsync(story.userStoryId);
-                      }
-                    }}
-                  >
-                    Delete Story
-                  </Button>
+                  <div className="flex justify-end pt-2">
+                    <button
+                      className="text-xs text-red-400 hover:text-red-600 dark:hover:text-red-400 transition-colors underline underline-offset-2"
+                      onClick={async () => {
+                        if (
+                          confirm("Are you sure you want to delete this story?")
+                        ) {
+                          await deleteStory.mutateAsync(story.userStoryId);
+                        }
+                      }}
+                    >
+                      Delete Story
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

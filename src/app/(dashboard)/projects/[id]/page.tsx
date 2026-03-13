@@ -86,7 +86,7 @@ export default function ProjectDetailPage() {
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-lg">Test Suites</h3>
               <Link
-                href={`/projects/${projectId}/test-suites`}
+                href="/suites"
                 className="text-primary text-sm font-bold hover:underline"
               >
                 View All
