@@ -126,11 +126,11 @@ export function ProjectCard({
         </div>
 
         {/* Description preview */}
-        {project.description && (
-          <p className="text-xs text-muted-foreground line-clamp-2 mb-4">
-            {project.description}
-          </p>
-        )}
+        <p className="text-xs text-muted-foreground line-clamp-2 mb-4">
+          {project.description || (
+            <span className="italic">No description added</span>
+          )}
+        </p>
 
       </article>
     </Link>

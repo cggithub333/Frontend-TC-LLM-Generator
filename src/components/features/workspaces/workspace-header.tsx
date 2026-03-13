@@ -1,68 +1,91 @@
 /**
  * WorkspaceHeader Component
- * Displays workspace breadcrumb, title, search, and create button
+ * Clean header with breadcrumb, dynamic role, and workspace context info
  */
 
 import Link from "next/link";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Calendar, Users, Layers } from "lucide-react";
 import type { Workspace } from "@/types/workspace.types";
 
 interface WorkspaceHeaderProps {
   workspace?: Workspace;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
+  isOwner?: boolean;
+  projectCount?: number;
 }
 
 export function WorkspaceHeader({
   workspace,
-  searchQuery,
-  onSearchChange,
+  isOwner = false,
+  projectCount = 0,
 }: WorkspaceHeaderProps) {
+  const createdDate = workspace?.createdAt
+    ? new Date(workspace.createdAt).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : null;
+
   return (
-    <header className="flex items-center justify-between border-b border-border bg-card px-8 py-4 sticky top-0 z-10">
-      {/* Left Section - Breadcrumb & Title */}
-      <div className="flex flex-col gap-1">
-        <nav className="flex flex-wrap gap-2" aria-label="Breadcrumb">
-          <Link
-            href="/workspaces"
-            className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
-          >
-            Workspaces
-          </Link>
-          <span className="text-xs font-medium text-muted-foreground" aria-hidden="true">
-            /
-          </span>
-          <span className="text-xs font-medium">Owner View</span>
-        </nav>
-        <div className="flex items-center gap-2">
-          <h2 className="text-xl font-bold">
-            {workspace?.name || "My Workspace"}
-          </h2>
+    <header className="border-b border-border bg-card px-8 py-4 sticky top-0 z-10">
+      {/* Top row — Breadcrumb & Title */}
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-1">
+          <nav className="flex flex-wrap gap-2" aria-label="Breadcrumb">
+            <Link
+              href="/workspaces"
+              className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
+            >
+              Workspaces
+            </Link>
+            <span className="text-xs font-medium text-muted-foreground" aria-hidden="true">
+              /
+            </span>
+            <span className="text-xs font-medium">
+              {workspace?.name || "Workspace"}
+            </span>
+          </nav>
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold">
+              {workspace?.name || "My Workspace"}
+            </h2>
+            <span
+              className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${
+                isOwner
+                  ? "bg-primary/10 text-primary"
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {isOwner ? "Owner" : "Member"}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Right Section - Search & Create Button */}
-      <div className="flex items-center gap-4">
-        {/* Search Input */}
-        <label className="flex flex-col min-w-64">
-          <div className="flex w-full items-stretch rounded-lg h-10 border border-input bg-background">
-            <div className="text-muted-foreground flex items-center justify-center pl-3">
-              <Search className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <Input
-              type="search"
-              className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 text-sm"
-              placeholder="Search projects..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              aria-label="Search projects"
-            />
+      {/* Bottom row — Workspace context stats */}
+      {workspace && (
+        <div className="flex items-center gap-5 mt-3 text-xs text-muted-foreground">
+          {workspace.description && (
+            <span className="truncate max-w-md" title={workspace.description}>
+              {workspace.description}
+            </span>
+          )}
+          <div className="flex items-center gap-1.5">
+            <Layers className="h-3.5 w-3.5" />
+            <span>{projectCount} project{projectCount !== 1 ? "s" : ""}</span>
           </div>
-        </label>
-
-      </div>
+          <div className="flex items-center gap-1.5">
+            <Users className="h-3.5 w-3.5" />
+            <span>{workspace.memberCount ?? 0} member{(workspace.memberCount ?? 0) !== 1 ? "s" : ""}</span>
+          </div>
+          {createdDate && (
+            <div className="flex items-center gap-1.5">
+              <Calendar className="h-3.5 w-3.5" />
+              <span>Created {createdDate}</span>
+            </div>
+          )}
+        </div>
+      )}
     </header>
   );
 }
-
