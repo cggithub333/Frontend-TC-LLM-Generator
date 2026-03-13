@@ -4,7 +4,7 @@ import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useProject } from "@/hooks/use-projects";
 import { cn } from "@/lib/utils";
-import { AlertCircle, Layers, Calendar, Plus } from "lucide-react";
+import { AlertCircle, Layers, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -31,7 +31,7 @@ export default function ProjectLayout({
 
   const navItems = [
     { name: "Overview", href: `/projects/${projectId}` },
-    { name: "Stories / Requirements", href: `/projects/${projectId}/stories` },
+    { name: "Stories", href: `/projects/${projectId}/stories` },
     { name: "Test Plans", href: `/projects/${projectId}/test-plans` },
     { name: "Team Management", href: `/projects/${projectId}/team` },
   ];
@@ -95,10 +95,6 @@ export default function ProjectLayout({
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <Button variant="outline" size="sm" className="gap-2">
-                <Calendar className="h-4 w-4" />
-                <span>Sync Jira</span>
-              </Button>
               <Button size="sm" className="gap-2 shadow-md shadow-primary/30">
                 <Plus className="h-4 w-4" />
                 <span>New Item</span>

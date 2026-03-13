@@ -9,7 +9,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { UserPlus, Layers, AlertCircle } from "lucide-react";
+import { UserPlus, Layers, AlertCircle, FileText, Plus, Folder } from "lucide-react";
 import { useProject } from "@/hooks/use-projects";
 import { useStoriesByProject } from "@/hooks/use-stories";
 import { useTestSuitesByProject } from "@/hooks/use-test-suites";
@@ -94,9 +94,24 @@ export default function ProjectDetailPage() {
             </div>
             <div className="space-y-3 flex-1">
               {testSuites.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-4 text-center">
-                  No test suites yet
-                </p>
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <div className="p-3 rounded-full bg-indigo-50 dark:bg-indigo-900/20 mb-3">
+                    <Folder className="h-6 w-6 text-indigo-500 dark:text-indigo-400" />
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">
+                    No test suites yet
+                  </p>
+                  <p className="text-xs text-muted-foreground/70 mb-3">
+                    Organize related test cases into suites
+                  </p>
+                  <Link
+                    href="/suites"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Create Test Suite
+                  </Link>
+                </div>
               ) : (
                 testSuites.map((suite) => (
                   <div
@@ -170,9 +185,24 @@ export default function ProjectDetailPage() {
               </div>
             </div>
             {userStories.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">
-                No user stories yet
-              </p>
+              <div className="flex flex-col items-center justify-center py-10 text-center">
+                <div className="p-3 rounded-full bg-amber-50 dark:bg-amber-900/20 mb-3">
+                  <FileText className="h-6 w-6 text-amber-500 dark:text-amber-400" />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground mb-1">
+                  No user stories yet
+                </p>
+                <p className="text-xs text-muted-foreground/70 mb-3">
+                  User stories define your requirements and acceptance criteria
+                </p>
+                <Link
+                  href={`/projects/${projectId}/stories`}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Write First Story
+                </Link>
+              </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
