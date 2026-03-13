@@ -26,6 +26,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { Workspace } from "@/types/workspace.types";
 
 /** Generic entity event from the centralized WebSocket broadcaster */
@@ -260,18 +267,18 @@ export default function WorkspacesPage() {
           {/* Sort dropdown */}
           <div className="flex items-center gap-1.5">
             <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-            <select
-              value={sortKey}
-              onChange={(e) => setSortKey(e.target.value as SortKey)}
-              className="text-sm bg-transparent border border-border rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
-              aria-label="Sort workspaces by"
-            >
-              {SORT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
+            <Select value={sortKey} onValueChange={(val) => setSortKey(val as SortKey)}>
+              <SelectTrigger className="w-[160px] h-8 bg-transparent border-border" aria-label="Sort workspaces by">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                {SORT_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <button
               onClick={toggleSortDir}
               className="p-1.5 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
