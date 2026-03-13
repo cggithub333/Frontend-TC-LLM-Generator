@@ -12,10 +12,12 @@ import { useProjectMembers } from "@/hooks/use-project-members";
 import { useProjects } from "@/hooks/use-projects";
 import { filterMembersByQuery } from "@/lib/utils/member.utils";
 import { DEFAULT_MEMBERS_PER_PAGE } from "@/lib/constants/member.constants";
+import { Search, UserPlus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import type { ProjectTeamStats } from "@/types/team.types";
 
 import {
-  TeamHeader,
   TeamStatsCards,
   MembersTable,
   TeamPagination,
@@ -139,13 +141,34 @@ export default function TeamManagementPage() {
   if (!members || members.length === 0) {
     return (
       <>
-        <TeamHeader
-          project={currentProject}
-          searchQuery={searchQuery}
-          onSearchChange={handleSearchChange}
-          onInviteMember={handleInviteMember}
-        />
         <main className="p-8">
+          {/* Control Bar: Search + Invite */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3 flex-1 max-w-md">
+              <div className="flex w-full items-stretch rounded-lg h-10 border border-input bg-background">
+                <div className="text-muted-foreground flex items-center justify-center pl-3">
+                  <Search className="h-4 w-4" aria-hidden="true" />
+                </div>
+                <Input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  placeholder="Search members..."
+                  className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 text-sm"
+                  aria-label="Search project members"
+                />
+              </div>
+            </div>
+            <Button
+              onClick={handleInviteMember}
+              className="h-10 px-5 gap-2 shadow-md shadow-primary/30"
+              aria-label="Invite new member to project"
+            >
+              <UserPlus className="h-4 w-4" aria-hidden="true" />
+              <span>Invite Member</span>
+            </Button>
+          </div>
+
           <TeamStatsCards stats={teamStats} />
           <div className="text-center py-12">
             <p className="text-muted-foreground mb-4">No team members yet</p>
@@ -163,14 +186,34 @@ export default function TeamManagementPage() {
 
   return (
     <>
-      <TeamHeader
-        project={currentProject}
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-        onInviteMember={handleInviteMember}
-      />
-
       <main className="p-8">
+        {/* Control Bar: Search + Invite */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3 flex-1 max-w-md">
+            <div className="flex w-full items-stretch rounded-lg h-10 border border-input bg-background">
+              <div className="text-muted-foreground flex items-center justify-center pl-3">
+                <Search className="h-4 w-4" aria-hidden="true" />
+              </div>
+              <Input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                placeholder="Search members..."
+                className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 text-sm"
+                aria-label="Search project members"
+              />
+            </div>
+          </div>
+          <Button
+            onClick={handleInviteMember}
+            className="h-10 px-5 gap-2 shadow-md shadow-primary/30"
+            aria-label="Invite new member to project"
+          >
+            <UserPlus className="h-4 w-4" aria-hidden="true" />
+            <span>Invite Member</span>
+          </Button>
+        </div>
+
         <TeamStatsCards stats={teamStats} />
 
         {filteredMembers.length === 0 ? (

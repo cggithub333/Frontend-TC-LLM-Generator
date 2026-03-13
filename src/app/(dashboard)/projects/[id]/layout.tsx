@@ -60,15 +60,10 @@ export default function ProjectLayout({
     );
   }
 
-  // Hide the global project header in Team management because it has its own, or merge later.
-  // Actually, we provide a unified Project Header here.
-  const isTeamPage = pathname.endsWith("/team");
-
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-muted/30">
       {/* Project Global Header */}
-      {!isTeamPage && (
-        <div className="border-b bg-card shrink-0">
+      <div className="border-b bg-card shrink-0">
           <header className="flex items-center justify-between px-8 py-5">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
@@ -127,7 +122,6 @@ export default function ProjectLayout({
             </nav>
           </div>
         </div>
-      )}
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-y-auto">{children}</div>
