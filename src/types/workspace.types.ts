@@ -6,6 +6,8 @@ export interface Workspace {
   description: string;
   createdAt: string;
   updatedAt: string;
+  projectCount?: number;
+  memberCount?: number;
 }
 
 export interface Project {

@@ -13,6 +13,8 @@ import {
   Pencil,
   Trash2,
   LayoutDashboard,
+  FolderKanban,
+  Users,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -66,7 +68,7 @@ export function WorkspaceCard({
 
   return (
     <Link href={`/workspaces/${workspace.workspaceId}`} className="block h-full">
-      <article className="group flex flex-col rounded-xl border border-border bg-card p-6 shadow-sm hover:shadow-md hover:border-primary/50 transition-all cursor-pointer h-full">
+      <article className="group flex flex-col rounded-xl border border-border bg-card p-6 shadow-sm hover:shadow-md hover:border-primary/50 hover:scale-[1.01] transition-all cursor-pointer h-full">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -113,14 +115,31 @@ export function WorkspaceCard({
         </div>
 
         {/* Description */}
-        {workspace.description && (
-          <p className="text-xs text-muted-foreground line-clamp-2 mb-4">
-            {workspace.description}
-          </p>
-        )}
+        <p className={`text-xs line-clamp-2 mb-4 ${
+          workspace.description
+            ? "text-muted-foreground"
+            : "text-muted-foreground/40 italic"
+        }`}>
+          {workspace.description || "No description added"}
+        </p>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-4 mb-6 mt-auto">
+        {/* Project & Member Count */}
+        <div className="flex items-center gap-4 mb-4 mt-auto">
+          <div className="flex items-center gap-1.5 text-sm">
+            <FolderKanban className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+            <span className="font-semibold">{workspace.projectCount ?? 0}</span>
+            <span className="text-muted-foreground text-xs">projects</span>
+          </div>
+          <div className="h-4 w-px bg-border" />
+          <div className="flex items-center gap-1.5 text-sm">
+            <Users className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+            <span className="font-semibold">{workspace.memberCount ?? 0}</span>
+            <span className="text-muted-foreground text-xs">members</span>
+          </div>
+        </div>
+
+        {/* Date Stats */}
+        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
           <div className="flex flex-col gap-1">
             <span className="text-xs font-medium text-muted-foreground">
               Created
@@ -144,3 +163,4 @@ export function WorkspaceCard({
     </Link>
   );
 }
+

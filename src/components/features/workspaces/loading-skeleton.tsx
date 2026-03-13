@@ -1,6 +1,6 @@
 /**
  * LoadingSkeleton Component
- * Skeleton loading state for workspace page
+ * Skeleton loading state for workspace page with shimmer animation
  */
 
 export function LoadingSkeleton() {
@@ -10,34 +10,37 @@ export function LoadingSkeleton() {
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="flex flex-col rounded-xl border border-border bg-card p-6 animate-pulse"
+            className="flex flex-col rounded-xl border border-border bg-card p-6 overflow-hidden relative"
           >
+            {/* Shimmer overlay */}
+            <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-lg bg-muted" />
+                <div className="size-10 rounded-lg bg-muted animate-pulse" />
                 <div className="space-y-2">
-                  <div className="h-4 w-32 bg-muted rounded" />
-                  <div className="h-3 w-16 bg-muted rounded" />
+                  <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+                  <div className="h-3 w-16 bg-muted rounded animate-pulse" />
                 </div>
               </div>
-              <div className="size-6 rounded-full bg-muted" />
+              <div className="size-6 rounded-full bg-muted animate-pulse" />
             </div>
+
+            {/* Description placeholder */}
+            <div className="h-3 w-3/4 bg-muted rounded animate-pulse mb-4" />
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="space-y-2">
-                <div className="h-3 w-20 bg-muted rounded" />
-                <div className="h-4 w-16 bg-muted rounded" />
+                <div className="h-3 w-20 bg-muted rounded animate-pulse" />
+                <div className="h-4 w-16 bg-muted rounded animate-pulse" />
               </div>
               <div className="space-y-2">
-                <div className="h-3 w-20 bg-muted rounded" />
-                <div className="h-4 w-16 bg-muted rounded" />
+                <div className="h-3 w-20 bg-muted rounded animate-pulse" />
+                <div className="h-4 w-16 bg-muted rounded animate-pulse" />
               </div>
             </div>
-
-            {/* Button */}
-            <div className="h-10 bg-muted rounded-lg" />
           </div>
         ))}
       </div>

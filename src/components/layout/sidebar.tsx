@@ -50,6 +50,7 @@ function WorkspaceSwitcher({ isCollapsed }: { isCollapsed: boolean }) {
 
   // Extract current workspace ID from URL
   const currentWorkspaceId = pathname.match(/\/workspaces\/([^/]+)/)?.[1];
+  const isOnWorkspacesPage = pathname === "/workspaces";
   const currentWorkspace = workspaces.find(
     (ws) => ws.workspaceId === currentWorkspaceId
   );
@@ -82,27 +83,39 @@ function WorkspaceSwitcher({ isCollapsed }: { isCollapsed: boolean }) {
   return (
     <div className="px-3 mt-2" ref={switcherRef}>
       <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center justify-between w-full p-2.5 rounded-lg border border-border bg-background hover:bg-accent/50 transition-colors text-left"
+        onClick={() => {
+          if (isOnWorkspacesPage) return;
+          setOpen(!open);
+        }}
+        className={cn(
+          "flex items-center justify-between w-full p-2.5 rounded-lg border border-border bg-background transition-colors text-left",
+          isOnWorkspacesPage
+            ? "cursor-default opacity-70"
+            : "hover:bg-accent/50 cursor-pointer"
+        )}
       >
         <div className="flex items-center gap-2 min-w-0">
           <div className="size-6 rounded bg-primary/10 flex items-center justify-center shrink-0">
             <LayoutDashboard className="h-3.5 w-3.5 text-primary" />
           </div>
           <span className="text-sm font-medium truncate">
-            {currentWorkspace?.name || "Select Workspace"}
+            {isOnWorkspacesPage
+              ? "All Workspaces"
+              : currentWorkspace?.name || "Select Workspace"}
           </span>
         </div>
-        <ChevronDown
-          className={cn(
-            "h-4 w-4 text-muted-foreground transition-transform shrink-0",
-            open && "rotate-180"
-          )}
-        />
+        {!isOnWorkspacesPage && (
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 text-muted-foreground transition-transform shrink-0",
+              open && "rotate-180"
+            )}
+          />
+        )}
       </button>
 
       {/* Dropdown */}
-      {open && (
+      {open && !isOnWorkspacesPage && (
         <div className="absolute left-3 right-3 mt-1 z-[60] rounded-lg border border-border bg-popover shadow-lg shadow-black/10 dark:shadow-black/30 max-h-64 overflow-auto">
           {workspaces.map((ws) => (
             <button
@@ -327,6 +340,8 @@ export function Sidebar() {
         className="relative p-4 border-t border-border"
         onMouseEnter={openProfileMenu}
         onMouseLeave={closeProfileMenu}
+        onFocus={openProfileMenu}
+        onBlur={closeProfileMenu}
       >
         {/* Popover menu - collapsed: fixed position to escape sidebar, expanded: absolute */}
         {isCollapsed ? (
