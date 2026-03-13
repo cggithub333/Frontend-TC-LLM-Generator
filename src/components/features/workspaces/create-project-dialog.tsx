@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, AlertCircle, Link as LinkIcon } from "lucide-react";
+import { CheckCircle2, AlertCircle } from "lucide-react";
 import type {
   CreateProjectInput,
   ProjectFormErrors,
@@ -26,8 +26,6 @@ import type {
 import {
   validateProjectName,
   validateProjectKey,
-  validateJiraSiteId,
-  validateJiraProjectKey,
   generateProjectKey,
 } from "@/lib/utils/validation.utils";
 import { useCreateProject } from "@/hooks/use-projects";
@@ -51,8 +49,6 @@ export function CreateProjectDialog({
     name: "",
     projectKey: "",
     description: "",
-    jiraSiteId: "",
-    jiraProjectKey: "",
   });
 
   const [errors, setErrors] = useState<ProjectFormErrors>({});
@@ -96,15 +92,6 @@ export function CreateProjectDialog({
         case "projectKey":
           error = projectKeyValidation.message;
           break;
-        case "jiraSiteId":
-          error = validateJiraSiteId(formData.jiraSiteId || "");
-          break;
-        case "jiraProjectKey":
-          error = validateJiraProjectKey(
-            formData.jiraProjectKey || "",
-            formData.jiraSiteId,
-          );
-          break;
       }
 
       if (error) {
@@ -123,15 +110,6 @@ export function CreateProjectDialog({
     if (!projectKeyValidation.isValid) {
       newErrors.projectKey = projectKeyValidation.message;
     }
-
-    const jiraSiteError = validateJiraSiteId(formData.jiraSiteId || "");
-    if (jiraSiteError) newErrors.jiraSiteId = jiraSiteError;
-
-    const jiraKeyError = validateJiraProjectKey(
-      formData.jiraProjectKey || "",
-      formData.jiraSiteId,
-    );
-    if (jiraKeyError) newErrors.jiraProjectKey = jiraKeyError;
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -297,89 +275,7 @@ export function CreateProjectDialog({
             />
           </div>
 
-          {/* Jira Integration */}
-          <div className="rounded-lg border bg-muted/50 p-4 space-y-4">
-            <div className="flex items-center gap-2">
-              <LinkIcon className="h-5 w-5 text-[#0052CC]" />
-              <h3 className="text-sm font-bold">Jira Integration</h3>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#0052CC]/10 text-[#0052CC] uppercase tracking-wide">
-                Optional
-              </span>
-            </div>
 
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <Label
-                  htmlFor="jira-site"
-                  className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                >
-                  Jira Site ID
-                </Label>
-                <Input
-                  id="jira-site"
-                  value={formData.jiraSiteId}
-                  onChange={(e) =>
-                    handleFieldChange("jiraSiteId", e.target.value)
-                  }
-                  onBlur={() => handleFieldBlur("jiraSiteId")}
-                  placeholder="e.g. mycompany.atlassian.net"
-                  className={cn(
-                    touched.jiraSiteId &&
-                      errors.jiraSiteId &&
-                      "border-destructive",
-                  )}
-                  disabled={createProject.isPending}
-                />
-                {touched.jiraSiteId && errors.jiraSiteId && (
-                  <p className="text-xs text-destructive flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" />
-                    {errors.jiraSiteId}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-1.5">
-                <Label
-                  htmlFor="jira-key"
-                  className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                >
-                  Jira Project Key
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="jira-key"
-                    value={formData.jiraProjectKey}
-                    onChange={(e) =>
-                      handleFieldChange(
-                        "jiraProjectKey",
-                        e.target.value.toUpperCase(),
-                      )
-                    }
-                    onBlur={() => handleFieldBlur("jiraProjectKey")}
-                    placeholder="e.g. PROJ"
-                    className={cn(
-                      "uppercase",
-                      touched.jiraProjectKey &&
-                        errors.jiraProjectKey &&
-                        "border-destructive bg-destructive/5",
-                    )}
-                    disabled={createProject.isPending}
-                  />
-                  {touched.jiraProjectKey && errors.jiraProjectKey && (
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
-                      <AlertCircle className="h-5 w-5 text-destructive" />
-                    </div>
-                  )}
-                </div>
-                {touched.jiraProjectKey && errors.jiraProjectKey && (
-                  <p className="text-xs text-destructive flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" />
-                    {errors.jiraProjectKey}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
 
           <DialogFooter className="gap-2 sm:gap-0">
             <Button
