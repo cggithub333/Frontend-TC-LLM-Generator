@@ -101,7 +101,8 @@ export function CreateManualTestCaseDialog({
         <DialogHeader>
           <DialogTitle>Create Test Case</DialogTitle>
           <DialogDescription>
-            User Story: {userStory.jiraIssueKey ? `[${userStory.jiraIssueKey}] ` : ""}
+            User Story:{" "}
+            {userStory.jiraIssueKey ? `[${userStory.jiraIssueKey}] ` : ""}
             {userStory.title}
           </DialogDescription>
         </DialogHeader>
@@ -109,10 +110,7 @@ export function CreateManualTestCaseDialog({
         <div className="space-y-6 py-4">
           <div className="space-y-2">
             <Label htmlFor="acceptanceCriteria">Acceptance Criteria *</Label>
-            <Select
-              value={selectedAcId}
-              onValueChange={setSelectedAcId}
-            >
+            <Select value={selectedAcId} onValueChange={setSelectedAcId}>
               <SelectTrigger id="acceptanceCriteria">
                 <SelectValue placeholder="Select Acceptance Criteria" />
               </SelectTrigger>

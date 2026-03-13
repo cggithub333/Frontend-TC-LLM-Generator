@@ -47,7 +47,7 @@ function AcItemWithTestCases({
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { data: testCasesData } = useTestCasesByAcceptanceCriteria(
-    criteria.acceptanceCriteriaId
+    criteria.acceptanceCriteriaId,
   );
   const testCasesCount = testCasesData?.items?.length || 0;
 
@@ -78,15 +78,20 @@ function AcItemWithTestCases({
               {criteria.content}
             </p>
             {testCasesCount > 0 && (
-              <Badge 
-                variant="secondary" 
+              <Badge
+                variant="secondary"
                 className="mt-1 text-[10px] py-0 cursor-pointer hover:bg-secondary/80"
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsExpanded(!isExpanded);
                 }}
               >
-                {testCasesCount} Tests {isExpanded ? <ChevronUp className="inline w-3 h-3 ml-1" /> : <ChevronDown className="inline w-3 h-3 ml-1" />}
+                {testCasesCount} Tests{" "}
+                {isExpanded ? (
+                  <ChevronUp className="inline w-3 h-3 ml-1" />
+                ) : (
+                  <ChevronDown className="inline w-3 h-3 ml-1" />
+                )}
               </Badge>
             )}
           </div>
@@ -108,7 +113,7 @@ function AcItemWithTestCases({
       {isExpanded && testCasesCount > 0 && (
         <div className="pl-10 pr-2 pb-2 space-y-2 relative before:absolute before:left-[19px] before:top-0 before:bottom-4 before:w-px before:bg-border">
           {testCasesData?.items.map((tc) => (
-            <div 
+            <div
               key={tc.testCaseId}
               className="bg-card border border-border rounded-md p-3 text-sm shadow-sm relative before:absolute before:left-[-21px] before:top-1/2 before:w-5 before:h-px before:bg-border"
             >
@@ -116,20 +121,33 @@ function AcItemWithTestCases({
                 <ClipboardList className="w-3.5 h-3.5 text-muted-foreground" />
                 {tc.title}
                 {tc.generatedByAi && (
-                  <Badge variant="outline" className="text-[9px] h-4 px-1 py-0 ml-auto bg-purple-50 text-purple-600 border-purple-200">AI Generated</Badge>
+                  <Badge
+                    variant="outline"
+                    className="text-[9px] h-4 px-1 py-0 ml-auto bg-purple-50 text-purple-600 border-purple-200"
+                  >
+                    AI Generated
+                  </Badge>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-3 mt-2">
                 {tc.steps && (
                   <div>
-                    <span className="text-[10px] font-semibold text-muted-foreground uppercase">Steps:</span>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{tc.steps}</p>
+                    <span className="text-[10px] font-semibold text-muted-foreground uppercase">
+                      Steps:
+                    </span>
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                      {tc.steps}
+                    </p>
                   </div>
                 )}
                 {tc.expectedResult && (
                   <div>
-                    <span className="text-[10px] font-semibold text-muted-foreground uppercase">Expected:</span>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{tc.expectedResult}</p>
+                    <span className="text-[10px] font-semibold text-muted-foreground uppercase">
+                      Expected:
+                    </span>
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                      {tc.expectedResult}
+                    </p>
                   </div>
                 )}
               </div>
@@ -169,8 +187,11 @@ export default function ProjectStoriesPage() {
 
   // Manual Test Case Dialog State
   const [isTestCaseDialogOpen, setIsTestCaseDialogOpen] = useState(false);
-  const [testCaseDialogStory, setTestCaseDialogStory] = useState<UserStory | null>(null);
-  const [testCaseDialogAcId, setTestCaseDialogAcId] = useState<string | null>(null);
+  const [testCaseDialogStory, setTestCaseDialogStory] =
+    useState<UserStory | null>(null);
+  const [testCaseDialogAcId, setTestCaseDialogAcId] = useState<string | null>(
+    null,
+  );
 
   const stories = storiesData?.items || [];
 
