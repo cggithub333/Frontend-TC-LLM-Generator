@@ -74,13 +74,9 @@ export default function ProjectStoriesPage() {
 
   const handleCreateStory = async (formData: StoryFormData) => {
     try {
-      const titleStr =
-        formData.iWantTo.slice(0, 50) +
-        (formData.iWantTo.length > 50 ? "..." : "");
-
       await createStory.mutateAsync({
         projectId: formData.projectId || projectId,
-        title: titleStr,
+        title: formData.title,
         asA: formData.asA,
         iWantTo: formData.iWantTo,
         soThat: formData.soThat,

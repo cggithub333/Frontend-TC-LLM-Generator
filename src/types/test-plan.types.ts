@@ -9,6 +9,7 @@ export interface TestPlan {
   description?: string;
   status: TestPlanStatus;
   storyIds?: string[];
+  suiteIds?: string[];
   createdAt: string;
   updatedAt?: string;
 }
@@ -19,6 +20,7 @@ export interface CreateTestPlanInput {
   description?: string;
   status?: TestPlanStatus;
   storyIds?: string[];
+  suiteIds?: string[];
 }
 
 export interface UpdateTestPlanInput {
@@ -26,6 +28,7 @@ export interface UpdateTestPlanInput {
   description?: string;
   status?: TestPlanStatus;
   storyIds?: string[];
+  suiteIds?: string[];
 }
 
 export interface UpdateTestPlanStatusInput {

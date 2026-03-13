@@ -36,6 +36,7 @@ interface AcceptanceCriterion {
 
 export interface StoryFormData {
   projectId: string;
+  title: string;
   asA: string;
   iWantTo: string;
   soThat: string;
@@ -53,6 +54,7 @@ export function CreateStoryModal({
 
   const [formData, setFormData] = useState<StoryFormData>({
     projectId: defaultProjectId ?? "",
+    title: "",
     asA: "",
     iWantTo: "",
     soThat: "",
@@ -90,13 +92,14 @@ export function CreateStoryModal({
   };
 
   const handleSubmit = () => {
-    if (!formData.projectId) return;
+    if (!formData.projectId || !formData.title.trim()) return;
     if (onCreateStory) {
       onCreateStory(formData);
     }
     // Reset form
     setFormData({
       projectId: defaultProjectId ?? "",
+      title: "",
       asA: "",
       iWantTo: "",
       soThat: "",
@@ -155,6 +158,20 @@ export function CreateStoryModal({
               </Select>
             </div>
           )}
+
+          {/* Title */}
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider">
+              Title <span className="text-destructive">*</span>
+            </label>
+            <Input
+              placeholder="e.g. View order history"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+            />
+          </div>
 
           {/* User Role */}
           <div className="space-y-2">
@@ -285,7 +302,7 @@ export function CreateStoryModal({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!formData.projectId}
+            disabled={!formData.projectId || !formData.title.trim()}
             className="shadow-lg shadow-primary/25"
           >
             Create Story

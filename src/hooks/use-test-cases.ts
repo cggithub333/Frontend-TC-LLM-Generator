@@ -33,6 +33,23 @@ export function useTestCasesByAcceptanceCriteria(
   });
 }
 
+export function useTestCasesByUserStory(
+  userStoryId: string,
+  params?: PaginationParams
+) {
+  return useQuery({
+    queryKey: ["testCases", "user-story", userStoryId, params],
+    queryFn: async (): Promise<PaginatedResult<TestCase>> => {
+      const { data } = await axios.get<PagedResponse<TestCase>>(
+        `/test-cases/user-story/${userStoryId}`,
+        { params: { page: params?.page ?? 0, size: params?.size ?? 20, sort: params?.sort } }
+      );
+      return extractPage(data);
+    },
+    enabled: !!userStoryId,
+  });
+}
+
 export function useSearchTestCases(title: string, params?: PaginationParams) {
   return useQuery({
     queryKey: ["testCases", "search", title, params],

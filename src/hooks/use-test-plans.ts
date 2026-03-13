@@ -126,3 +126,45 @@ export function useDeleteTestPlan() {
     },
   });
 }
+
+// ---- PlanSuite hooks: manage test suites in a plan ----
+
+export function useTestSuitesInPlan(planId: string) {
+  return useQuery({
+    queryKey: ["testPlans", planId, "testSuites"],
+    queryFn: async () => {
+      const { data } = await axios.get(`/test-plans/${planId}/test-suites`);
+      return data;
+    },
+    enabled: !!planId,
+  });
+}
+
+export function useAttachSuiteToPlan() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ planId, testSuiteId }: { planId: string; testSuiteId: string }) => {
+      const { data } = await axios.post(`/test-plans/${planId}/test-suites`, { testSuiteId });
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["testPlans", variables.planId, "testSuites"] });
+      queryClient.invalidateQueries({ queryKey: ["testPlans", variables.planId] });
+    },
+  });
+}
+
+export function useDetachSuiteFromPlan() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ planId, testSuiteId }: { planId: string; testSuiteId: string }) => {
+      await axios.delete(`/test-plans/${planId}/test-suites/${testSuiteId}`);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["testPlans", variables.planId, "testSuites"] });
+      queryClient.invalidateQueries({ queryKey: ["testPlans", variables.planId] });
+    },
+  });
+}

@@ -82,3 +82,43 @@ export function useDeleteTestSuite() {
     },
   });
 }
+
+// ---- TestSuiteItem hooks: manage test cases in a suite ----
+
+export function useTestCasesInSuite(suiteId: string) {
+  return useQuery({
+    queryKey: ["testSuites", suiteId, "testCases"],
+    queryFn: async () => {
+      const { data } = await axios.get(`/test-suites/${suiteId}/test-cases`);
+      return data;
+    },
+    enabled: !!suiteId,
+  });
+}
+
+export function useAddTestCaseToSuite() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ suiteId, testCaseId }: { suiteId: string; testCaseId: string }) => {
+      const { data } = await axios.post(`/test-suites/${suiteId}/test-cases`, { testCaseId });
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["testSuites", variables.suiteId, "testCases"] });
+    },
+  });
+}
+
+export function useRemoveTestCaseFromSuite() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ suiteId, testCaseId }: { suiteId: string; testCaseId: string }) => {
+      await axios.delete(`/test-suites/${suiteId}/test-cases/${testCaseId}`);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["testSuites", variables.suiteId, "testCases"] });
+    },
+  });
+}

@@ -1,5 +1,7 @@
 export interface TestCase {
   testCaseId: string;
+  userStoryId?: string;
+  userStoryTitle?: string;
   acceptanceCriteriaId?: string;
   testCaseTypeId?: string;
   testCaseTypeName?: string;
@@ -13,6 +15,7 @@ export interface TestCase {
 }
 
 export interface CreateTestCaseInput {
+  userStoryId?: string;
   acceptanceCriteriaId?: string;
   testCaseTypeId?: string;
   title: string;

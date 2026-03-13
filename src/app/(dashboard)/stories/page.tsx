@@ -65,7 +65,7 @@ export default function StoriesPage() {
   const handleCreateStory = (formData: StoryFormData) => {
     createStory.mutate({
       projectId: formData.projectId,
-      title: formData.iWantTo.slice(0, 50) || "Untitled Story",
+      title: formData.title,
       asA: formData.asA,
       iWantTo: formData.iWantTo,
       soThat: formData.soThat,
