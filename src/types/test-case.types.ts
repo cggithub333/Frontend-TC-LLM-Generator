@@ -14,9 +14,12 @@ export interface TestCase {
   createdAt: string;
 }
 
-export interface CreateTestCaseInput {
-  userStoryId?: string;
-  acceptanceCriteriaId?: string;
+// Enforce: at least one of userStoryId or acceptanceCriteriaId must be provided
+type TestCaseStoryRef =
+  | { userStoryId: string; acceptanceCriteriaId?: string }
+  | { userStoryId?: string; acceptanceCriteriaId: string };
+
+export type CreateTestCaseInput = TestCaseStoryRef & {
   testCaseTypeId?: string;
   title: string;
   preconditions?: string;
@@ -24,7 +27,7 @@ export interface CreateTestCaseInput {
   expectedResult?: string;
   customFieldsJson?: string;
   generatedByAi?: boolean;
-}
+};
 
 export interface UpdateTestCaseInput {
   title?: string;
