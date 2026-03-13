@@ -27,12 +27,28 @@ import { useLogout, useCurrentUser } from "@/hooks/use-auth";
 import { broadcastLogout, onLogoutBroadcast } from "@/lib/auth-broadcast";
 import { useWorkspaces } from "@/hooks/use-workspaces";
 
-const navigation = [
-  { name: "Workspace", href: "/workspaces", icon: LayoutDashboard },
-  { name: "Stories", href: "/stories", icon: FileText },
-  { name: "Test Plans", href: "/test-plans", icon: ClipboardList },
-  { name: "Test Suites", href: "/suites", icon: Folder },
-  { name: "Reports", href: "/reports", icon: BarChart3 },
+// Grouped navigation for better information architecture
+const navigationGroups = [
+  {
+    label: "WORKSPACE",
+    items: [
+      { name: "Dashboard", href: "/workspaces", icon: LayoutDashboard },
+      { name: "Stories", href: "/stories", icon: FileText },
+    ],
+  },
+  {
+    label: "TEST MANAGEMENT",
+    items: [
+      { name: "Test Plans", href: "/test-plans", icon: ClipboardList },
+      { name: "Test Suites", href: "/suites", icon: Folder },
+    ],
+  },
+  {
+    label: "ANALYTICS",
+    items: [
+      { name: "Reports", href: "/reports", icon: BarChart3 },
+    ],
+  },
 ];
 
 const adminNav = [
@@ -249,34 +265,49 @@ export function Sidebar() {
       {/* Workspace Switcher */}
       <WorkspaceSwitcher isCollapsed={isCollapsed} />
 
-      {/* Navigation */}
-      <nav className="flex-1 mt-4 px-3 space-y-2">
-        {navigation.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-4 p-3 rounded-xl transition-all",
-                isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-              )}
-              title={isCollapsed ? item.name : undefined}
-            >
-              <item.icon className="h-5 w-5 shrink-0" />
-              <span
+      {/* Navigation — Grouped */}
+      <nav className="flex-1 mt-4 px-3 space-y-1">
+        {navigationGroups.map((group) => (
+          <div key={group.label}>
+            {/* Section header */}
+            <div className="pt-4 pb-2 px-3">
+              <p
                 className={cn(
-                  "font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
+                  "text-[10px] uppercase tracking-wider text-muted-foreground font-bold transition-all duration-300 whitespace-nowrap overflow-hidden",
                   isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
                 )}
               >
-                {item.name}
-              </span>
-            </Link>
-          );
-        })}
+                {group.label}
+              </p>
+            </div>
+            {group.items.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center gap-4 p-3 rounded-xl transition-all",
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  )}
+                  title={isCollapsed ? item.name : undefined}
+                >
+                  <item.icon className="h-5 w-5 shrink-0" />
+                  <span
+                    className={cn(
+                      "font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
+                      isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                    )}
+                  >
+                    {item.name}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        ))}
 
         {/* Admin Section */}
         <div className="pt-4 pb-2 px-3">

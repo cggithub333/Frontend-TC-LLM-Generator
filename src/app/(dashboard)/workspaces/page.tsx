@@ -155,6 +155,7 @@ export default function WorkspacesPage() {
 
   // Active filter count for indicator
   const activeFilterCount =
+    (searchQuery.trim() ? 1 : 0) +
     (roleFilter !== "all" ? 1 : 0) +
     (sortKey !== "updatedAt" ? 1 : 0);
 
@@ -262,8 +263,25 @@ export default function WorkspacesPage() {
           </div>
         )}
 
-        {/* Sort & Filter Bar */}
+        {/* Control Bar: Search + Sort + Filter — all grouped together */}
         <div className="flex flex-wrap items-center gap-3 mb-6">
+          {/* Search — primary action, placed left-most */}
+          <div className="flex items-center gap-2 flex-1 min-w-[200px] max-w-sm">
+            <div className="flex w-full items-stretch rounded-lg h-9 border border-input dark:border-white/10 bg-background dark:bg-muted/50">
+              <div className="text-muted-foreground flex items-center justify-center pl-3">
+                <Search className="h-4 w-4" aria-hidden="true" />
+              </div>
+              <Input
+                type="search"
+                className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 text-sm h-full"
+                placeholder="Search workspaces..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search workspaces"
+              />
+            </div>
+          </div>
+
           {/* Sort dropdown */}
           <div className="flex items-center gap-1.5">
             <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
@@ -290,7 +308,7 @@ export default function WorkspacesPage() {
           </div>
 
           {/* Role filter pills */}
-          <div className="flex items-center gap-1 ml-2">
+          <div className="flex items-center gap-1">
             {(["all", "owner", "member"] as RoleFilter[]).map((role) => (
               <button
                 key={role}
@@ -306,24 +324,25 @@ export default function WorkspacesPage() {
             ))}
           </div>
 
-          {/* Active filter indicator */}
-          {activeFilterCount > 0 && (
-            <button
-              onClick={() => {
-                setSortKey("updatedAt");
-                setSortDir("desc");
-                setRoleFilter("all");
-              }}
-              className="text-xs text-muted-foreground hover:text-foreground underline ml-auto transition-colors"
-            >
-              Reset filters
-            </button>
-          )}
-
-          {/* Workspace count */}
-          <span className="text-xs text-muted-foreground ml-auto">
-            {filteredWorkspaces.length} workspace{filteredWorkspaces.length !== 1 ? "s" : ""}
-          </span>
+          {/* Active filter indicator + count */}
+          <div className="flex items-center gap-3 ml-auto">
+            {activeFilterCount > 0 && (
+              <button
+                onClick={() => {
+                  setSortKey("updatedAt");
+                  setSortDir("desc");
+                  setRoleFilter("all");
+                  setSearchQuery("");
+                }}
+                className="text-xs text-muted-foreground hover:text-foreground underline transition-colors"
+              >
+                Reset filters
+              </button>
+            )}
+            <span className="text-xs text-muted-foreground">
+              {filteredWorkspaces.length} workspace{filteredWorkspaces.length !== 1 ? "s" : ""}
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -336,17 +355,22 @@ export default function WorkspacesPage() {
               onDelete={handleDelete}
             />
           ))}
-          {/* Create Workspace Card */}
+          {/* Create Workspace Card — prominent CTA */}
           <button
             onClick={() => setCreateOpen(true)}
-            className="group flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-card/50 p-6 shadow-sm hover:shadow-md hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer min-h-[220px] focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+            className="group relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-card/50 p-6 hover:border-primary/60 hover:bg-primary/5 transition-all duration-300 cursor-pointer min-h-[220px] focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
             aria-label="Create new workspace"
           >
-            <div className="size-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-              <Plus className="h-7 w-7 text-primary" />
+            {/* Glow ring on hover */}
+            <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5" />
+            <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
+              <Plus className="h-8 w-8 text-primary" />
             </div>
-            <span className="text-sm font-bold text-muted-foreground">
+            <span className="text-base font-bold text-foreground/80 group-hover:text-primary transition-colors">
               Create Workspace
+            </span>
+            <span className="text-xs text-muted-foreground mt-1">
+              Start a new project space
             </span>
           </button>
         </div>
@@ -356,30 +380,11 @@ export default function WorkspacesPage() {
 
   return (
     <>
-      {/* Header */}
+      {/* Header — clean, title-only */}
       <header className="flex items-center justify-between border-b border-border bg-card px-8 py-4 sticky top-0 z-10">
         <div className="flex flex-col gap-1">
           <span className="text-xs font-medium text-muted-foreground">My Workspaces</span>
           <h1 className="text-xl font-bold">Workspaces</h1>
-        </div>
-
-        <div className="flex items-center gap-4">
-          {/* Search */}
-          <label className="flex flex-col min-w-64">
-            <div className="flex w-full items-stretch rounded-lg h-10 border border-input dark:border-white/10 bg-background dark:bg-muted/50">
-              <div className="text-muted-foreground flex items-center justify-center pl-3">
-                <Search className="h-5 w-5" aria-hidden="true" />
-              </div>
-              <Input
-                type="search"
-                className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 text-sm"
-                placeholder="Search workspaces..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                aria-label="Search workspaces"
-              />
-            </div>
-          </label>
         </div>
       </header>
 
