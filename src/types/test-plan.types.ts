@@ -1,3 +1,5 @@
+export type TestPlanStatus = 'DRAFT' | 'IN_PROGRESS' | 'COMPLETED';
+
 export interface TestPlan {
   testPlanId: string;
   projectId: string;
@@ -5,19 +7,27 @@ export interface TestPlan {
   createdByUserFullName: string;
   name: string;
   description?: string;
-  status: string;
+  status: TestPlanStatus;
+  storyIds?: string[];
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface CreateTestPlanInput {
   projectId: string;
   name: string;
   description?: string;
-  status: string;
+  status?: TestPlanStatus;
+  storyIds?: string[];
 }
 
 export interface UpdateTestPlanInput {
   name?: string;
   description?: string;
-  status?: string;
+  status?: TestPlanStatus;
+  storyIds?: string[];
+}
+
+export interface UpdateTestPlanStatusInput {
+  status: TestPlanStatus;
 }

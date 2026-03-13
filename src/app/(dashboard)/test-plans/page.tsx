@@ -20,7 +20,6 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useTestPlans } from "@/hooks/use-test-plans";
-import { extractPage } from "@/types/pagination.types";
 import type { TestPlan } from "@/types/test-plan.types";
 
 const tabs = [
@@ -64,7 +63,14 @@ export default function TestPlansPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: plansData, isLoading, error } = useTestPlans();
-  const testPlans = plansData ? extractPage<TestPlan>(plansData).items : [];
+  const allPlans: TestPlan[] = plansData?.items ?? [];
+  const testPlans = searchQuery
+    ? allPlans.filter(
+        (p) =>
+          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          p.description?.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+    : allPlans;
 
   return (
     <div className="min-h-screen">
@@ -92,9 +98,11 @@ export default function TestPlansPage() {
               <Button variant="outline" size="icon">
                 <Bell className="h-5 w-5 text-muted-foreground" />
               </Button>
-              <Button className="gap-2 shadow-md shadow-primary/20">
-                <Plus className="h-4 w-4" />
-                Create Plan
+              <Button className="gap-2 shadow-md shadow-primary/20" asChild>
+                <Link href="/workspaces">
+                  <Plus className="h-4 w-4" />
+                  Create Plan
+                </Link>
               </Button>
             </div>
           </div>
@@ -161,7 +169,7 @@ export default function TestPlansPage() {
             <FlaskConical className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p className="text-lg font-medium">No test plans yet</p>
             <p className="text-sm mt-1">
-              Create your first test plan to get started.
+              Go to a <Link href="/workspaces" className="text-primary hover:underline font-medium">Project</Link> and open the <strong>Test Plans</strong> tab to create one.
             </p>
           </div>
         )}
