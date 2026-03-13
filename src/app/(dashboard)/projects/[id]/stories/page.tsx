@@ -10,7 +10,6 @@ import {
 import { useUpdateAcceptanceCriteria } from "@/hooks/use-acceptance-criteria";
 import { CreateStoryModal } from "@/components/features/stories/create-story-modal";
 import type { StoryFormData } from "@/components/features/stories/create-story-modal";
-import type { AcceptanceCriteria } from "@/types/story.types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -28,9 +27,119 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { LoadingSkeleton } from "@/components/features/workspaces/loading-skeleton";
+import { CreateManualTestCaseDialog } from "@/components/features/test-cases/create-manual-test-case-dialog";
 
 import { useWebSocket } from "@/hooks/use-websocket";
 import { useQueryClient } from "@tanstack/react-query";
+import type { UserStory, AcceptanceCriteria } from "@/types/story.types";
+import { useTestCasesByAcceptanceCriteria } from "@/hooks/use-test-cases";
+
+function AcItemWithTestCases({
+  criteria,
+  story,
+  toggleACCompletion,
+  onAddTestCase,
+}: {
+  criteria: AcceptanceCriteria;
+  story: UserStory;
+  toggleACCompletion: (ac: AcceptanceCriteria) => void;
+  onAddTestCase: (story: UserStory, acId: string) => void;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const { data: testCasesData } = useTestCasesByAcceptanceCriteria(
+    criteria.acceptanceCriteriaId
+  );
+  const testCasesCount = testCasesData?.items?.length || 0;
+
+  return (
+    <div className="w-full flex flex-col gap-1">
+      <div className="flex items-start gap-3 w-full group hover:bg-muted/30 p-2 -m-2 rounded-lg transition-colors">
+        <button
+          onClick={() => toggleACCompletion(criteria)}
+          className="flex items-start gap-3 flex-1 text-sm text-left"
+        >
+          <div
+            className={`mt-0.5 w-5 h-5 flex items-center justify-center rounded shrink-0 transition-all ${
+              criteria.completed
+                ? "bg-primary text-white"
+                : "border-2 border-muted-foreground/30 group-hover:border-primary/50"
+            }`}
+          >
+            {criteria.completed && <Check className="h-3 w-3" />}
+          </div>
+          <div>
+            <p
+              className={
+                criteria.completed
+                  ? "text-foreground line-through opacity-70"
+                  : "text-muted-foreground group-hover:text-foreground transition-colors"
+              }
+            >
+              {criteria.content}
+            </p>
+            {testCasesCount > 0 && (
+              <Badge 
+                variant="secondary" 
+                className="mt-1 text-[10px] py-0 cursor-pointer hover:bg-secondary/80"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsExpanded(!isExpanded);
+                }}
+              >
+                {testCasesCount} Tests {isExpanded ? <ChevronUp className="inline w-3 h-3 ml-1" /> : <ChevronDown className="inline w-3 h-3 ml-1" />}
+              </Badge>
+            )}
+          </div>
+        </button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+          title="Add Test Case for this AC"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddTestCase(story, criteria.acceptanceCriteriaId);
+          }}
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {isExpanded && testCasesCount > 0 && (
+        <div className="pl-10 pr-2 pb-2 space-y-2 relative before:absolute before:left-[19px] before:top-0 before:bottom-4 before:w-px before:bg-border">
+          {testCasesData?.items.map((tc) => (
+            <div 
+              key={tc.testCaseId}
+              className="bg-card border border-border rounded-md p-3 text-sm shadow-sm relative before:absolute before:left-[-21px] before:top-1/2 before:w-5 before:h-px before:bg-border"
+            >
+              <div className="font-semibold flex items-center gap-2 mb-1.5">
+                <ClipboardList className="w-3.5 h-3.5 text-muted-foreground" />
+                {tc.title}
+                {tc.generatedByAi && (
+                  <Badge variant="outline" className="text-[9px] h-4 px-1 py-0 ml-auto bg-purple-50 text-purple-600 border-purple-200">AI Generated</Badge>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                {tc.steps && (
+                  <div>
+                    <span className="text-[10px] font-semibold text-muted-foreground uppercase">Steps:</span>
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{tc.steps}</p>
+                  </div>
+                )}
+                {tc.expectedResult && (
+                  <div>
+                    <span className="text-[10px] font-semibold text-muted-foreground uppercase">Expected:</span>
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{tc.expectedResult}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function ProjectStoriesPage() {
   const params = useParams();
@@ -57,6 +166,11 @@ export default function ProjectStoriesPage() {
   const [expandedStories, setExpandedStories] = useState<string[]>([]);
   const [selectedStories, setSelectedStories] = useState<string[]>([]);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+
+  // Manual Test Case Dialog State
+  const [isTestCaseDialogOpen, setIsTestCaseDialogOpen] = useState(false);
+  const [testCaseDialogStory, setTestCaseDialogStory] = useState<UserStory | null>(null);
+  const [testCaseDialogAcId, setTestCaseDialogAcId] = useState<string | null>(null);
 
   const stories = storiesData?.items || [];
 
@@ -266,40 +380,28 @@ export default function ProjectStoriesPage() {
                     </div>
                     <div className="space-y-2">
                       {acs.map((criteria) => (
-                        <button
+                        <AcItemWithTestCases
                           key={criteria.acceptanceCriteriaId}
-                          onClick={() => toggleACCompletion(criteria)}
-                          className="flex items-start gap-3 text-sm w-full text-left group hover:bg-muted/30 p-2 -m-2 rounded-lg transition-colors"
-                        >
-                          <div
-                            className={`mt-0.5 w-5 h-5 flex items-center justify-center rounded shrink-0 transition-all ${
-                              criteria.completed
-                                ? "bg-primary text-white"
-                                : "border-2 border-muted-foreground/30 group-hover:border-primary/50"
-                            }`}
-                          >
-                            {criteria.completed && (
-                              <Check className="h-3 w-3" />
-                            )}
-                          </div>
-                          <p
-                            className={
-                              criteria.completed
-                                ? "text-foreground line-through opacity-70"
-                                : "text-muted-foreground group-hover:text-foreground transition-colors"
-                            }
-                          >
-                            {criteria.content}
-                          </p>
-                        </button>
+                          criteria={criteria}
+                          story={story}
+                          toggleACCompletion={toggleACCompletion}
+                          onAddTestCase={(story, acId) => {
+                            setTestCaseDialogStory(story);
+                            setTestCaseDialogAcId(acId);
+                            setIsTestCaseDialogOpen(true);
+                          }}
+                        />
                       ))}
                     </div>
                   </div>
 
-                  {/* Generate Button */}
-                  <Button className="w-full gap-2 bg-primary shadow-lg shadow-primary/20">
+                  {/* Generate Button - Disabled until AI is integrated */}
+                  <Button
+                    className="w-full gap-2 bg-primary/50 cursor-not-allowed"
+                    title="AI Generation is coming soon"
+                  >
                     <Sparkles className="h-4 w-4" />
-                    Generate Tests
+                    Generate Tests (Coming soon)
                   </Button>
 
                   {/* Delete Button */}
@@ -360,6 +462,14 @@ export default function ProjectStoriesPage() {
         onOpenChange={setCreateModalOpen}
         onCreateStory={handleCreateStory}
         defaultProjectId={projectId}
+      />
+
+      {/* Manual Test Case Creation Dialog */}
+      <CreateManualTestCaseDialog
+        open={isTestCaseDialogOpen}
+        onOpenChange={setIsTestCaseDialogOpen}
+        userStory={testCaseDialogStory}
+        defaultAcId={testCaseDialogAcId}
       />
     </div>
   );

@@ -1,0 +1,202 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { UserStory, AcceptanceCriteria } from "@/types/story.types";
+import { useCreateTestCase } from "@/hooks/use-test-cases";
+
+interface CreateManualTestCaseDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  userStory: UserStory | null;
+  defaultAcId?: string | null;
+}
+
+export function CreateManualTestCaseDialog({
+  open,
+  onOpenChange,
+  userStory,
+  defaultAcId,
+}: CreateManualTestCaseDialogProps) {
+  const { mutateAsync: createTestCase, isPending } = useCreateTestCase();
+
+  // Form State
+  const [selectedAcId, setSelectedAcId] = useState<string>("");
+  const [title, setTitle] = useState("");
+  const [preconditions, setPreconditions] = useState("");
+  const [steps, setSteps] = useState("");
+  const [expectedResult, setExpectedResult] = useState("");
+
+  useEffect(() => {
+    if (open) {
+      if (defaultAcId) {
+        setSelectedAcId(defaultAcId);
+      } else if (userStory?.acceptanceCriteria?.length) {
+        setSelectedAcId(userStory.acceptanceCriteria[0].acceptanceCriteriaId);
+      }
+    }
+  }, [open, defaultAcId, userStory]);
+
+  const resetForm = () => {
+    setTitle("");
+    setPreconditions("");
+    setSteps("");
+    setExpectedResult("");
+    // keep selectedAcId
+  };
+
+  const handleClose = () => {
+    onOpenChange(false);
+    resetForm();
+  };
+
+  const handleSave = async (closeAfterSave: boolean) => {
+    if (!title.trim() || !selectedAcId) return;
+
+    try {
+      await createTestCase({
+        userStoryId: userStory?.userStoryId,
+        acceptanceCriteriaId: selectedAcId,
+        title,
+        preconditions,
+        steps,
+        expectedResult,
+        customFieldsJson: "{}",
+        generatedByAi: false,
+      });
+
+      if (closeAfterSave) {
+        handleClose();
+      } else {
+        resetForm();
+      }
+    } catch (error) {
+      console.error("Failed to create test case:", error);
+    }
+  };
+
+  if (!userStory) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={(val) => !val && handleClose()}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Create Test Case</DialogTitle>
+          <DialogDescription>
+            User Story: {userStory.jiraIssueKey ? `[${userStory.jiraIssueKey}] ` : ""}
+            {userStory.title}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-6 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="acceptanceCriteria">Acceptance Criteria *</Label>
+            <Select
+              value={selectedAcId}
+              onValueChange={setSelectedAcId}
+            >
+              <SelectTrigger id="acceptanceCriteria">
+                <SelectValue placeholder="Select Acceptance Criteria" />
+              </SelectTrigger>
+              <SelectContent>
+                {userStory.acceptanceCriteria?.map((ac) => (
+                  <SelectItem
+                    key={ac.acceptanceCriteriaId}
+                    value={ac.acceptanceCriteriaId}
+                  >
+                    {ac.content}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="title">Test Case Title *</Label>
+            <Input
+              id="title"
+              placeholder="e.g. Verify user can login with valid credentials"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="preconditions">Preconditions</Label>
+            <Textarea
+              id="preconditions"
+              placeholder="Conditions that must be met before executing the test case"
+              value={preconditions}
+              onChange={(e) => setPreconditions(e.target.value)}
+              className="resize-none"
+              rows={2}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="steps">Steps</Label>
+            <Textarea
+              id="steps"
+              placeholder="Step 1: ...&#10;Step 2: ..."
+              value={steps}
+              onChange={(e) => setSteps(e.target.value)}
+              className="resize-none"
+              rows={4}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="expectedResult">Expected Result</Label>
+            <Textarea
+              id="expectedResult"
+              placeholder="The expected outcome after executing the steps"
+              value={expectedResult}
+              onChange={(e) => setExpectedResult(e.target.value)}
+              className="resize-none"
+              rows={3}
+            />
+          </div>
+        </div>
+
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button variant="outline" onClick={handleClose}>
+            Cancel
+          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => handleSave(false)}
+              disabled={!title.trim() || !selectedAcId || isPending}
+            >
+              Save & Add Another
+            </Button>
+            <Button
+              onClick={() => handleSave(true)}
+              disabled={!title.trim() || !selectedAcId || isPending}
+            >
+              Save & Close
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
