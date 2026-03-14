@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,14 @@ interface CreateStoryModalProps {
   onCreateStory?: (story: StoryFormData) => void;
   /** Pre-selected project ID (e.g. from project-scoped pages) */
   defaultProjectId?: string;
+  /** If provided, the modal operates in edit mode with pre-filled data */
+  editStory?: {
+    title: string;
+    asA?: string;
+    iWantTo?: string;
+    soThat?: string;
+    acceptanceCriteria?: { content: string }[];
+  };
 }
 
 interface AcceptanceCriterion {
@@ -48,18 +56,34 @@ export function CreateStoryModal({
   onOpenChange,
   onCreateStory,
   defaultProjectId,
+  editStory,
 }: CreateStoryModalProps) {
   const { data: projectsData } = useProjects({ size: 100 });
   const projects = projectsData?.items ?? [];
 
-  const [formData, setFormData] = useState<StoryFormData>({
+  const isEditMode = !!editStory;
+
+  const getInitialFormData = (): StoryFormData => ({
     projectId: defaultProjectId ?? "",
-    title: "",
-    asA: "",
-    iWantTo: "",
-    soThat: "",
-    acceptanceCriteria: [{ id: "1", description: "" }],
+    title: editStory?.title ?? "",
+    asA: editStory?.asA ?? "",
+    iWantTo: editStory?.iWantTo ?? "",
+    soThat: editStory?.soThat ?? "",
+    acceptanceCriteria: editStory?.acceptanceCriteria?.length
+      ? editStory.acceptanceCriteria.map((ac, i) => ({
+          id: String(i + 1),
+          description: ac.content,
+        }))
+      : [{ id: "1", description: "" }],
   });
+
+  const [formData, setFormData] = useState<StoryFormData>(getInitialFormData());
+
+  // Sync form data when editStory changes (opening edit modal)
+  useEffect(() => {
+    setFormData(getInitialFormData());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editStory, open]);
 
   const addCriterion = () => {
     setFormData({
@@ -97,14 +121,9 @@ export function CreateStoryModal({
       onCreateStory(formData);
     }
     // Reset form
-    setFormData({
-      projectId: defaultProjectId ?? "",
-      title: "",
-      asA: "",
-      iWantTo: "",
-      soThat: "",
-      acceptanceCriteria: [{ id: "1", description: "" }],
-    });
+    if (!isEditMode) {
+      setFormData(getInitialFormData());
+    }
     onOpenChange(false);
   };
 
@@ -125,13 +144,13 @@ export function CreateStoryModal({
       <DialogContent className="max-w-2xl max-h-[95vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
-            Create New User Story
+            {isEditMode ? "Edit User Story" : "Create New User Story"}
           </DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto py-4 space-y-5">
-          {/* Project Selector */}
-          {!defaultProjectId && (
+          {/* Project Selector - only show in create mode without defaultProjectId */}
+          {!isEditMode && !defaultProjectId && (
             <div className="space-y-2">
               <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider">
                 Project <span className="text-destructive">*</span>
@@ -305,7 +324,7 @@ export function CreateStoryModal({
             disabled={!formData.projectId || !formData.title.trim()}
             className="shadow-lg shadow-primary/25"
           >
-            Create Story
+            {isEditMode ? "Save Changes" : "Create Story"}
           </Button>
         </DialogFooter>
       </DialogContent>

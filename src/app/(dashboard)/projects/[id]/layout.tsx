@@ -4,7 +4,7 @@ import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useProject } from "@/hooks/use-projects";
 import { cn } from "@/lib/utils";
-import { AlertCircle, Layers, Plus } from "lucide-react";
+import { AlertCircle, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -88,12 +88,6 @@ export default function ProjectLayout({
               <p className="text-muted-foreground text-xs font-medium pl-10">
                 {project.description || "Project Dashboard"}
               </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <Button size="sm" className="gap-2 shadow-md shadow-primary/30">
-                <Plus className="h-4 w-4" />
-                <span>New Item</span>
-              </Button>
             </div>
           </header>
 

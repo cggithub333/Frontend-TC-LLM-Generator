@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import {
   useStoriesByProject,
   useCreateStory,
+  useUpdateStory,
   useDeleteStory,
 } from "@/hooks/use-stories";
 import { useUpdateAcceptanceCriteria } from "@/hooks/use-acceptance-criteria";
@@ -15,15 +16,22 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
   Search,
   ChevronDown,
   ChevronUp,
   Sparkles,
   Check,
-  FolderOpen,
   ClipboardList,
   Plus,
   ListChecks,
+  Pencil,
 } from "lucide-react";
 import Link from "next/link";
 import { LoadingSkeleton } from "@/components/features/workspaces/loading-skeleton";
@@ -182,12 +190,15 @@ export default function ProjectStoriesPage() {
   const { data: storiesData, isLoading } = useStoriesByProject(projectId);
 
   const createStory = useCreateStory();
+  const updateStory = useUpdateStory();
   const deleteStory = useDeleteStory();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedStories, setExpandedStories] = useState<string[]>([]);
   const [selectedStories, setSelectedStories] = useState<string[]>([]);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editingStory, setEditingStory] = useState<UserStory | null>(null);
+  const [deleteConfirmStory, setDeleteConfirmStory] = useState<UserStory | null>(null);
 
   // Manual Test Case Dialog State
   const [isTestCaseDialogOpen, setIsTestCaseDialogOpen] = useState(false);
@@ -228,7 +239,7 @@ export default function ProjectStoriesPage() {
           })),
       });
     } catch (err) {
-      console.error("Failed to create user story", err);
+      console.error("Failed to create/update user story", err);
     }
   };
 
@@ -245,47 +256,30 @@ export default function ProjectStoriesPage() {
     return <LoadingSkeleton />;
   }
 
+  const handleEditStory = async (formData: StoryFormData) => {
+    if (!editingStory) return;
+    try {
+      await updateStory.mutateAsync({
+        id: editingStory.userStoryId,
+        title: formData.title,
+        asA: formData.asA,
+        iWantTo: formData.iWantTo,
+        soThat: formData.soThat,
+      });
+      setEditingStory(null);
+    } catch (err) {
+      console.error("Failed to update user story", err);
+    }
+  };
+
   const filteredStories = stories.filter(
     (story) =>
       story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      story.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      story.jiraIssueKey?.toLowerCase().includes(searchQuery.toLowerCase()),
+      story.description?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
     <div className="p-4 sm:p-8 space-y-6 max-w-5xl mx-auto w-full">
-      {/* Action Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-        <div className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-colors cursor-pointer">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-              <FolderOpen className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <h3 className="font-bold text-lg mb-1">Repository</h3>
-              <p className="text-sm text-muted-foreground">
-                View and manage test assets
-              </p>
-            </div>
-          </div>
-        </div>
-        <Link
-          href={`/projects/${projectId}/test-plans`}
-          className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-colors cursor-pointer"
-        >
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center">
-              <ClipboardList className="h-6 w-6 text-slate-600 dark:text-slate-400" />
-            </div>
-            <div>
-              <h3 className="font-bold text-lg mb-1">Test Plans</h3>
-              <p className="text-sm text-muted-foreground">
-                Structure your testing strategy
-              </p>
-            </div>
-          </div>
-        </Link>
-      </div>
 
       {/* Search */}
       <div className="relative">
@@ -331,7 +325,7 @@ export default function ProjectStoriesPage() {
                       variant="outline"
                       className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 font-semibold"
                     >
-                      {story.jiraIssueKey || "US"}
+                      US
                     </Badge>
                     <h3 className="font-bold text-lg hover:text-primary transition-colors">
                       {story.title}
@@ -429,17 +423,20 @@ export default function ProjectStoriesPage() {
                     Generate Tests (Coming soon)
                   </Button>
 
-                  {/* Delete Button */}
-                  <div className="flex justify-end pt-2">
+                  {/* Story Actions */}
+                  <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                      onClick={() => setEditingStory(story)}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                      Edit Story
+                    </Button>
                     <button
                       className="text-xs text-red-400 hover:text-red-600 dark:hover:text-red-400 transition-colors underline underline-offset-2"
-                      onClick={async () => {
-                        if (
-                          confirm("Are you sure you want to delete this story?")
-                        ) {
-                          await deleteStory.mutateAsync(story.userStoryId);
-                        }
-                      }}
+                      onClick={() => setDeleteConfirmStory(story)}
                     >
                       Delete Story
                     </button>
@@ -490,6 +487,15 @@ export default function ProjectStoriesPage() {
         defaultProjectId={projectId}
       />
 
+      {/* Edit Story Modal */}
+      <CreateStoryModal
+        open={!!editingStory}
+        onOpenChange={(open) => { if (!open) setEditingStory(null); }}
+        onCreateStory={handleEditStory}
+        defaultProjectId={projectId}
+        editStory={editingStory ?? undefined}
+      />
+
       {/* Manual Test Case Creation Dialog */}
       <CreateManualTestCaseDialog
         open={isTestCaseDialogOpen}
@@ -497,6 +503,45 @@ export default function ProjectStoriesPage() {
         userStory={testCaseDialogStory}
         defaultAcId={testCaseDialogAcId}
       />
+
+      {/* Delete Story Confirmation Dialog */}
+      <Dialog
+        open={!!deleteConfirmStory}
+        onOpenChange={(open) => { if (!open) setDeleteConfirmStory(null); }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete User Story</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground py-2">
+            Are you sure you want to delete{" "}
+            <span className="font-semibold text-foreground">
+              &quot;{deleteConfirmStory?.title}&quot;
+            </span>
+            ? This action cannot be undone and will also remove all associated
+            acceptance criteria and test case links.
+          </p>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setDeleteConfirmStory(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                if (deleteConfirmStory) {
+                  await deleteStory.mutateAsync(deleteConfirmStory.userStoryId);
+                  setDeleteConfirmStory(null);
+                }
+              }}
+            >
+              Delete Story
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

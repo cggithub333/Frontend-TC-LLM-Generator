@@ -27,19 +27,19 @@ import { useLogout, useCurrentUser } from "@/hooks/use-auth";
 import { broadcastLogout, onLogoutBroadcast } from "@/lib/auth-broadcast";
 import { useWorkspaces } from "@/hooks/use-workspaces";
 
-// Grouped navigation for better information architecture
-const navigationGroups = [
+// Base navigation groups — hrefs will be adjusted based on current project context
+const getNavigationGroups = (projectId: string | null) => [
   {
     label: "WORKSPACE",
     items: [
       { name: "Dashboard", href: "/workspaces", icon: LayoutDashboard },
-      { name: "Stories", href: "/stories", icon: FileText },
+      { name: "Stories", href: projectId ? `/projects/${projectId}/stories` : "/stories", icon: FileText },
     ],
   },
   {
     label: "TEST MANAGEMENT",
     items: [
-      { name: "Test Plans", href: "/test-plans", icon: ClipboardList },
+      { name: "Test Plans", href: projectId ? `/projects/${projectId}/test-plans` : "/test-plans", icon: ClipboardList },
       { name: "Test Suites", href: "/suites", icon: Folder },
     ],
   },
@@ -267,7 +267,7 @@ export function Sidebar() {
 
       {/* Navigation — Grouped */}
       <nav className="flex-1 mt-4 px-3 space-y-1">
-        {navigationGroups.map((group) => (
+        {getNavigationGroups(pathname.match(/\/projects\/([^/]+)/)?.[1] ?? null).map((group) => (
           <div key={group.label}>
             {/* Section header */}
             <div className="pt-4 pb-2 px-3">
