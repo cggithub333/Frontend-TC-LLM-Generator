@@ -23,7 +23,25 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <body suppressHydrationWarning className={`${inter.variable} font-sans antialiased`}>
         <Providers>{children}</Providers>
-        <Toaster position="top-right" richColors closeButton />
+        <Toaster
+          position="top-right"
+          closeButton
+          theme="dark"
+          toastOptions={{
+            className: "sonner-toast-custom",
+            style: {
+              background: "hsl(0 0% 13% / 0.85)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              border: "1px solid hsl(0 0% 100% / 0.08)",
+              color: "hsl(0 0% 95%)",
+              boxShadow: "0 8px 32px hsl(0 0% 0% / 0.4), 0 0 0 1px hsl(0 0% 100% / 0.05)",
+              borderRadius: "12px",
+              fontSize: "13px",
+              padding: "14px 16px",
+            },
+          }}
+        />
       </body>
     </html>
   );
