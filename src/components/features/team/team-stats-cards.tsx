@@ -3,7 +3,7 @@
  * Displays project team statistics in card format
  */
 
-import { Users, CheckSquare } from "lucide-react";
+import { Users, Info } from "lucide-react";
 import type { ProjectTeamStats } from "@/types/team.types";
 
 interface TeamStatsCardsProps {
@@ -32,7 +32,7 @@ export function TeamStatsCards({ stats }: TeamStatsCardsProps) {
           <p className="text-sm font-medium text-muted-foreground">
             Available Slots
           </p>
-          <CheckSquare className="h-5 w-5 text-primary" aria-hidden="true" />
+          <Info className="h-5 w-5 text-primary" aria-hidden="true" />
         </div>
         <p className="text-3xl font-bold">
           {stats.availableSlots}

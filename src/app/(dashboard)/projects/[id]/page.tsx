@@ -264,9 +264,24 @@ export default function ProjectDetailPage() {
             </div>
             <div className="space-y-4 flex-1">
               {teamMembers.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-4 text-center">
-                  No members yet
-                </p>
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <div className="p-3 rounded-full bg-violet-50 dark:bg-violet-900/20 mb-3">
+                    <UserPlus className="h-6 w-6 text-violet-500 dark:text-violet-400" />
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">
+                    No members yet
+                  </p>
+                  <p className="text-xs text-muted-foreground/70 mb-3">
+                    Add team members to collaborate
+                  </p>
+                  <Link
+                    href={`/projects/${projectId}/team`}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Invite Member
+                  </Link>
+                </div>
               ) : (
                 teamMembers.map((member) => (
                   <div
@@ -293,13 +308,6 @@ export default function ProjectDetailPage() {
                 ))
               )}
             </div>
-            <Button
-              variant="outline"
-              className="w-full mt-6 border-primary text-primary hover:bg-primary/5"
-              asChild
-            >
-              <Link href={`/projects/${projectId}/team`}>Manage Access</Link>
-            </Button>
           </div>
         </div>
       </div>
