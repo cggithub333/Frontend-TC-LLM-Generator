@@ -51,7 +51,6 @@ import { toast } from "sonner";
 
 const STATUS_OPTIONS: { value: TestPlanStatus; label: string; icon: React.ReactNode }[] = [
   { value: "DRAFT", label: "Draft", icon: <FileText className="h-3.5 w-3.5" /> },
-  { value: "IN_PROGRESS", label: "In Progress", icon: <Clock className="h-3.5 w-3.5" /> },
   { value: "COMPLETED", label: "Completed", icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
 ];
 
@@ -107,9 +106,10 @@ export default function TestPlanDetailPage() {
   const handleStatusChange = async (status: string) => {
     try {
       await updateStatus.mutateAsync({ id: planId, status: status as TestPlanStatus });
-      toast.success("Plan status updated");
-    } catch (err) {
-      toast.error("Failed to update status");
+      toast.success(`Plan ${status === "COMPLETED" ? "finalized" : "reopened"} successfully`);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || "Failed to update status";
+      toast.error(msg);
     }
   };
 
@@ -310,12 +310,36 @@ export default function TestPlanDetailPage() {
                       ))}
                     </SelectContent>
                   </Select>
-                  {updateStatus.isPending && (
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                      Updating...
-                    </p>
-                  )}
+                  {/* Finalize / Reopen button */}
+                  <Button
+                    size="sm"
+                    className={cn(
+                      "w-full gap-2 mt-2",
+                      plan.status === "DRAFT"
+                        ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                        : "bg-amber-600 hover:bg-amber-700 text-white"
+                    )}
+                    disabled={updateStatus.isPending}
+                    onClick={() =>
+                      handleStatusChange(
+                        plan.status === "DRAFT" ? "COMPLETED" : "DRAFT"
+                      )
+                    }
+                  >
+                    {updateStatus.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : plan.status === "DRAFT" ? (
+                      <>
+                        <CheckCircle2 className="h-4 w-4" />
+                        Finalize Plan
+                      </>
+                    ) : (
+                      <>
+                        <FileText className="h-4 w-4" />
+                        Reopen Plan
+                      </>
+                    )}
+                  </Button>
                 </div>
 
                 <div className="flex justify-between pt-1">

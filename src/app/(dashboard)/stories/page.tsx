@@ -14,6 +14,12 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Search,
   ChevronDown,
   ChevronUp,
@@ -36,6 +42,8 @@ import {
   useCreateStory,
   useUpdateStory,
   useDeleteStory,
+  useUpdateStoryStatus,
+  ALLOWED_STORY_TRANSITIONS,
 } from "@/hooks/use-stories";
 import { useUpdateAcceptanceCriteria } from "@/hooks/use-acceptance-criteria";
 import type { UserStory, AcceptanceCriteria } from "@/types/story.types";
@@ -66,6 +74,7 @@ function formatRelativeTime(dateStr: string) {
 
 export default function StoriesPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [expandedStories, setExpandedStories] = useState<string[]>([]);
   const [selectedStories, setSelectedStories] = useState<string[]>([]);
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -76,14 +85,19 @@ export default function StoriesPage() {
   const createStory = useCreateStory();
   const updateStory = useUpdateStory();
   const deleteStory = useDeleteStory();
+  const updateStoryStatus = useUpdateStoryStatus();
   const updateAC = useUpdateAcceptanceCriteria();
 
   const stories = storiesData?.items ?? [];
 
   const filteredStories = stories.filter(
-    (story) =>
-      story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      story.description?.toLowerCase().includes(searchQuery.toLowerCase()),
+    (story) => {
+      const matchesSearch =
+        story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        story.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === "ALL" || story.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    }
   );
 
   const toggleExpand = (id: string) => {
@@ -200,6 +214,39 @@ export default function StoriesPage() {
         <span className="text-foreground font-semibold">All User Stories</span>
       </div>
 
+      {/* Status Filter Tabs — only show when there are stories */}
+      {stories.length > 0 && (
+        <div className="flex gap-2 flex-wrap">
+          {[
+            { value: "ALL", label: "All", count: stories.length },
+            { value: "DRAFT", label: "Draft", count: stories.filter(s => s.status === "DRAFT").length },
+            { value: "READY", label: "Ready", count: stories.filter(s => s.status === "READY").length },
+            { value: "IN_PROGRESS", label: "In Progress", count: stories.filter(s => s.status === "IN_PROGRESS").length },
+            { value: "DONE", label: "Done", count: stories.filter(s => s.status === "DONE").length },
+            { value: "ARCHIVED", label: "Archived", count: stories.filter(s => s.status === "ARCHIVED").length },
+          ].filter(tab => tab.value === "ALL" || tab.count > 0).map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setStatusFilter(tab.value)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                statusFilter === tab.value
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                  : "bg-card text-muted-foreground border-border hover:bg-muted"
+              }`}
+            >
+              {tab.label}
+              <span className={`text-[10px] px-1.5 py-0 rounded-full ${
+                statusFilter === tab.value
+                  ? "bg-primary-foreground/20"
+                  : "bg-muted-foreground/10"
+              }`}>
+                {tab.count}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Search — only show when there are stories */}
       {stories.length > 0 && (
         <div className="relative">
@@ -269,12 +316,38 @@ export default function StoriesPage() {
                         {story.title}
                       </Link>
                       {story.status && (
-                        <Badge
-                          variant="outline"
-                          className={`text-[10px] font-bold ${statusColors[story.status] ?? statusColors.DRAFT}`}
-                        >
-                          {story.status.replace("_", " ")}
-                        </Badge>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border cursor-pointer transition-colors hover:opacity-80 ${statusColors[story.status] ?? statusColors.DRAFT}`}
+                            >
+                              {story.status.replace("_", " ")}
+                              <ChevronDown className="h-3 w-3" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start">
+                            {(ALLOWED_STORY_TRANSITIONS[story.status] || []).map((nextStatus) => (
+                              <DropdownMenuItem
+                                key={nextStatus}
+                                onClick={() => {
+                                  updateStoryStatus.mutate(
+                                    { id: story.userStoryId, status: nextStatus },
+                                    {
+                                      onSuccess: () => toast.success(`Status changed to ${nextStatus.replace("_", " ")}`),
+                                      onError: (err: any) => {
+                                        const msg = err?.response?.data?.message || err?.message || "Failed to update status";
+                                        toast.error(msg);
+                                      },
+                                    }
+                                  );
+                                }}
+                                className="text-xs font-medium"
+                              >
+                                → {nextStatus.replace("_", " ")}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       )}
                       <span className="text-xs text-muted-foreground ml-auto shrink-0">
                         {story.createdAt && formatRelativeTime(story.createdAt)}
