@@ -380,7 +380,7 @@ export default function ProjectStoriesPage() {
   };
 
   return (
-    <div className="p-4 sm:p-8 space-y-6 max-w-5xl mx-auto w-full">
+    <div className="p-8 space-y-6 max-w-5xl mx-auto w-full">
 
       {/* Page Title + Search + New Story */}
       <div className="flex items-center gap-4">

@@ -84,44 +84,47 @@ export default function ProjectTestPlansPage() {
     : allPlans;
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-        <div className="relative flex-1 max-w-lg">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search test plans..."
-            className="pl-10"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+    <div className="p-8 space-y-6">
+      {/* Page Title + Toolbar */}
+      <div className="flex items-center gap-4">
+        <h1 className="text-2xl font-bold shrink-0">Test Plans</h1>
+        <div className="flex items-center gap-3 flex-1 justify-end">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search test plans..."
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
 
-        {/* Status filter pills */}
-        <div className="flex items-center gap-1.5">
-          {STATUS_FILTERS.map((f) => (
-            <button
-              key={f.value}
-              onClick={() => setStatusFilter(f.value as TestPlanStatus | "")}
-              className={cn(
-                "px-3 py-1.5 rounded-full text-xs font-semibold transition-colors border",
-                statusFilter === f.value
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-background text-muted-foreground border-border hover:border-primary/50"
-              )}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
+          {/* Status filter pills */}
+          <div className="flex items-center gap-1.5">
+            {STATUS_FILTERS.map((f) => (
+              <button
+                key={f.value}
+                onClick={() => setStatusFilter(f.value as TestPlanStatus | "")}
+                className={cn(
+                  "px-3 py-1.5 rounded-full text-xs font-semibold transition-colors border",
+                  statusFilter === f.value
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background text-muted-foreground border-border hover:border-primary/50"
+                )}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
 
-        <Button
-          className="gap-2 shadow-md shadow-primary/20 shrink-0"
-          onClick={() => setCreateOpen(true)}
-        >
-          <Plus className="h-4 w-4" />
-          Create Plan
-        </Button>
+          <Button
+            className="gap-2 shadow-md shadow-primary/20 shrink-0"
+            onClick={() => setCreateOpen(true)}
+          >
+            <Plus className="h-4 w-4" />
+            Create Plan
+          </Button>
+        </div>
       </div>
 
       {/* Loading */}
