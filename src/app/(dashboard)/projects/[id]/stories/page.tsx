@@ -265,6 +265,8 @@ export default function ProjectStoriesPage() {
             orderNo: index + 1,
           })),
       });
+      setCreateModalOpen(false);
+      setSearchQuery("");
       toast.success("Story created successfully");
     } catch (err) {
       toast.error("Failed to create story");
