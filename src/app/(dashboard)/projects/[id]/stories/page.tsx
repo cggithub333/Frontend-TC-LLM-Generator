@@ -382,24 +382,27 @@ export default function ProjectStoriesPage() {
   return (
     <div className="p-4 sm:p-8 space-y-6 max-w-5xl mx-auto w-full">
 
-      {/* Search + New Story */}
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search user stories..."
-            className="pl-12"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+      {/* Page Title + Search + New Story */}
+      <div className="flex items-center gap-4">
+        <h1 className="text-2xl font-bold shrink-0">Stories</h1>
+        <div className="flex items-center gap-3 flex-1 justify-end">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search user stories..."
+              className="pl-12"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <Button
+            onClick={() => setCreateModalOpen(true)}
+            className="gap-2 shrink-0"
+          >
+            <Plus className="h-4 w-4" />
+            New Story
+          </Button>
         </div>
-        <Button
-          onClick={() => setCreateModalOpen(true)}
-          className="gap-2 shrink-0"
-        >
-          <Plus className="h-4 w-4" />
-          New Story
-        </Button>
       </div>
 
       {/* Stories List */}

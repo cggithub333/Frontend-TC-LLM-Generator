@@ -23,6 +23,9 @@ import {
   ArrowLeft,
   Users,
   Layers,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Home,
 } from "lucide-react";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 import { useSidebar } from "@/components/layout/sidebar-context";
@@ -31,12 +34,12 @@ import { broadcastLogout, onLogoutBroadcast } from "@/lib/auth-broadcast";
 import { useWorkspaces } from "@/hooks/use-workspaces";
 import { useProject } from "@/hooks/use-projects";
 
-// ──────── Workspace-level nav (when NOT inside a project) ────────
 const workspaceNavGroups = [
   {
     label: "WORKSPACE",
     items: [
-      { name: "Projects", href: "/workspaces", icon: LayoutDashboard },
+      { name: "Home", href: "/workspaces", icon: Home, exactMatch: true },
+      { name: "Projects", href: "/workspaces", icon: LayoutDashboard, matchWorkspaceChild: true },
     ],
   },
 ];
@@ -217,8 +220,8 @@ function ProjectNameHeader({ isCollapsed, projectName }: { isCollapsed: boolean;
   if (isCollapsed) return null;
 
   return (
-    <div className="px-6 mt-4 mb-1">
-      <p className="text-xs font-bold text-foreground truncate uppercase tracking-wider">
+    <div className="px-5 mt-4 mb-1">
+      <p className="text-sm font-bold text-foreground truncate">
         {projectName}
       </p>
     </div>
@@ -314,9 +317,9 @@ export function Sidebar() {
         aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         {isCollapsed ? (
-          <ChevronRight className="h-4 w-4" />
+          <PanelLeftOpen className="h-3.5 w-3.5" />
         ) : (
-          <ChevronLeft className="h-4 w-4" />
+          <PanelLeftClose className="h-3.5 w-3.5" />
         )}
       </button>
 
@@ -371,14 +374,23 @@ export function Sidebar() {
               </p>
             </div>
             {group.items.map((item) => {
-              // For "Overview" (exact match) vs others (prefix match)
-              const isExactMatch = item.name === "Overview" || item.name === "Projects";
-              const isActive = isExactMatch
-                ? pathname === item.href
-                : pathname === item.href || pathname.startsWith(item.href + "/");
+              // Determine active state
+              let isActive = false;
+              const itemAny = item as any;
+              if (itemAny.exactMatch) {
+                // "Home" — only active on exact /workspaces
+                isActive = pathname === item.href;
+              } else if (itemAny.matchWorkspaceChild) {
+                // "Projects" — active when inside a specific workspace (/workspaces/:id)
+                isActive = /\/workspaces\/[^/]+/.test(pathname);
+              } else if (item.name === "Overview") {
+                isActive = pathname === item.href;
+              } else {
+                isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+              }
               return (
                 <Link
-                  key={item.href}
+                  key={item.name}
                   href={item.href}
                   className={cn(
                     "flex items-center gap-4 p-3 rounded-xl transition-all",

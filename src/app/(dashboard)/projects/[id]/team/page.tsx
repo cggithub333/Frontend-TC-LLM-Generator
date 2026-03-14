@@ -142,10 +142,11 @@ export default function TeamManagementPage() {
     return (
       <>
         <main className="p-8">
-          {/* Control Bar: Search + Invite */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3 flex-1 max-w-md">
-              <div className="flex w-full items-stretch rounded-lg h-10 border border-input bg-background">
+          {/* Page Title + Control Bar */}
+          <div className="flex items-center gap-4 mb-6">
+            <h1 className="text-2xl font-bold shrink-0">Team Management</h1>
+            <div className="flex items-center gap-3 flex-1 justify-end">
+              <div className="flex items-stretch rounded-lg h-10 border border-input bg-background max-w-md flex-1">
                 <div className="text-muted-foreground flex items-center justify-center pl-3">
                   <Search className="h-4 w-4" aria-hidden="true" />
                 </div>
@@ -158,26 +159,33 @@ export default function TeamManagementPage() {
                   aria-label="Search project members"
                 />
               </div>
+              <Button
+                onClick={handleInviteMember}
+                className="h-10 px-5 gap-2 shadow-md shadow-primary/30 shrink-0"
+                aria-label="Invite new member to project"
+              >
+                <UserPlus className="h-4 w-4" aria-hidden="true" />
+                <span>Invite Member</span>
+              </Button>
             </div>
-            <Button
-              onClick={handleInviteMember}
-              className="h-10 px-5 gap-2 shadow-md shadow-primary/30"
-              aria-label="Invite new member to project"
-            >
-              <UserPlus className="h-4 w-4" aria-hidden="true" />
-              <span>Invite Member</span>
-            </Button>
           </div>
 
           <TeamStatsCards stats={teamStats} />
-          <div className="text-center py-12">
-            <p className="text-muted-foreground mb-4">No team members yet</p>
-            <button
+          <div className="text-center py-16">
+            <div className="p-4 rounded-full bg-muted/50 mb-6 inline-block">
+              <UserPlus className="h-10 w-10 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">No team members yet</h3>
+            <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
+              Invite team members to collaborate on this project together.
+            </p>
+            <Button
               onClick={handleInviteMember}
-              className="text-primary hover:text-primary/80 font-medium"
+              className="gap-2 shadow-md shadow-primary/30"
             >
-              Invite your first member
-            </button>
+              <UserPlus className="h-4 w-4" />
+              Invite First Member
+            </Button>
           </div>
         </main>
       </>
@@ -187,10 +195,11 @@ export default function TeamManagementPage() {
   return (
     <>
       <main className="p-8">
-        {/* Control Bar: Search + Invite */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3 flex-1 max-w-md">
-            <div className="flex w-full items-stretch rounded-lg h-10 border border-input bg-background">
+        {/* Page Title + Control Bar */}
+        <div className="flex items-center gap-4 mb-6">
+          <h1 className="text-2xl font-bold shrink-0">Team Management</h1>
+          <div className="flex items-center gap-3 flex-1 justify-end">
+            <div className="flex items-stretch rounded-lg h-10 border border-input bg-background max-w-md flex-1">
               <div className="text-muted-foreground flex items-center justify-center pl-3">
                 <Search className="h-4 w-4" aria-hidden="true" />
               </div>
@@ -203,15 +212,15 @@ export default function TeamManagementPage() {
                 aria-label="Search project members"
               />
             </div>
+            <Button
+              onClick={handleInviteMember}
+              className="h-10 px-5 gap-2 shadow-md shadow-primary/30 shrink-0"
+              aria-label="Invite new member to project"
+            >
+              <UserPlus className="h-4 w-4" aria-hidden="true" />
+              <span>Invite Member</span>
+            </Button>
           </div>
-          <Button
-            onClick={handleInviteMember}
-            className="h-10 px-5 gap-2 shadow-md shadow-primary/30"
-            aria-label="Invite new member to project"
-          >
-            <UserPlus className="h-4 w-4" aria-hidden="true" />
-            <span>Invite Member</span>
-          </Button>
         </div>
 
         <TeamStatsCards stats={teamStats} />
