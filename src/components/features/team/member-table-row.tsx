@@ -18,6 +18,7 @@ import {
 import type { ProjectMember } from "@/types/team.types";
 import { getRoleBadgeClass, getMemberInitials } from "@/lib/utils/member.utils";
 import { useUpdateProjectMember } from "@/hooks/use-project-members";
+import { toast } from "sonner";
 
 interface MemberTableRowProps {
   member: ProjectMember;
@@ -35,8 +36,9 @@ export function MemberTableRow({ member, onMenuClick }: MemberTableRowProps) {
           memberId: member.projectMemberId,
           role: newRole,
         });
+        toast.success(`Role updated to ${newRole}`);
       } catch (error) {
-        console.error("Failed to update member role:", error);
+        toast.error("Failed to update member role");
       }
     },
     [member.projectId, member.projectMemberId, updateMember]

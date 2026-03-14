@@ -1,202 +1,164 @@
 "use client";
 
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  CheckCircle2,
-  User,
-  Calendar,
-  Save,
-  Share2,
-  MoreVertical,
+  ArrowLeft,
+  ClipboardList,
+  Loader2,
+  AlertCircle,
+  Pencil,
+  Trash2,
 } from "lucide-react";
-
-const testCase = {
-  id: "TC-1024",
-  title: "Verify Google OAuth Login Flow",
-  type: "Positive",
-  priority: "High",
-  status: "Passed",
-  storyId: "ST-101",
-  preconditions: [
-    "User has a valid Google account",
-    "Application OAuth credentials are configured",
-    "User is on the login page",
-  ],
-  steps: [
-    {
-      step: 1,
-      action: "Click on 'Sign in with Google' button",
-      expected: "User is redirected to Google OAuth consent page",
-    },
-    {
-      step: 2,
-      action: "Select Google account and grant permissions",
-      expected: "User is redirected back to application",
-    },
-    {
-      step: 3,
-      action: "Verify user session is created",
-      expected: "User dashboard is displayed with user profile",
-    },
-  ],
-  testData: {
-    email: "test@example.com",
-    environment: "staging",
-  },
-  assignedTo: "Alex Rivera",
-  executedBy: "Maria Kim",
-  executedAt: "Dec 1, 2024 2:30 PM",
-};
+import { useTestCase } from "@/hooks/use-test-cases";
 
 export default function TestCaseDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const testCaseId = params.id as string;
+
+  const { data: testCase, isLoading, error } = useTestCase(testCaseId);
+
+  if (isLoading) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3 text-muted-foreground">
+          <Loader2 className="h-8 w-8 animate-spin" />
+          <p className="text-sm">Loading test case...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !testCase) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
+            <AlertCircle className="h-6 w-6 text-destructive" />
+          </div>
+          <h2 className="text-lg font-semibold">Test Case Not Found</h2>
+          <p className="text-sm text-muted-foreground max-w-md">
+            The test case you&apos;re looking for doesn&apos;t exist or you
+            don&apos;t have access to it.
+          </p>
+          <Button variant="outline" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-8 space-y-8 max-w-5xl mx-auto w-full">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-3">
-            <Badge variant="outline" className="font-mono text-xs">
-              {testCase.id}
-            </Badge>
-            <Badge
-              className={
-                testCase.type === "Positive"
-                  ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-none"
-                  : "bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-none"
-              }
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => router.back()}
             >
-              {testCase.type}
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <Badge variant="outline" className="font-mono text-xs">
+              <ClipboardList className="h-3 w-3 mr-1" />
+              Test Case
             </Badge>
-            <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-none">
-              {testCase.priority} Priority
-            </Badge>
-            <Badge className="bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-200 dark:border-green-900">
-              <CheckCircle2 className="h-3 w-3 mr-1" />
-              {testCase.status}
-            </Badge>
+            {testCase.generatedByAi && (
+              <Badge className="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border-none">
+                AI Generated
+              </Badge>
+            )}
           </div>
           <h1 className="text-3xl font-bold tracking-tight mb-2">
             {testCase.title}
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Related to Story:{" "}
-            <a href="#" className="text-primary font-semibold hover:underline">
-              {testCase.storyId}
-            </a>
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon">
-            <Share2 className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="icon">
-            <MoreVertical className="h-4 w-4" />
-          </Button>
-          <Button className="gap-2 bg-primary shadow-lg shadow-primary/20">
-            <Save className="h-4 w-4" />
-            Save to Suite
-          </Button>
+          {testCase.userStoryId && (
+            <p className="text-sm text-muted-foreground">
+              Linked to User Story:{" "}
+              <span className="text-primary font-semibold">
+                {testCase.userStoryId}
+              </span>
+            </p>
+          )}
         </div>
       </div>
 
       {/* Main Content */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
         {/* Preconditions */}
-        <div className="p-6 border-b border-border">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">
-            Preconditions
-          </h2>
-          <ul className="space-y-2">
-            {testCase.preconditions.map((condition, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold mt-0.5 shrink-0">
-                  {i + 1}
-                </div>
-                <span className="text-sm leading-relaxed">{condition}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {testCase.preconditions && (
+          <div className="p-6 border-b border-border">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">
+              Preconditions
+            </h2>
+            <div className="bg-muted/50 rounded-lg p-4">
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                {testCase.preconditions}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Test Steps */}
-        <div className="p-6 border-b border-border">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">
-            Test Steps
-          </h2>
-          <div className="space-y-6">
-            {testCase.steps.map((step) => (
-              <div key={step.step} className="flex gap-4">
-                <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold shrink-0">
-                  {step.step}
-                </div>
-                <div className="flex-1 space-y-3">
-                  <div>
-                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">
-                      Action
-                    </p>
-                    <p className="text-sm leading-relaxed bg-muted p-3 rounded-lg">
-                      {step.action}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">
-                      Expected Result
-                    </p>
-                    <p className="text-sm leading-relaxed bg-green-50 dark:bg-green-900/10 text-green-700 dark:text-green-300 p-3 rounded-lg border border-green-200 dark:border-green-900/30">
-                      {step.expected}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
+        {testCase.steps && (
+          <div className="p-6 border-b border-border">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">
+              Test Steps
+            </h2>
+            <div className="bg-muted/50 rounded-lg p-4">
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                {testCase.steps}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Test Data */}
-        <div className="p-6 border-b border-border">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">
-            Test Data
-          </h2>
-          <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 font-mono text-sm">
-            <pre className="text-xs">
-              {JSON.stringify(testCase.testData, null, 2)}
-            </pre>
+        {/* Expected Result */}
+        {testCase.expectedResult && (
+          <div className="p-6 border-b border-border">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">
+              Expected Result
+            </h2>
+            <div className="bg-green-50 dark:bg-green-900/10 rounded-lg p-4 border border-green-200 dark:border-green-900/30">
+              <p className="text-sm leading-relaxed text-green-700 dark:text-green-300 whitespace-pre-wrap">
+                {testCase.expectedResult}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Execution Details */}
+        {/* Metadata */}
         <div className="p-6">
           <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">
-            Execution Details
+            Details
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
-                <User className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Assigned To</p>
-                <p className="text-sm font-semibold">{testCase.assignedTo}</p>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">Test Case ID:</span>
+              <code className="bg-muted px-2 py-0.5 rounded text-xs font-mono">
+                {testCase.testCaseId}
+              </code>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center text-green-600 dark:text-green-400">
-                <CheckCircle2 className="h-5 w-5" />
+            {testCase.acceptanceCriteriaId && (
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">Linked AC:</span>
+                <code className="bg-muted px-2 py-0.5 rounded text-xs font-mono">
+                  {testCase.acceptanceCriteriaId}
+                </code>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Executed By</p>
-                <p className="text-sm font-semibold">{testCase.executedBy}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400">
-                <Calendar className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Executed At</p>
-                <p className="text-sm font-semibold">{testCase.executedAt}</p>
-              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">Source:</span>
+              <Badge variant="outline" className="text-xs">
+                {testCase.generatedByAi ? "AI Generated" : "Manual"}
+              </Badge>
             </div>
           </div>
         </div>

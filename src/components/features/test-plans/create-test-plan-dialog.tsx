@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { useCreateTestPlan } from "@/hooks/use-test-plans";
 import { useStoriesByProject } from "@/hooks/use-stories";
 import type { CreateTestPlanInput, TestPlanStatus } from "@/types/test-plan.types";
+import { toast } from "sonner";
 
 interface CreateTestPlanDialogProps {
   projectId: string;
@@ -120,8 +121,9 @@ export function CreateTestPlanDialog({
         await createTestPlan.mutateAsync({ projectId, ...form });
         onOpenChange(false);
         onSuccess?.();
+        toast.success("Test plan created successfully");
       } catch (err) {
-        console.error("Failed to create test plan:", err);
+        toast.error("Failed to create test plan");
       }
     },
     [form, projectId, createTestPlan, onOpenChange, onSuccess]

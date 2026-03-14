@@ -21,6 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { AlertCircle } from "lucide-react";
 import { useCreateWorkspace } from "@/hooks/use-workspaces";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface CreateWorkspaceDialogProps {
   open: boolean;
@@ -67,8 +68,9 @@ export function CreateWorkspaceDialog({
         setDescription("");
         setErrors({});
         setTouched({});
+        toast.success("Workspace created successfully");
       } catch (error) {
-        console.error("Failed to create workspace:", error);
+        toast.error("Failed to create workspace");
       }
     },
     [name, description, createWorkspace, onOpenChange, onSuccess]

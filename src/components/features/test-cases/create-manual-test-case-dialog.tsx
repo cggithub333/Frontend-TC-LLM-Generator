@@ -23,6 +23,7 @@ import {
 import type { UserStory, AcceptanceCriteria } from "@/types/story.types";
 import type { TestCase } from "@/types/test-case.types";
 import { useCreateTestCase, useUpdateTestCase } from "@/hooks/use-test-cases";
+import { toast } from "sonner";
 
 interface CreateManualTestCaseDialogProps {
   open: boolean;
@@ -119,8 +120,9 @@ export function CreateManualTestCaseDialog({
       } else {
         resetForm();
       }
+      toast.success(isEditMode ? "Test case updated successfully" : "Test case created successfully");
     } catch (error) {
-      console.error("Failed to save test case:", error);
+      toast.error(isEditMode ? "Failed to update test case" : "Failed to create test case");
     }
   };
 

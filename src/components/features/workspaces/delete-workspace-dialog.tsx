@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
 import { useDeleteWorkspace } from "@/hooks/use-workspaces";
 import type { Workspace } from "@/types/workspace.types";
+import { toast } from "sonner";
 
 interface DeleteWorkspaceDialogProps {
   open: boolean;
@@ -41,8 +42,9 @@ export function DeleteWorkspaceDialog({
       await deleteWorkspace.mutateAsync(workspace.workspaceId);
       onOpenChange(false);
       onSuccess?.();
+      toast.success("Workspace deleted");
     } catch (error) {
-      console.error("Failed to delete workspace:", error);
+      toast.error("Failed to delete workspace");
     }
   }, [workspace, deleteWorkspace, onOpenChange, onSuccess]);
 

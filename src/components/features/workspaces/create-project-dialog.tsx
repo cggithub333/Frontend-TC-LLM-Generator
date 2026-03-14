@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle2, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 import type {
   CreateProjectInput,
   ProjectFormErrors,
@@ -155,8 +156,9 @@ export function CreateProjectDialog({
         });
         setErrors({});
         setTouched({});
+        toast.success("Project created successfully");
       } catch (error) {
-        console.error("Failed to create project:", error);
+        toast.error("Failed to create project");
       }
     },
     [

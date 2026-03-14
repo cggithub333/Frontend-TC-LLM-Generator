@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
+import { toast } from "sonner";
 import {
   useStoriesByProject,
   useCreateStory,
@@ -263,8 +264,9 @@ export default function ProjectStoriesPage() {
             orderNo: index + 1,
           })),
       });
+      toast.success("Story created successfully");
     } catch (err) {
-      console.error("Failed to create/update user story", err);
+      toast.error("Failed to create story");
     }
   };
 
@@ -292,8 +294,9 @@ export default function ProjectStoriesPage() {
         soThat: formData.soThat,
       });
       setEditingStory(null);
+      toast.success("Story updated successfully");
     } catch (err) {
-      console.error("Failed to update user story", err);
+      toast.error("Failed to update story");
     }
   };
 
@@ -570,6 +573,7 @@ export default function ProjectStoriesPage() {
                 if (deleteConfirmTestCase) {
                   await deleteTestCase.mutateAsync(deleteConfirmTestCase.testCaseId);
                   setDeleteConfirmTestCase(null);
+                  toast.success("Test case deleted");
                 }
               }}
             >
@@ -609,6 +613,7 @@ export default function ProjectStoriesPage() {
                 if (deleteConfirmStory) {
                   await deleteStory.mutateAsync(deleteConfirmStory.userStoryId);
                   setDeleteConfirmStory(null);
+                  toast.success("Story deleted");
                 }
               }}
             >

@@ -47,6 +47,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { TestPlanStatus } from "@/types/test-plan.types";
 import { CreateTestPlanDialog } from "@/components/features/test-plans/create-test-plan-dialog";
+import { toast } from "sonner";
 
 const STATUS_OPTIONS: { value: TestPlanStatus; label: string; icon: React.ReactNode }[] = [
   { value: "DRAFT", label: "Draft", icon: <FileText className="h-3.5 w-3.5" /> },
@@ -106,17 +107,19 @@ export default function TestPlanDetailPage() {
   const handleStatusChange = async (status: string) => {
     try {
       await updateStatus.mutateAsync({ id: planId, status: status as TestPlanStatus });
+      toast.success("Plan status updated");
     } catch (err) {
-      console.error("Failed to update status:", err);
+      toast.error("Failed to update status");
     }
   };
 
   const handleDelete = async () => {
     try {
       await deleteTestPlan.mutateAsync(planId);
+      toast.success("Test plan deleted");
       router.back();
     } catch (err) {
-      console.error("Failed to delete test plan:", err);
+      toast.error("Failed to delete test plan");
     }
   };
 
