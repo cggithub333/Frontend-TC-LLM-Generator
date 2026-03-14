@@ -21,13 +21,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { UserStory, AcceptanceCriteria } from "@/types/story.types";
-import { useCreateTestCase } from "@/hooks/use-test-cases";
+import type { TestCase } from "@/types/test-case.types";
+import { useCreateTestCase, useUpdateTestCase } from "@/hooks/use-test-cases";
 
 interface CreateManualTestCaseDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   userStory: UserStory | null;
   defaultAcId?: string | null;
+  editTestCase?: TestCase | null;
+  onSuccess?: () => void;
 }
 
 export function CreateManualTestCaseDialog({
@@ -35,8 +38,13 @@ export function CreateManualTestCaseDialog({
   onOpenChange,
   userStory,
   defaultAcId,
+  editTestCase,
+  onSuccess,
 }: CreateManualTestCaseDialogProps) {
-  const { mutateAsync: createTestCase, isPending } = useCreateTestCase();
+  const { mutateAsync: createTestCase, isPending: isCreating } = useCreateTestCase();
+  const { mutateAsync: updateTestCase, isPending: isUpdating } = useUpdateTestCase();
+  const isPending = isCreating || isUpdating;
+  const isEditMode = !!editTestCase;
 
   // Form State
   const [selectedAcId, setSelectedAcId] = useState<string>("");
@@ -47,13 +55,24 @@ export function CreateManualTestCaseDialog({
 
   useEffect(() => {
     if (open) {
-      if (defaultAcId) {
-        setSelectedAcId(defaultAcId);
-      } else if (userStory?.acceptanceCriteria?.length) {
-        setSelectedAcId(userStory.acceptanceCriteria[0].acceptanceCriteriaId);
+      if (editTestCase) {
+        setTitle(editTestCase.title);
+        setPreconditions(editTestCase.preconditions || "");
+        setSteps(editTestCase.steps || "");
+        setExpectedResult(editTestCase.expectedResult || "");
+        if (editTestCase.acceptanceCriteriaId) {
+          setSelectedAcId(editTestCase.acceptanceCriteriaId);
+        }
+      } else {
+        resetForm();
+        if (defaultAcId) {
+          setSelectedAcId(defaultAcId);
+        } else if (userStory?.acceptanceCriteria?.length) {
+          setSelectedAcId(userStory.acceptanceCriteria[0].acceptanceCriteriaId);
+        }
       }
     }
-  }, [open, defaultAcId, userStory]);
+  }, [open, defaultAcId, userStory, editTestCase]);
 
   const resetForm = () => {
     setTitle("");
@@ -72,16 +91,28 @@ export function CreateManualTestCaseDialog({
     if (!title.trim() || !selectedAcId) return;
 
     try {
-      await createTestCase({
-        userStoryId: userStory?.userStoryId,
-        acceptanceCriteriaId: selectedAcId,
-        title,
-        preconditions,
-        steps,
-        expectedResult,
-        customFieldsJson: "{}",
-        generatedByAi: false,
-      });
+      if (isEditMode && editTestCase) {
+        await updateTestCase({
+          id: editTestCase.testCaseId,
+          title,
+          preconditions,
+          steps,
+          expectedResult,
+        });
+      } else {
+        await createTestCase({
+          userStoryId: userStory?.userStoryId,
+          acceptanceCriteriaId: selectedAcId,
+          title,
+          preconditions,
+          steps,
+          expectedResult,
+          customFieldsJson: "{}",
+          generatedByAi: false,
+        });
+      }
+
+      onSuccess?.();
 
       if (closeAfterSave) {
         handleClose();
@@ -89,7 +120,7 @@ export function CreateManualTestCaseDialog({
         resetForm();
       }
     } catch (error) {
-      console.error("Failed to create test case:", error);
+      console.error("Failed to save test case:", error);
     }
   };
 
@@ -99,11 +130,9 @@ export function CreateManualTestCaseDialog({
     <Dialog open={open} onOpenChange={(val) => !val && handleClose()}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Test Case</DialogTitle>
+          <DialogTitle>{isEditMode ? "Edit Test Case" : "Create Test Case"}</DialogTitle>
           <DialogDescription>
-            User Story:{" "}
-            {userStory.jiraIssueKey ? `[${userStory.jiraIssueKey}] ` : ""}
-            {userStory.title}
+            User Story: {userStory.title}
           </DialogDescription>
         </DialogHeader>
 
@@ -179,18 +208,20 @@ export function CreateManualTestCaseDialog({
             Cancel
           </Button>
           <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              onClick={() => handleSave(false)}
-              disabled={!title.trim() || !selectedAcId || isPending}
-            >
-              Save & Add Another
-            </Button>
+            {!isEditMode && (
+              <Button
+                variant="secondary"
+                onClick={() => handleSave(false)}
+                disabled={!title.trim() || !selectedAcId || isPending}
+              >
+                Save & Add Another
+              </Button>
+            )}
             <Button
               onClick={() => handleSave(true)}
               disabled={!title.trim() || !selectedAcId || isPending}
             >
-              Save & Close
+              {isEditMode ? "Save Changes" : "Save & Close"}
             </Button>
           </div>
         </DialogFooter>

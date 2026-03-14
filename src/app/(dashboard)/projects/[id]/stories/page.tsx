@@ -32,6 +32,7 @@ import {
   Plus,
   ListChecks,
   Pencil,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { LoadingSkeleton } from "@/components/features/workspaces/loading-skeleton";
@@ -40,18 +41,23 @@ import { CreateManualTestCaseDialog } from "@/components/features/test-cases/cre
 import { useWebSocket } from "@/hooks/use-websocket";
 import { useQueryClient } from "@tanstack/react-query";
 import type { UserStory, AcceptanceCriteria } from "@/types/story.types";
-import { useTestCasesByAcceptanceCriteria } from "@/hooks/use-test-cases";
+import type { TestCase } from "@/types/test-case.types";
+import { useTestCasesByAcceptanceCriteria, useDeleteTestCase } from "@/hooks/use-test-cases";
 
 function AcItemWithTestCases({
   criteria,
   story,
   toggleACCompletion,
   onAddTestCase,
+  onEditTestCase,
+  onDeleteTestCase,
 }: {
   criteria: AcceptanceCriteria;
   story: UserStory;
   toggleACCompletion: (ac: AcceptanceCriteria) => void;
   onAddTestCase: (story: UserStory, acId: string) => void;
+  onEditTestCase: (tc: TestCase, story: UserStory) => void;
+  onDeleteTestCase: (tc: TestCase) => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { data: testCasesData } = useTestCasesByAcceptanceCriteria(
@@ -127,7 +133,7 @@ function AcItemWithTestCases({
           {testCasesData?.items.map((tc) => (
             <div
               key={tc.testCaseId}
-              className="bg-card border border-border rounded-md p-3 text-sm shadow-sm relative before:absolute before:left-[-21px] before:top-1/2 before:w-5 before:h-px before:bg-border"
+              className="bg-card border border-border rounded-md p-3 text-sm shadow-sm relative before:absolute before:left-[-21px] before:top-1/2 before:w-5 before:h-px before:bg-border group/tc"
             >
               <div className="font-semibold flex items-center gap-2 mb-1.5">
                 <ClipboardList className="w-3.5 h-3.5 text-muted-foreground" />
@@ -135,11 +141,27 @@ function AcItemWithTestCases({
                 {tc.generatedByAi && (
                   <Badge
                     variant="outline"
-                    className="text-[9px] h-4 px-1 py-0 ml-auto bg-purple-50 text-purple-600 border-purple-200"
+                    className="text-[9px] h-4 px-1 py-0 bg-purple-50 text-purple-600 border-purple-200"
                   >
                     AI Generated
                   </Badge>
                 )}
+                <div className="ml-auto flex items-center gap-1 opacity-0 group-hover/tc:opacity-100 transition-opacity">
+                  <button
+                    className="p-1 rounded hover:bg-muted transition-colors"
+                    title="Edit Test Case"
+                    onClick={(e) => { e.stopPropagation(); onEditTestCase(tc, story); }}
+                  >
+                    <Pencil className="w-3 h-3 text-muted-foreground" />
+                  </button>
+                  <button
+                    className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors"
+                    title="Delete Test Case"
+                    onClick={(e) => { e.stopPropagation(); onDeleteTestCase(tc); }}
+                  >
+                    <Trash2 className="w-3 h-3 text-red-400" />
+                  </button>
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-3 mt-2">
                 {tc.steps && (
@@ -207,6 +229,9 @@ export default function ProjectStoriesPage() {
   const [testCaseDialogAcId, setTestCaseDialogAcId] = useState<string | null>(
     null,
   );
+  const [editingTestCase, setEditingTestCase] = useState<TestCase | null>(null);
+  const [deleteConfirmTestCase, setDeleteConfirmTestCase] = useState<TestCase | null>(null);
+  const deleteTestCase = useDeleteTestCase();
 
   const stories = storiesData?.items || [];
 
@@ -407,8 +432,16 @@ export default function ProjectStoriesPage() {
                           onAddTestCase={(story, acId) => {
                             setTestCaseDialogStory(story);
                             setTestCaseDialogAcId(acId);
+                            setEditingTestCase(null);
                             setIsTestCaseDialogOpen(true);
                           }}
+                          onEditTestCase={(tc, story) => {
+                            setEditingTestCase(tc);
+                            setTestCaseDialogStory(story);
+                            setTestCaseDialogAcId(tc.acceptanceCriteriaId || null);
+                            setIsTestCaseDialogOpen(true);
+                          }}
+                          onDeleteTestCase={(tc) => setDeleteConfirmTestCase(tc)}
                         />
                       ))}
                     </div>
@@ -496,13 +529,55 @@ export default function ProjectStoriesPage() {
         editStory={editingStory ?? undefined}
       />
 
-      {/* Manual Test Case Creation Dialog */}
+      {/* Manual Test Case Creation/Edit Dialog */}
       <CreateManualTestCaseDialog
         open={isTestCaseDialogOpen}
-        onOpenChange={setIsTestCaseDialogOpen}
+        onOpenChange={(open) => {
+          setIsTestCaseDialogOpen(open);
+          if (!open) setEditingTestCase(null);
+        }}
         userStory={testCaseDialogStory}
         defaultAcId={testCaseDialogAcId}
+        editTestCase={editingTestCase}
       />
+
+      {/* Delete Test Case Confirmation Dialog */}
+      <Dialog
+        open={!!deleteConfirmTestCase}
+        onOpenChange={(open) => { if (!open) setDeleteConfirmTestCase(null); }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Test Case</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground py-2">
+            Are you sure you want to delete{" "}
+            <span className="font-semibold text-foreground">
+              &quot;{deleteConfirmTestCase?.title}&quot;
+            </span>
+            ? This action cannot be undone.
+          </p>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setDeleteConfirmTestCase(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                if (deleteConfirmTestCase) {
+                  await deleteTestCase.mutateAsync(deleteConfirmTestCase.testCaseId);
+                  setDeleteConfirmTestCase(null);
+                }
+              }}
+            >
+              Delete Test Case
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Story Confirmation Dialog */}
       <Dialog
