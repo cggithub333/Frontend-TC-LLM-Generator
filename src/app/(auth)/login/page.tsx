@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+
 import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,6 @@ import {
 import { useLogin, useLoginGoogle } from "@/hooks/use-auth";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,7 +36,7 @@ export default function LoginPage() {
       {
         onSuccess: (data) => {
           const dest = data?.role === "ADMIN" ? "/admin/overview" : "/workspaces";
-          router.push(dest);
+          window.location.href = dest;
         },
         onError: (err) => setError(err.message),
       }
@@ -54,7 +53,7 @@ export default function LoginPage() {
     loginGoogle.mutate(response.credential, {
       onSuccess: (data) => {
         const dest = data?.role === "ADMIN" ? "/admin/overview" : "/workspaces";
-        router.push(dest);
+        window.location.href = dest;
       },
       onError: (err) => setError(err.message),
     });
@@ -129,6 +128,12 @@ export default function LoginPage() {
               onChange={(e) => {
                 setPassword(e.target.value);
                 setError("");
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  e.currentTarget.closest("form")?.requestSubmit();
+                }
               }}
             />
             <button
