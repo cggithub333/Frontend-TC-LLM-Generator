@@ -34,6 +34,7 @@ import {
   ListChecks,
   Pencil,
   Trash2,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 import { LoadingSkeleton } from "@/components/features/workspaces/loading-skeleton";
@@ -353,11 +354,23 @@ export default function ProjectStoriesPage() {
                       variant="outline"
                       className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 font-semibold"
                     >
-                      US
+                      {story.jiraIssueKey ?? `US-${story.userStoryId.slice(0, 6).toUpperCase()}`}
                     </Badge>
-                    <h3 className="font-bold text-lg hover:text-primary transition-colors">
+                    <Link
+                      href={`/stories/${story.userStoryId}`}
+                      className="font-bold text-lg hover:text-primary transition-colors hover:underline underline-offset-2"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       {story.title}
-                    </h3>
+                    </Link>
+                    {story.status && (
+                      <Badge
+                        variant="outline"
+                        className="text-[10px] font-bold"
+                      >
+                        {story.status.replace("_", " ")}
+                      </Badge>
+                    )}
                   </div>
                   {!isExpanded && (
                     <div className="flex items-center gap-4 mt-2">
@@ -482,9 +495,29 @@ export default function ProjectStoriesPage() {
             </div>
           );
         })}
-        {filteredStories.length === 0 && (
+        {filteredStories.length === 0 && stories.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="p-4 rounded-full bg-muted/50 mb-6">
+              <FileText className="h-12 w-12 text-muted-foreground/50" />
+            </div>
+            <h2 className="text-xl font-bold mb-2">No user stories yet</h2>
+            <p className="text-muted-foreground max-w-md mb-8">
+              User stories help define what your users need. Create your first
+              one to start building acceptance criteria and generating test cases.
+            </p>
+            <Button
+              size="lg"
+              onClick={() => setCreateModalOpen(true)}
+              className="gap-2 shadow-lg shadow-primary/20"
+            >
+              <Plus className="h-5 w-5" />
+              Create Your First Story
+            </Button>
+          </div>
+        )}
+        {filteredStories.length === 0 && stories.length > 0 && (
           <div className="text-center py-12 text-muted-foreground border rounded-xl border-dashed">
-            No stories found. Create one.
+            No stories matching &quot;{searchQuery}&quot;
           </div>
         )}
       </div>

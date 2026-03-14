@@ -1,10 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   Search,
   ChevronDown,
@@ -12,31 +20,71 @@ import {
   Sparkles,
   Check,
   ChevronRight,
-  FolderOpen,
-  ClipboardList,
   Plus,
   ListChecks,
   Loader2,
   AlertCircle,
+  Pencil,
+  Trash2,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 import { CreateStoryModal } from "@/components/features/stories/create-story-modal";
 import type { StoryFormData } from "@/components/features/stories/create-story-modal";
-import { useStories, useCreateStory } from "@/hooks/use-stories";
+import {
+  useStories,
+  useCreateStory,
+  useUpdateStory,
+  useDeleteStory,
+} from "@/hooks/use-stories";
 import { useUpdateAcceptanceCriteria } from "@/hooks/use-acceptance-criteria";
-import { extractPage } from "@/types/pagination.types";
 import type { UserStory, AcceptanceCriteria } from "@/types/story.types";
 
+/** Map story status to badge colors */
+const statusColors: Record<string, string> = {
+  DRAFT: "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700",
+  READY: "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800",
+  IN_PROGRESS: "bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800",
+  DONE: "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
+  ARCHIVED: "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700",
+};
+
+/** Format a date as relative time (simple) */
+function formatRelativeTime(dateStr: string) {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return "just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHrs = Math.floor(diffMins / 60);
+  if (diffHrs < 24) return `${diffHrs}h ago`;
+  const diffDays = Math.floor(diffHrs / 24);
+  if (diffDays < 30) return `${diffDays}d ago`;
+  return date.toLocaleDateString();
+}
+
 export default function StoriesPage() {
+  const [searchQuery, setSearchQuery] = useState("");
   const [expandedStories, setExpandedStories] = useState<string[]>([]);
   const [selectedStories, setSelectedStories] = useState<string[]>([]);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editingStory, setEditingStory] = useState<UserStory | null>(null);
+  const [deleteConfirmStory, setDeleteConfirmStory] = useState<UserStory | null>(null);
 
   const { data: storiesData, isLoading, error } = useStories();
   const createStory = useCreateStory();
+  const updateStory = useUpdateStory();
+  const deleteStory = useDeleteStory();
   const updateAC = useUpdateAcceptanceCriteria();
 
-  const stories = storiesData ? extractPage<UserStory>(storiesData).items : [];
+  const stories = storiesData?.items ?? [];
+
+  const filteredStories = stories.filter(
+    (story) =>
+      story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      story.description?.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   const toggleExpand = (id: string) => {
     setExpandedStories((prev) =>
@@ -62,23 +110,56 @@ export default function StoriesPage() {
     return { completed, total: criteria.length };
   };
 
-  const handleCreateStory = (formData: StoryFormData) => {
-    createStory.mutate({
-      projectId: formData.projectId,
-      title: formData.title,
-      asA: formData.asA,
-      iWantTo: formData.iWantTo,
-      soThat: formData.soThat,
-      status: "DRAFT",
-      acceptanceCriteria: formData.acceptanceCriteria
-        .filter((ac) => ac.description.trim())
-        .map((ac, index) => ({
-          content: ac.description,
-          orderNo: index + 1,
-          completed: false,
-        })),
-    });
-    setCreateModalOpen(false);
+  const handleCreateStory = async (formData: StoryFormData) => {
+    try {
+      await createStory.mutateAsync({
+        projectId: formData.projectId,
+        title: formData.title,
+        asA: formData.asA,
+        iWantTo: formData.iWantTo,
+        soThat: formData.soThat,
+        status: "DRAFT",
+        acceptanceCriteria: formData.acceptanceCriteria
+          .filter((ac) => ac.description.trim())
+          .map((ac, index) => ({
+            content: ac.description,
+            orderNo: index + 1,
+            completed: false,
+          })),
+      });
+      toast.success("Story created successfully");
+      setCreateModalOpen(false);
+    } catch {
+      toast.error("Failed to create story");
+    }
+  };
+
+  const handleEditStory = async (formData: StoryFormData) => {
+    if (!editingStory) return;
+    try {
+      await updateStory.mutateAsync({
+        id: editingStory.userStoryId,
+        title: formData.title,
+        asA: formData.asA,
+        iWantTo: formData.iWantTo,
+        soThat: formData.soThat,
+      });
+      setEditingStory(null);
+      toast.success("Story updated successfully");
+    } catch {
+      toast.error("Failed to update story");
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmStory) return;
+    try {
+      await deleteStory.mutateAsync(deleteConfirmStory.userStoryId);
+      setDeleteConfirmStory(null);
+      toast.success("Story deleted successfully");
+    } catch {
+      toast.error("Failed to delete story");
+    }
   };
 
   if (isLoading) {
@@ -100,7 +181,7 @@ export default function StoriesPage() {
   }
 
   return (
-    <div className="p-8 space-y-6 max-w-5xl mx-auto w-full">
+    <div className="p-4 sm:p-8 space-y-6 max-w-5xl mx-auto w-full">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Link
@@ -113,60 +194,47 @@ export default function StoriesPage() {
         <span className="text-foreground font-semibold">All User Stories</span>
       </div>
 
-      {/* Action Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-colors cursor-pointer">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-              <FolderOpen className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <h3 className="font-bold text-lg mb-1">Repository</h3>
-              <p className="text-sm text-muted-foreground">
-                View and manage test assets
-              </p>
-            </div>
-          </div>
+      {/* Search — only show when there are stories */}
+      {stories.length > 0 && (
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search user stories..."
+            className="pl-12"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
-        <Link
-          href="/test-plans"
-          className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-colors cursor-pointer"
-        >
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center">
-              <ClipboardList className="h-6 w-6 text-slate-600 dark:text-slate-400" />
-            </div>
-            <div>
-              <h3 className="font-bold text-lg mb-1">Test Plans</h3>
-              <p className="text-sm text-muted-foreground">
-                Structure your testing strategy
-              </p>
-            </div>
-          </div>
-        </Link>
-      </div>
-
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Search user stories..." className="pl-12" />
-      </div>
+      )}
 
       {/* Stories List */}
       {stories.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <ListChecks className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p className="text-lg font-medium">No user stories yet</p>
-          <p className="text-sm mt-1">
-            Create your first user story to get started.
+        /* ────── Rich Empty State ────── */
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="p-4 rounded-full bg-muted/50 mb-6">
+            <FileText className="h-12 w-12 text-muted-foreground/50" />
+          </div>
+          <h2 className="text-xl font-bold mb-2">No user stories yet</h2>
+          <p className="text-muted-foreground max-w-md mb-8">
+            User stories help define what your users need. Create your first one
+            to start building acceptance criteria and generating test cases.
           </p>
+          <Button
+            size="lg"
+            onClick={() => setCreateModalOpen(true)}
+            className="gap-2 shadow-lg shadow-primary/20"
+          >
+            <Plus className="h-5 w-5" />
+            Create Your First Story
+          </Button>
         </div>
       ) : (
         <div className="space-y-4">
-          {stories.map((story) => {
+          {filteredStories.map((story) => {
             const isExpanded = expandedStories.includes(story.userStoryId);
             const isSelected = selectedStories.includes(story.userStoryId);
-            const stats = getCompletionStats(story.acceptanceCriteria ?? []);
+            const acs = story.acceptanceCriteria ?? [];
+            const stats = getCompletionStats(acs);
 
             return (
               <div
@@ -180,21 +248,31 @@ export default function StoriesPage() {
                     onCheckedChange={() => toggleSelect(story.userStoryId)}
                     className="mt-1"
                   />
-                  <Link
-                    href={`/stories/${story.userStoryId}`}
-                    className="flex-1 min-w-0 cursor-pointer"
-                  >
-                    <div className="flex items-center gap-3 mb-1">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <Badge
                         variant="outline"
                         className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 font-semibold"
                       >
-                        {story.jiraIssueKey ??
-                          story.userStoryId.slice(0, 8).toUpperCase()}
+                        {story.jiraIssueKey ?? `US-${story.userStoryId.slice(0, 6).toUpperCase()}`}
                       </Badge>
-                      <h3 className="font-bold text-lg hover:text-primary transition-colors">
+                      <Link
+                        href={`/stories/${story.userStoryId}`}
+                        className="font-bold text-lg hover:text-primary transition-colors hover:underline underline-offset-2"
+                      >
                         {story.title}
-                      </h3>
+                      </Link>
+                      {story.status && (
+                        <Badge
+                          variant="outline"
+                          className={`text-[10px] font-bold ${statusColors[story.status] ?? statusColors.DRAFT}`}
+                        >
+                          {story.status.replace("_", " ")}
+                        </Badge>
+                      )}
+                      <span className="text-xs text-muted-foreground ml-auto shrink-0">
+                        {story.createdAt && formatRelativeTime(story.createdAt)}
+                      </span>
                     </div>
                     {!isExpanded && (
                       <div className="flex items-center gap-4 mt-2">
@@ -206,14 +284,12 @@ export default function StoriesPage() {
                         <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
                           <div className="flex items-center gap-1">
                             <ListChecks className="h-4 w-4" />
-                            <span>
-                              {(story.acceptanceCriteria ?? []).length} ACs
-                            </span>
+                            <span>{acs.length} ACs</span>
                           </div>
                         </div>
                       </div>
                     )}
-                  </Link>
+                  </div>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -264,8 +340,8 @@ export default function StoriesPage() {
                       </div>
                     )}
 
-                    {/* Acceptance Criteria - Interactive */}
-                    {(story.acceptanceCriteria ?? []).length > 0 && (
+                    {/* Acceptance Criteria */}
+                    {acs.length > 0 && (
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
@@ -279,7 +355,7 @@ export default function StoriesPage() {
                           </Badge>
                         </div>
                         <div className="space-y-2">
-                          {(story.acceptanceCriteria ?? []).map((criteria) => (
+                          {acs.map((criteria) => (
                             <button
                               key={criteria.acceptanceCriteriaId}
                               onClick={() => toggleACCompletion(criteria)}
@@ -299,7 +375,7 @@ export default function StoriesPage() {
                               <p
                                 className={
                                   criteria.completed
-                                    ? "text-foreground"
+                                    ? "text-foreground line-through opacity-70"
                                     : "text-muted-foreground group-hover:text-foreground transition-colors"
                                 }
                               >
@@ -312,15 +388,43 @@ export default function StoriesPage() {
                     )}
 
                     {/* Generate Button */}
-                    <Button className="w-full gap-2 bg-primary shadow-lg shadow-primary/20">
+                    <Button
+                      className="w-full gap-2 bg-primary/50 cursor-not-allowed"
+                      title="AI Generation is coming soon"
+                    >
                       <Sparkles className="h-4 w-4" />
-                      Generate Tests
+                      Generate Tests (Coming soon)
                     </Button>
+
+                    {/* Story Actions */}
+                    <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => setEditingStory(story)}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                        Edit Story
+                      </Button>
+                      <button
+                        className="text-xs text-red-400 hover:text-red-600 dark:hover:text-red-400 transition-colors underline underline-offset-2"
+                        onClick={() => setDeleteConfirmStory(story)}
+                      >
+                        Delete Story
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
             );
           })}
+
+          {filteredStories.length === 0 && stories.length > 0 && (
+            <div className="text-center py-12 text-muted-foreground border rounded-xl border-dashed">
+              No stories matching &quot;{searchQuery}&quot;
+            </div>
+          )}
         </div>
       )}
 
@@ -342,20 +446,74 @@ export default function StoriesPage() {
       )}
 
       {/* Floating + Button */}
-      <Button
-        size="icon"
-        onClick={() => setCreateModalOpen(true)}
-        className="fixed bottom-8 right-8 w-14 h-14 rounded-full shadow-lg shadow-primary/30 hover:scale-110 active:scale-95 transition-all z-50"
-      >
-        <Plus className="h-6 w-6" />
-      </Button>
+      {stories.length > 0 && (
+        <Button
+          size="icon"
+          onClick={() => setCreateModalOpen(true)}
+          className="fixed bottom-8 right-8 w-14 h-14 rounded-full shadow-lg shadow-primary/30 hover:scale-110 active:scale-95 transition-all z-50"
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
+      )}
 
       {/* Create Story Modal */}
       <CreateStoryModal
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
         onCreateStory={handleCreateStory}
+        isPending={createStory.isPending}
       />
+
+      {/* Edit Story Modal */}
+      <CreateStoryModal
+        open={!!editingStory}
+        onOpenChange={(open) => {
+          if (!open) setEditingStory(null);
+        }}
+        onCreateStory={handleEditStory}
+        editStory={editingStory ?? undefined}
+        isPending={updateStory.isPending}
+      />
+
+      {/* Delete Story Confirmation Dialog */}
+      <Dialog
+        open={!!deleteConfirmStory}
+        onOpenChange={(open) => {
+          if (!open) setDeleteConfirmStory(null);
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete User Story</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground py-2">
+            Are you sure you want to delete{" "}
+            <span className="font-semibold text-foreground">
+              &quot;{deleteConfirmStory?.title}&quot;
+            </span>
+            ? This action cannot be undone and will also remove all associated
+            acceptance criteria and test cases.
+          </p>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setDeleteConfirmStory(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={deleteStory.isPending}
+            >
+              {deleteStory.isPending && (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              )}
+              Delete Story
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Sparkles, X, Plus } from "lucide-react";
+import { Sparkles, X, Plus, Loader2 } from "lucide-react";
 import { useProjects } from "@/hooks/use-projects";
 
 interface CreateStoryModalProps {
@@ -35,6 +35,8 @@ interface CreateStoryModalProps {
     soThat?: string;
     acceptanceCriteria?: { content: string }[];
   };
+  /** Whether a mutation is in progress */
+  isPending?: boolean;
 }
 
 interface AcceptanceCriterion {
@@ -57,6 +59,7 @@ export function CreateStoryModal({
   onCreateStory,
   defaultProjectId,
   editStory,
+  isPending = false,
 }: CreateStoryModalProps) {
   const { data: projectsData } = useProjects({ size: 100 });
   const projects = projectsData?.items ?? [];
@@ -128,12 +131,13 @@ export function CreateStoryModal({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent, id: string) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
+    // Tab on last AC item → add new AC
+    if (e.key === "Tab" && !e.shiftKey) {
       const currentIndex = formData.acceptanceCriteria.findIndex(
         (c) => c.id === id,
       );
       if (currentIndex === formData.acceptanceCriteria.length - 1) {
+        e.preventDefault();
         addCriterion();
       }
     }
@@ -274,12 +278,13 @@ export function CreateStoryModal({
                   className="flex items-start gap-3 group"
                 >
                   <div className="mt-3 w-1.5 h-1.5 rounded-full bg-muted-foreground/50 shrink-0" />
-                  <Input
-                    className="flex-1 bg-transparent border-0 border-b border-transparent focus:border-border rounded-none px-0 focus-visible:ring-0"
+                  <Textarea
+                    className="flex-1 bg-transparent border-0 border-b border-transparent focus:border-border rounded-none px-0 focus-visible:ring-0 min-h-[56px] resize-none"
+                    rows={2}
                     placeholder={
                       index === 0
-                        ? "Type criterion and press enter..."
-                        : "Add another..."
+                        ? "Type criterion... (Tab to add next)"
+                        : "Add another... (Tab to add next)"
                     }
                     value={criterion.description}
                     onChange={(e) =>
@@ -321,10 +326,13 @@ export function CreateStoryModal({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!formData.projectId || !formData.title.trim()}
+            disabled={!formData.projectId || !formData.title.trim() || isPending}
             className="shadow-lg shadow-primary/25"
           >
-            {isEditMode ? "Save Changes" : "Create Story"}
+            {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            {isPending
+              ? (isEditMode ? "Saving..." : "Creating...")
+              : (isEditMode ? "Save Changes" : "Create Story")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,52 +1,30 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
   ChevronRight,
-  Edit,
-  Share2,
   Sparkles,
-  User,
-  ShieldCheck,
-  MessageSquare,
   FileText,
+  Loader2,
+  Pencil,
+  ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { useStory } from "@/hooks/use-stories";
+import { useStory, useDeleteStory } from "@/hooks/use-stories";
 import { LoadingSkeleton } from "@/components/features/workspaces/loading-skeleton";
-
-// Mock data for features not yet backed by API
-const mockDiscussion = [
-  {
-    id: 1,
-    author: "Sarah Adams",
-    initials: "SA",
-    color: "bg-indigo-100 text-indigo-600",
-    message:
-      "Should we support Apple Calendar in this first iteration as well? Many users requested it during the beta.",
-    time: "2h ago",
-  },
-  {
-    id: 2,
-    author: "Mike K.",
-    initials: "MK",
-    color: "bg-amber-100 text-amber-600",
-    message:
-      "Let's stick to Google and Outlook for MVP. Apple requires a separate CalDAV implementation which is planned for US-105.",
-    time: "1h ago",
-  },
-];
-
-const mockAssignedTeam = [
-  { role: "Lead Developer", name: "Alex Rivera" },
-  { role: "QA Tester", name: "Jordan Smith" },
-];
 
 const tabs = [
   { id: "story", label: "Story" },
@@ -56,18 +34,30 @@ const tabs = [
 
 export default function StoryDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const storyId = params.id as string;
 
   const { data: story, isLoading } = useStory(storyId);
+  const deleteStory = useDeleteStory();
 
   const [activeTab, setActiveTab] = useState("story");
   const [selectedCriteria, setSelectedCriteria] = useState<string[]>([]);
-  const [newComment, setNewComment] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const toggleCriteria = (id: string) => {
     setSelectedCriteria((prev) =>
       prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
     );
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteStory.mutateAsync(storyId);
+      toast.success("Story deleted successfully");
+      router.push("/stories");
+    } catch {
+      toast.error("Failed to delete story");
+    }
   };
 
   if (isLoading || !story) {
@@ -84,30 +74,30 @@ export default function StoryDetailPage() {
           {/* Breadcrumb */}
           <nav className="flex items-center text-sm font-medium text-muted-foreground">
             <Link
-              href="/workspaces"
-              className="hover:text-primary transition-colors"
-            >
-              Workspaces
-            </Link>
-            <ChevronRight className="h-4 w-4 mx-2" />
-            <Link
               href="/stories"
-              className="hover:text-primary transition-colors"
+              className="hover:text-primary transition-colors flex items-center gap-1"
             >
-              {story.projectName}
+              <ArrowLeft className="h-4 w-4" />
+              Stories
             </Link>
             <ChevronRight className="h-4 w-4 mx-2" />
-            <span className="text-foreground font-semibold">{storyId}</span>
+            <span className="text-foreground font-semibold truncate max-w-[300px]">
+              {story.title}
+            </span>
           </nav>
 
           {/* Actions */}
           <div className="flex items-center gap-3">
             <Button variant="outline" className="gap-2">
-              <Edit className="h-4 w-4" />
+              <Pencil className="h-4 w-4" />
               Edit Story
             </Button>
-            <Button variant="outline" size="icon">
-              <Share2 className="h-4 w-4" />
+            <Button
+              variant="outline"
+              className="text-destructive hover:text-destructive"
+              onClick={() => setShowDeleteConfirm(true)}
+            >
+              Delete
             </Button>
           </div>
         </div>
@@ -123,12 +113,17 @@ export default function StoryDetailPage() {
                 <Badge className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-0 text-[10px] font-bold uppercase tracking-widest">
                   Project: {story.projectName}
                 </Badge>
+                {story.status && (
+                  <Badge variant="outline" className="text-[10px] font-bold">
+                    {story.status}
+                  </Badge>
+                )}
                 <span className="text-xs text-muted-foreground">
                   Created {story.createdAt}
                 </span>
               </div>
               <h1 className="text-4xl font-extrabold tracking-tight">
-                Story Details
+                {story.title}
               </h1>
             </div>
 
@@ -170,7 +165,7 @@ export default function StoryDetailPage() {
                     variant="outline"
                     className="bg-white/10 backdrop-blur-md text-white border-white/20"
                   >
-                    # {story.jiraIssueKey || storyId}
+                    # {story.jiraIssueKey || `US-${storyId.slice(0, 6).toUpperCase()}`}
                   </Badge>
                 </div>
               </div>
@@ -209,55 +204,6 @@ export default function StoryDetailPage() {
                   </span>
                   <div className="text-xl font-bold mt-1">{story.soThat}</div>
                 </div>
-              </div>
-            </div>
-
-            {/* Discussion */}
-            <div className="bg-card border rounded-xl p-8 shadow-sm">
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-xl font-bold flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-primary" />
-                  Discussion ({mockDiscussion.length})
-                </h3>
-                <Button variant="link" className="text-sm text-primary p-0">
-                  View all
-                </Button>
-              </div>
-
-              <div className="space-y-8">
-                {mockDiscussion.map((comment) => (
-                  <div key={comment.id} className="flex gap-4">
-                    <div
-                      className={`h-10 w-10 rounded-full ${comment.color} flex items-center justify-center font-bold text-sm shrink-0`}
-                    >
-                      {comment.initials}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold">{comment.author}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {comment.time}
-                        </span>
-                      </div>
-                      <p className="text-muted-foreground leading-relaxed">
-                        {comment.message}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Add Comment */}
-              <div className="mt-8 pt-8 border-t flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold shrink-0">
-                  JD
-                </div>
-                <Input
-                  placeholder="Write a comment..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  className="flex-1 bg-muted/30"
-                />
               </div>
             </div>
           </div>
@@ -311,69 +257,44 @@ export default function StoryDetailPage() {
                 </p>
               </div>
             </div>
-
-            {/* Assigned Team */}
-            <div className="bg-card border rounded-xl p-8 shadow-sm">
-              <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-6">
-                Assigned Teams
-              </h4>
-              <div className="space-y-6">
-                {mockAssignedTeam.map((member, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-bold text-primary uppercase tracking-tighter">
-                        {member.role}
-                      </span>
-                      <span className="text-sm font-bold mt-0.5">
-                        {member.name}
-                      </span>
-                    </div>
-                    <div className="h-9 w-9 rounded-full bg-muted border flex items-center justify-center text-muted-foreground">
-                      {member.role.includes("Developer") ? (
-                        <User className="h-5 w-5" />
-                      ) : (
-                        <ShieldCheck className="h-5 w-5" />
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="max-w-7xl mx-auto w-full py-12 px-6 border-t mt-12">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground font-medium">
-            © 2024 QA Artifacts Platform. All rights reserved.
+      {/* Delete Confirmation */}
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete User Story</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground py-2">
+            Are you sure you want to delete{" "}
+            <span className="font-semibold text-foreground">
+              &quot;{story.title}&quot;
+            </span>
+            ? This action cannot be undone and will also remove all associated
+            acceptance criteria and test cases.
           </p>
-          <div className="flex gap-6">
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-primary font-medium transition-colors"
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setShowDeleteConfirm(false)}
             >
-              Privacy Policy
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-primary font-medium transition-colors"
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteStory.isPending}
             >
-              Terms of Service
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-primary font-medium transition-colors"
-            >
-              Support
-            </Link>
-          </div>
-        </div>
-      </footer>
+              {deleteStory.isPending && (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              )}
+              Delete Story
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
