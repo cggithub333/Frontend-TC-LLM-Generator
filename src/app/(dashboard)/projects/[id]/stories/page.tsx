@@ -293,6 +293,12 @@ export default function ProjectStoriesPage() {
         asA: formData.asA,
         iWantTo: formData.iWantTo,
         soThat: formData.soThat,
+        acceptanceCriteria: formData.acceptanceCriteria
+          .filter((ac) => ac.description.trim())
+          .map((ac, index) => ({
+            content: ac.description,
+            orderNo: index + 1,
+          })),
       });
       setEditingStory(null);
       toast.success("Story updated successfully");
