@@ -20,41 +20,50 @@ import {
   Loader2,
   Plus,
   Check,
+  ArrowLeft,
+  Users,
+  Layers,
 } from "lucide-react";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 import { useSidebar } from "@/components/layout/sidebar-context";
 import { useLogout, useCurrentUser } from "@/hooks/use-auth";
 import { broadcastLogout, onLogoutBroadcast } from "@/lib/auth-broadcast";
 import { useWorkspaces } from "@/hooks/use-workspaces";
+import { useProject } from "@/hooks/use-projects";
 
-// Base navigation groups — hrefs will be adjusted based on current project context
-const getNavigationGroups = (projectId: string | null) => [
+// ──────── Workspace-level nav (when NOT inside a project) ────────
+const workspaceNavGroups = [
   {
     label: "WORKSPACE",
     items: [
-      { name: "Dashboard", href: "/workspaces", icon: LayoutDashboard },
-      { name: "Stories", href: projectId ? `/projects/${projectId}/stories` : "/stories", icon: FileText },
-    ],
-  },
-  {
-    label: "TEST MANAGEMENT",
-    items: [
-      { name: "Test Plans", href: projectId ? `/projects/${projectId}/test-plans` : "/test-plans", icon: ClipboardList },
-      { name: "Test Suites", href: "/suites", icon: Folder },
-    ],
-  },
-  {
-    label: "ANALYTICS",
-    items: [
-      { name: "Reports", href: "/reports", icon: BarChart3 },
+      { name: "Projects", href: "/workspaces", icon: LayoutDashboard },
     ],
   },
 ];
 
-const adminNav = [
+const workspaceAdminNav = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
+// ──────── Project-level nav (when inside /projects/:id) ────────
+const getProjectNavGroups = (projectId: string) => [
+  {
+    label: "PROJECT NAVIGATION",
+    items: [
+      { name: "Overview", href: `/projects/${projectId}`, icon: Layers },
+      { name: "Stories", href: `/projects/${projectId}/stories`, icon: FileText },
+      { name: "Test Plans", href: `/projects/${projectId}/test-plans`, icon: ClipboardList },
+      { name: "Test Suites", href: `/projects/${projectId}/suites`, icon: Folder },
+      { name: "Team Management", href: `/projects/${projectId}/team`, icon: Users },
+    ],
+  },
+];
+
+const getProjectAdminNav = (projectId: string) => [
+  { name: "Project Settings", href: `/projects/${projectId}/settings`, icon: Settings },
+];
+
+// ──────── Workspace Switcher ────────
 function WorkspaceSwitcher({ isCollapsed }: { isCollapsed: boolean }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -67,8 +76,13 @@ function WorkspaceSwitcher({ isCollapsed }: { isCollapsed: boolean }) {
   // Extract current workspace ID from URL
   const currentWorkspaceId = pathname.match(/\/workspaces\/([^/]+)/)?.[1];
   const isOnWorkspacesPage = pathname === "/workspaces";
+
+  // Also try to get workspace from project context
+  const projectId = pathname.match(/\/projects\/([^/]+)/)?.[1];
+  const { data: project } = useProject(projectId ?? "");
+
   const currentWorkspace = workspaces.find(
-    (ws) => ws.workspaceId === currentWorkspaceId
+    (ws) => ws.workspaceId === currentWorkspaceId || ws.workspaceId === project?.workspaceId
   );
 
   // Close dropdown when clicking outside
@@ -117,7 +131,7 @@ function WorkspaceSwitcher({ isCollapsed }: { isCollapsed: boolean }) {
           <span className="text-sm font-medium truncate">
             {isOnWorkspacesPage
               ? "All Workspaces"
-              : currentWorkspace?.name || "Select Workspace"}
+              : currentWorkspace?.name || project?.workspaceName || "Select Workspace"}
           </span>
         </div>
         {!isOnWorkspacesPage && (
@@ -142,11 +156,11 @@ function WorkspaceSwitcher({ isCollapsed }: { isCollapsed: boolean }) {
               }}
               className={cn(
                 "flex items-center justify-between w-full px-3 py-2 text-sm hover:bg-accent transition-colors text-left",
-                ws.workspaceId === currentWorkspaceId && "bg-primary/5 text-primary"
+                (ws.workspaceId === currentWorkspaceId || ws.workspaceId === project?.workspaceId) && "bg-primary/5 text-primary"
               )}
             >
               <span className="truncate">{ws.name}</span>
-              {ws.workspaceId === currentWorkspaceId && (
+              {(ws.workspaceId === currentWorkspaceId || ws.workspaceId === project?.workspaceId) && (
                 <Check className="h-4 w-4 text-primary shrink-0" />
               )}
             </button>
@@ -167,6 +181,51 @@ function WorkspaceSwitcher({ isCollapsed }: { isCollapsed: boolean }) {
   );
 }
 
+// ──────── Back to Projects Button ────────
+function BackToProjectsButton({ isCollapsed, workspaceId }: { isCollapsed: boolean; workspaceId?: string }) {
+  const href = workspaceId ? `/workspaces/${workspaceId}` : "/workspaces";
+
+  if (isCollapsed) {
+    return (
+      <div className="px-3 mt-3">
+        <Link
+          href={href}
+          className="flex items-center justify-center p-2.5 rounded-xl text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all"
+          title="Back to Projects"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-3 mt-3">
+      <Link
+        href={href}
+        className="flex items-center gap-3 p-2.5 rounded-xl text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all group"
+      >
+        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+        <span className="text-sm font-medium">Back to Projects</span>
+      </Link>
+    </div>
+  );
+}
+
+// ──────── Project Name Header in Sidebar ────────
+function ProjectNameHeader({ isCollapsed, projectName }: { isCollapsed: boolean; projectName: string }) {
+  if (isCollapsed) return null;
+
+  return (
+    <div className="px-6 mt-4 mb-1">
+      <p className="text-xs font-bold text-foreground truncate uppercase tracking-wider">
+        {projectName}
+      </p>
+    </div>
+  );
+}
+
+// ──────── Main Sidebar ────────
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -178,6 +237,11 @@ export function Sidebar() {
   const popoverRef = useRef<HTMLDivElement>(null);
   const logout = useLogout();
   const { data: user } = useCurrentUser();
+
+  // ── Context Detection ──
+  const projectId = pathname.match(/\/projects\/([^/]+)/)?.[1] ?? null;
+  const isProjectContext = !!projectId;
+  const { data: project } = useProject(projectId ?? "");
 
   const displayName = user?.name || "User";
   const displayEmail = user?.email || "";
@@ -227,6 +291,15 @@ export function Sidebar() {
     };
   }, [router]);
 
+  // ── Determine which nav items to render ──
+  const navGroups = isProjectContext
+    ? getProjectNavGroups(projectId!)
+    : workspaceNavGroups;
+
+  const adminItems = isProjectContext
+    ? getProjectAdminNav(projectId!)
+    : workspaceAdminNav;
+
   return (
     <aside
       className={cn(
@@ -265,9 +338,26 @@ export function Sidebar() {
       {/* Workspace Switcher */}
       <WorkspaceSwitcher isCollapsed={isCollapsed} />
 
+      {/* Back to Projects (only in project context) */}
+      {isProjectContext && (
+        <>
+          <BackToProjectsButton
+            isCollapsed={isCollapsed}
+            workspaceId={project?.workspaceId}
+          />
+          {/* Divider */}
+          <div className="mx-3 my-2 h-px bg-border" />
+          {/* Project Name */}
+          <ProjectNameHeader
+            isCollapsed={isCollapsed}
+            projectName={project?.name || "Loading..."}
+          />
+        </>
+      )}
+
       {/* Navigation — Grouped */}
-      <nav className="flex-1 mt-4 px-3 space-y-1">
-        {getNavigationGroups(pathname.match(/\/projects\/([^/]+)/)?.[1] ?? null).map((group) => (
+      <nav className="flex-1 mt-2 px-3 space-y-1">
+        {navGroups.map((group) => (
           <div key={group.label}>
             {/* Section header */}
             <div className="pt-4 pb-2 px-3">
@@ -281,7 +371,11 @@ export function Sidebar() {
               </p>
             </div>
             {group.items.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+              // For "Overview" (exact match) vs others (prefix match)
+              const isExactMatch = item.name === "Overview" || item.name === "Projects";
+              const isActive = isExactMatch
+                ? pathname === item.href
+                : pathname === item.href || pathname.startsWith(item.href + "/");
               return (
                 <Link
                   key={item.href}
@@ -317,10 +411,10 @@ export function Sidebar() {
               isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
             )}
           >
-            Administration
+            {isProjectContext ? "Project Admin" : "Administration"}
           </p>
         </div>
-        {adminNav.map((item) => {
+        {adminItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
@@ -486,4 +580,3 @@ export function Sidebar() {
     </aside>
   );
 }
-

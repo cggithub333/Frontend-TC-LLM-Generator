@@ -382,15 +382,24 @@ export default function ProjectStoriesPage() {
   return (
     <div className="p-4 sm:p-8 space-y-6 max-w-5xl mx-auto w-full">
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search user stories..."
-          className="pl-12"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+      {/* Search + New Story */}
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search user stories..."
+            className="pl-12"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <Button
+          onClick={() => setCreateModalOpen(true)}
+          className="gap-2 shrink-0"
+        >
+          <Plus className="h-4 w-4" />
+          New Story
+        </Button>
       </div>
 
       {/* Stories List */}
@@ -541,12 +550,17 @@ export default function ProjectStoriesPage() {
                       <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                         Acceptance Criteria
                       </p>
-                      <Badge
-                        variant="outline"
-                        className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 font-semibold"
-                      >
-                        {stats.completed}/{stats.total} DONE
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 h-2 rounded-full bg-muted overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-emerald-500 transition-all duration-500 ease-out"
+                            style={{ width: stats.total > 0 ? `${(stats.completed / stats.total) * 100}%` : '0%' }}
+                          />
+                        </div>
+                        <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                          {stats.completed}/{stats.total} DONE
+                        </span>
+                      </div>
                     </div>
                     <div className="space-y-2">
                       {acs.map((criteria) => (
@@ -649,14 +663,7 @@ export default function ProjectStoriesPage() {
         </div>
       )}
 
-      {/* Floating + Button */}
-      <Button
-        size="icon"
-        onClick={() => setCreateModalOpen(true)}
-        className="fixed bottom-8 right-8 w-14 h-14 rounded-full shadow-lg shadow-primary/30 hover:scale-110 active:scale-95 transition-all z-50"
-      >
-        <Plus className="h-6 w-6" />
-      </Button>
+
 
       {/* Create Story Modal */}
       <CreateStoryModal

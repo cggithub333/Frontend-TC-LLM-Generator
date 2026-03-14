@@ -29,17 +29,10 @@ export default function ProjectLayout({
 
   const { data: project, isLoading, error } = useProject(projectId);
 
-  const navItems = [
-    { name: "Overview", href: `/projects/${projectId}` },
-    { name: "Stories", href: `/projects/${projectId}/stories` },
-    { name: "Test Plans", href: `/projects/${projectId}/test-plans` },
-    { name: "Team Management", href: `/projects/${projectId}/team` },
-  ];
-
   if (isLoading) {
     return (
       <div className="flex-1 p-8">
-        <div className="h-24 bg-muted animate-pulse rounded-xl mb-6" />
+        <div className="h-16 bg-muted animate-pulse rounded-xl mb-6" />
         <div className="h-64 bg-muted animate-pulse rounded-xl" />
       </div>
     );
@@ -60,10 +53,14 @@ export default function ProjectLayout({
     );
   }
 
+  // Check if on overview page (exact match to /projects/:id)
+  const isOverview = pathname === `/projects/${projectId}`;
+
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-muted/30">
-      {/* Project Global Header */}
-      <div className="border-b bg-card shrink-0">
+      {/* Simplified Project Header — no horizontal tabs */}
+      {isOverview && (
+        <div className="border-b bg-card shrink-0">
           <header className="flex items-center justify-between px-8 py-5">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
@@ -90,32 +87,8 @@ export default function ProjectLayout({
               </p>
             </div>
           </header>
-
-          {/* Navigation Tabs */}
-          <div className="px-8 mt-2">
-            <nav className="flex items-center gap-6 overflow-x-auto no-scrollbar">
-              {navItems.map((item) => {
-                const isActive =
-                  pathname === item.href ||
-                  (item.name !== "Overview" && pathname.startsWith(item.href));
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      "pb-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap",
-                      isActive
-                        ? "border-primary text-primary"
-                        : "border-transparent text-muted-foreground hover:text-foreground hover:border-border",
-                    )}
-                  >
-                    {item.name}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
         </div>
+      )}
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-y-auto">{children}</div>
