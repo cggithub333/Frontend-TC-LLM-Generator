@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -244,6 +244,10 @@ export default function ProjectStoriesPage() {
   const [deleteConfirmTestCase, setDeleteConfirmTestCase] = useState<TestCase | null>(null);
   const deleteTestCase = useDeleteTestCase();
 
+  // Soft Retention: flash animation state
+  const [flashStoryId, setFlashStoryId] = useState<string | null>(null);
+  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const stories = storiesData?.items || [];
 
   const toggleExpand = (id: string) => {
@@ -324,6 +328,57 @@ export default function ProjectStoriesPage() {
       story.description?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  /**
+   * Optimistic UI handler — called after TC is created successfully.
+   * Updates the local cache so the story stays visible with its new status.
+   */
+  const handleTestCaseCreated = (storyId: string | undefined) => {
+    if (!storyId) return;
+
+    // 1. Optimistic cache update — patch the story status in local list
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    queryClient.setQueriesData<any>(
+      { queryKey: ["stories", "project", projectId] },
+      (oldData: any) => {
+        if (!oldData?.items) return oldData;
+        return {
+          ...oldData,
+          items: oldData.items.map((story: UserStory) => {
+            if (story.userStoryId !== storyId) return story;
+            // Auto-transition DRAFT → READY
+            if (
+              story.status === "DRAFT" &&
+              story.acceptanceCriteria &&
+              story.acceptanceCriteria.length > 0
+            ) {
+              return { ...story, status: "READY" as const };
+            }
+            return story;
+          }),
+        };
+      },
+    );
+
+    // Also invalidate the per-AC test cases queries so expanded lists update
+    queryClient.invalidateQueries({ queryKey: ["testCases"] });
+
+    // 2. Keep the story expanded
+    setExpandedStories((prev) =>
+      prev.includes(storyId) ? prev : [...prev, storyId],
+    );
+
+    // 3. Flash animation
+    setFlashStoryId(storyId);
+    if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+    flashTimerRef.current = setTimeout(() => setFlashStoryId(null), 2200);
+
+    // 4. Toast
+    toast.success("Test case created successfully", {
+      description: "Story status auto-updated to READY.",
+      duration: 5000,
+    });
+  };
+
   return (
     <div className="p-4 sm:p-8 space-y-6 max-w-5xl mx-auto w-full">
 
@@ -353,7 +408,9 @@ export default function ProjectStoriesPage() {
           return (
             <div
               key={story.userStoryId}
-              className="bg-card border border-border rounded-xl overflow-hidden"
+              className={`bg-card border border-border rounded-xl overflow-hidden transition-all ${
+                flashStoryId === story.userStoryId ? "animate-flash-success" : ""
+              }`}
             >
               {/* Story Header */}
               <div className="p-4 flex items-start gap-3">
@@ -628,6 +685,9 @@ export default function ProjectStoriesPage() {
         userStory={testCaseDialogStory}
         defaultAcId={testCaseDialogAcId}
         editTestCase={editingTestCase}
+        onSuccess={() => {
+          handleTestCaseCreated(testCaseDialogStory?.userStoryId);
+        }}
       />
 
       {/* Delete Test Case Confirmation Dialog */}

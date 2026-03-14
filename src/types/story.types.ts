@@ -12,6 +12,7 @@ export interface AcceptanceCriteria {
   orderNo: number;
   completed: boolean;
   createdAt: string;
+  testCases?: import("./test-case.types").TestCase[];
 }
 
 export interface UserStory {

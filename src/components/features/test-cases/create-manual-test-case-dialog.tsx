@@ -31,7 +31,7 @@ interface CreateManualTestCaseDialogProps {
   userStory: UserStory | null;
   defaultAcId?: string | null;
   editTestCase?: TestCase | null;
-  onSuccess?: () => void;
+  onSuccess?: (createdTestCase?: TestCase) => void;
 }
 
 export function CreateManualTestCaseDialog({
@@ -92,6 +92,7 @@ export function CreateManualTestCaseDialog({
     if (!title.trim() || !selectedAcId) return;
 
     try {
+      let result: TestCase | undefined;
       if (isEditMode && editTestCase) {
         await updateTestCase({
           id: editTestCase.testCaseId,
@@ -101,7 +102,7 @@ export function CreateManualTestCaseDialog({
           expectedResult,
         });
       } else {
-        await createTestCase({
+        result = await createTestCase({
           userStoryId: userStory?.userStoryId,
           acceptanceCriteriaId: selectedAcId,
           title,
@@ -113,14 +114,17 @@ export function CreateManualTestCaseDialog({
         });
       }
 
-      onSuccess?.();
-
       if (closeAfterSave) {
         handleClose();
       } else {
         resetForm();
       }
-      toast.success(isEditMode ? "Test case updated successfully" : "Test case created successfully");
+
+      onSuccess?.(result);
+      // Only show generic toast if no onSuccess handler (caller provides richer toast)
+      if (!onSuccess) {
+        toast.success(isEditMode ? "Test case updated successfully" : "Test case created successfully");
+      }
     } catch (error) {
       toast.error(isEditMode ? "Failed to update test case" : "Failed to create test case");
     }

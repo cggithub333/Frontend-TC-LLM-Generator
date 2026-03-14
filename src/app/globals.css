@@ -199,3 +199,23 @@
 :root [data-sonner-toast] [data-description] {
   color: hsl(0 0% 40%) !important;
 }
+
+/* ── Flash animation for Optimistic UI / Soft Retention ── */
+@keyframes flash-success {
+  0% {
+    box-shadow: 0 0 0 0 hsla(152, 69%, 46%, 0.4);
+    border-color: hsl(152, 69%, 46%);
+  }
+  30% {
+    box-shadow: 0 0 12px 4px hsla(152, 69%, 46%, 0.15);
+    border-color: hsl(152, 69%, 46%);
+  }
+  100% {
+    box-shadow: none;
+    border-color: var(--border);
+  }
+}
+
+.animate-flash-success {
+  animation: flash-success 2s ease-out forwards;
+}

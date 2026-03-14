@@ -75,16 +75,14 @@ export function useTestCase(id: string) {
 }
 
 export function useCreateTestCase() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (input: CreateTestCaseInput) => {
-      const { data } = await axios.post<TestCase>("/test-cases", input);
-      return data;
+      const { data } = await axios.post<{ data: TestCase }>("/test-cases", input);
+      return data.data; // unwrap ApiResponse → TestCase
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["testCases"] });
-    },
+    // NOTE: No onSuccess / invalidateQueries here.
+    // The caller handles optimistic cache updates to prevent
+    // "Disappearing Act" when filters are active.
   });
 }
 
