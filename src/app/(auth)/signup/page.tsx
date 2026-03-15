@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,15 +15,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Logo } from "@/components/ui/logo";
+import { Calendar } from "@/components/ui/calendar";
 import {
-  Eye,
-  EyeOff,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Logo } from "@/components/ui/logo";
+import { AlertBanner } from "@/components/ui/alert-banner";
+import { PasswordInput } from "@/components/ui/password-input";
+import { StatusIcon } from "@/components/ui/status-icon";
+import {
+  CalendarIcon,
   CheckCircle2,
   Loader2,
-  AlertCircle,
   Check,
-  AlertTriangle,
   Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -61,14 +68,12 @@ function SignUpContent() {
   const [pageState, setPageState] = useState<PageState>("form");
 
   // Form state
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [gender, setGender] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(undefined);
   const [error, setError] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
@@ -133,12 +138,12 @@ function SignUpContent() {
     return () => clearInterval(timer);
   }, [expirySeconds, pageState]);
 
-  // Auto-redirect for verified state (1.5s)
+  // Auto-redirect for verified state (3.5s)
   useEffect(() => {
     if (pageState !== "verified") return;
     const timer = setTimeout(() => {
       router.push("/login");
-    }, 1500);
+    }, 3500);
     return () => clearTimeout(timer);
   }, [pageState, router]);
 
@@ -168,10 +173,9 @@ function SignUpContent() {
     }
 
     if (dateOfBirth) {
-      const dob = new Date(dateOfBirth);
       const minAge = new Date();
       minAge.setFullYear(minAge.getFullYear() - 13);
-      if (dob > minAge) {
+      if (dateOfBirth > minAge) {
         setError("You must be at least 13 years old to sign up.");
         return;
       }
@@ -184,7 +188,7 @@ function SignUpContent() {
         fullName,
         confirmPassword,
         gender: gender || undefined,
-        dateOfBirth: dateOfBirth || undefined,
+        dateOfBirth: dateOfBirth ? format(dateOfBirth, "yyyy-MM-dd") : undefined,
       },
       {
         onSuccess: handleSignupSuccess,
@@ -210,7 +214,7 @@ function SignUpContent() {
         fullName,
         confirmPassword,
         gender: gender || undefined,
-        dateOfBirth: dateOfBirth || undefined,
+        dateOfBirth: dateOfBirth ? format(dateOfBirth, "yyyy-MM-dd") : undefined,
       },
       {
         onSuccess: handleSignupSuccess,
@@ -233,17 +237,20 @@ function SignUpContent() {
   if (pageState === "verified") {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="max-w-md w-full text-center space-y-8">
+        <div className="max-w-md w-full text-center space-y-8 animate-fade-in-up">
           {/* Success Icon */}
           <div className="flex justify-center">
-            <div className="w-20 h-20 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center">
-              <CheckCircle2 className="w-10 h-10 text-emerald-500" />
-            </div>
+            <StatusIcon
+              icon={CheckCircle2}
+              variant="success"
+              size="lg"
+              className="animate-scale-in"
+            />
           </div>
 
           {/* Success Text */}
           <div className="space-y-4">
-            <h2 className="text-3xl font-bold">
+            <h2 className="text-2xl sm:text-3xl tracking-tight">
               Account Created Successfully!
             </h2>
             <p className="text-muted-foreground leading-relaxed">
@@ -275,19 +282,22 @@ function SignUpContent() {
           <Logo href={undefined} />
         </header>
 
-        <div className="text-center space-y-6">
+        <div className="text-center space-y-6 animate-fade-in-up">
           {/* Email icon */}
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-              <Mail className="w-8 h-8 text-primary" />
-            </div>
+            <StatusIcon
+              icon={Mail}
+              variant="primary"
+              size="md"
+              className="animate-gentle-pulse"
+            />
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">
+            <h2 className="text-2xl sm:text-3xl tracking-tight">
               Check your email
             </h2>
-            <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+            <p className="text-muted-foreground mt-2 text-sm sm:text-base leading-relaxed">
               We&apos;ve sent a verification email to{" "}
               <span className="font-semibold text-foreground">{email}</span>
             </p>
@@ -306,20 +316,14 @@ function SignUpContent() {
           )}
 
           {expirySeconds === 0 && pageState === "check-email" && (
-            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
-              <p className="text-sm text-amber-600 dark:text-amber-400">
-                Verification link has expired. Please resend the email.
-              </p>
-            </div>
+            <AlertBanner
+              message="Verification link has expired. Please resend the email."
+              variant="warning"
+            />
           )}
 
           {/* Error */}
-          {error && (
-            <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
+          {error && <AlertBanner message={error} />}
 
           {/* Cooldown / Resend */}
           <div className="space-y-3">
@@ -363,7 +367,7 @@ function SignUpContent() {
 
   // ─── SIGNUP FORM STATE (default) ───
   return (
-    <>
+    <div className="animate-stagger">
       {/* Mobile logo */}
       <header className="flex items-center gap-3 mb-10 lg:hidden">
         <Logo href={undefined} />
@@ -371,7 +375,7 @@ function SignUpContent() {
 
       {/* Title */}
       <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+        <h1 className="text-2xl sm:text-3xl tracking-tight">
           Create an account
         </h1>
         <p className="text-muted-foreground mt-2 text-sm sm:text-base leading-relaxed">
@@ -381,14 +385,11 @@ function SignUpContent() {
 
       {/* Error banner */}
       {error && (
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive dark:border-destructive/40 dark:bg-destructive/10">
-          {error.includes("expired") || error.includes("verification") ? (
-            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
-          ) : (
-            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
-          )}
-          <span>{error}</span>
-        </div>
+        <AlertBanner
+          message={error}
+          variant={error.includes("expired") || error.includes("verification") ? "warning" : "error"}
+          className="mb-6"
+        />
       )}
 
       {/* Form */}
@@ -443,25 +444,42 @@ function SignUpContent() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="dateOfBirth" className="text-sm font-medium">
+            <Label className="text-sm font-medium">
               Date of birth{" "}
               <span className="text-muted-foreground font-normal">
                 (optional)
               </span>
             </Label>
-            <Input
-              id="dateOfBirth"
-              name="dateOfBirth"
-              type="date"
-              disabled={isLoading}
-              className="h-11"
-              max={new Date().toISOString().split("T")[0]}
-              value={dateOfBirth}
-              onChange={(e) => {
-                setDateOfBirth(e.target.value);
-                clearError();
-              }}
-            />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  disabled={isLoading}
+                  className={cn(
+                    "h-11 w-full justify-start text-left font-normal",
+                    !dateOfBirth && "text-muted-foreground",
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateOfBirth ? format(dateOfBirth, "dd/MM/yyyy") : "Pick a date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dateOfBirth}
+                  onSelect={(day) => {
+                    setDateOfBirth(day);
+                    clearError();
+                  }}
+                  captionLayout="dropdown"
+                  fromYear={1920}
+                  toYear={new Date().getFullYear()}
+                  disabled={{ after: new Date() }}
+                  defaultMonth={dateOfBirth ?? new Date(2000, 0)}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 
@@ -492,35 +510,20 @@ function SignUpContent() {
           <Label htmlFor="password" className="text-sm font-medium">
             Password
           </Label>
-          <div className="relative">
-            <Input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Create a password"
-              required
-              autoComplete="new-password"
-              disabled={isLoading}
-              className="h-11 pr-11"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                clearError();
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-              tabIndex={-1}
-            >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </button>
-          </div>
+          <PasswordInput
+            id="password"
+            name="password"
+            placeholder="Create a password"
+            required
+            autoComplete="new-password"
+            disabled={isLoading}
+            className="h-11"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              clearError();
+            }}
+          />
 
           {/* Password strength indicator */}
           {password.length > 0 && (
@@ -530,13 +533,16 @@ function SignUpContent() {
                   <div
                     key={i}
                     className={cn(
-                      "h-1 flex-1 rounded-full transition-colors",
+                      "h-1 flex-1 rounded-full transition-all duration-300",
                       i < passwordStrength
-                        ? passwordStrength === PASSWORD_RULES.length
-                          ? "bg-emerald-500"
-                          : passwordStrength >= 2
-                            ? "bg-amber-500"
-                            : "bg-destructive"
+                        ? cn(
+                            "scale-y-150 origin-bottom",
+                            passwordStrength === PASSWORD_RULES.length
+                              ? "bg-success"
+                              : passwordStrength >= 2
+                                ? "bg-warning"
+                                : "bg-destructive"
+                          )
                         : "bg-border",
                     )}
                   />
@@ -551,7 +557,7 @@ function SignUpContent() {
                       className={cn(
                         "flex items-center gap-2 text-xs transition-colors",
                         passed
-                          ? "text-emerald-600 dark:text-emerald-400"
+                          ? "text-success"
                           : "text-muted-foreground",
                       )}
                     >
@@ -575,40 +581,25 @@ function SignUpContent() {
           <Label htmlFor="confirmPassword" className="text-sm font-medium">
             Confirm password
           </Label>
-          <div className="relative">
-            <Input
-              id="confirmPassword"
-              name="confirmPassword"
-              type={showConfirm ? "text" : "password"}
-              placeholder="Repeat your password"
-              required
-              autoComplete="new-password"
-              disabled={isLoading}
-              className={cn(
-                "h-11 pr-11",
-                confirmPassword.length > 0 &&
-                  password !== confirmPassword &&
-                  "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/30",
-              )}
-              value={confirmPassword}
-              onChange={(e) => {
-                setConfirmPassword(e.target.value);
-                clearError();
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-              tabIndex={-1}
-            >
-              {showConfirm ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </button>
-          </div>
+          <PasswordInput
+            id="confirmPassword"
+            name="confirmPassword"
+            placeholder="Repeat your password"
+            required
+            autoComplete="new-password"
+            disabled={isLoading}
+            className={cn(
+              "h-11",
+              confirmPassword.length > 0 &&
+                password !== confirmPassword &&
+                "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/30",
+            )}
+            value={confirmPassword}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              clearError();
+            }}
+          />
           {confirmPassword.length > 0 && password !== confirmPassword && (
             <p className="text-xs text-destructive">Passwords do not match.</p>
           )}
@@ -673,6 +664,6 @@ function SignUpContent() {
           Sign in
         </Link>
       </p>
-    </>
+    </div>
   );
 }

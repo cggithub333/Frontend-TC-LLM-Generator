@@ -46,6 +46,14 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  /* Semantic colors */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
 }
 
 :root {
@@ -56,7 +64,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.558 0.118 175); /* #0d9488 - Teal-600 */
+  --primary: oklch(0.558 0.118 175);        /* Teal-600 */
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -68,6 +76,16 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+
+  /* Semantic colors */
+  --success: oklch(0.586 0.156 152);
+  --success-foreground: oklch(0.985 0 0);
+  --warning: oklch(0.750 0.183 55);
+  --warning-foreground: oklch(0.145 0 0);
+  --info: oklch(0.623 0.214 259);
+  --info-foreground: oklch(0.985 0 0);
+
+  /* Chart + Sidebar */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -90,8 +108,11 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+
+  /* FIX: Primary keeps teal hue in dark mode */
+  --primary: oklch(0.720 0.100 175);        /* Teal-400 — brighter for dark bg */
+  --primary-foreground: oklch(0.145 0 0);
+
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -102,11 +123,23 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
+
+  /* Semantic colors for dark mode */
+  --success: oklch(0.696 0.140 152);
+  --success-foreground: oklch(0.145 0 0);
+  --warning: oklch(0.820 0.160 75);
+  --warning-foreground: oklch(0.145 0 0);
+  --info: oklch(0.720 0.180 259);
+  --info-foreground: oklch(0.145 0 0);
+
+  /* Chart */
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
+
+  /* Sidebar */
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.558 0.118 175);
@@ -124,9 +157,10 @@
   body {
     @apply bg-background text-foreground;
   }
-  /* Distinctive heading typography — DM Serif Display */
+  /* DM Serif Display only has weight 400 — prevent faux-bold */
   h1, h2 {
     font-family: var(--font-heading);
+    font-weight: 400;
   }
 }
 
@@ -141,6 +175,46 @@
   }
 }
 
+/* ── React Day Picker dropdown caption fix ── */
+
+/* Hide the redundant span label when dropdown mode is active */
+.rdp-month_caption .rdp-caption_label {
+  display: none !important;
+}
+
+/* Style the native <select> dropdowns */
+.rdp-dropdown {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 2px 20px 2px 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  transition: border-color 0.15s ease;
+}
+
+.rdp-dropdown:hover {
+  border-color: var(--ring);
+}
+
+.rdp-dropdown:focus {
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.2);
+}
+
+.rdp-dropdown option {
+  background: var(--popover);
+  color: var(--foreground);
+}
+
 /* ── Sonner toast custom styles ── */
 [data-sonner-toaster] [data-sonner-toast] {
   --normal-bg: hsl(0 0% 13% / 0.85);
@@ -149,36 +223,36 @@
   font-family: 'Inter', sans-serif;
 }
 
-/* Success toast — emerald accent */
+/* Success toast */
 [data-sonner-toast][data-type="success"] {
-  border-left: 3px solid hsl(152 69% 46%) !important;
+  border-left: 3px solid var(--success) !important;
 }
 [data-sonner-toast][data-type="success"] [data-icon] svg {
-  color: hsl(152 69% 46%);
+  color: var(--success);
 }
 
-/* Error toast — rose accent */
+/* Error toast */
 [data-sonner-toast][data-type="error"] {
-  border-left: 3px solid hsl(0 72% 51%) !important;
+  border-left: 3px solid var(--destructive) !important;
 }
 [data-sonner-toast][data-type="error"] [data-icon] svg {
-  color: hsl(0 72% 51%);
+  color: var(--destructive);
 }
 
-/* Info toast — blue accent */
+/* Info toast */
 [data-sonner-toast][data-type="info"] {
-  border-left: 3px solid hsl(217 91% 60%) !important;
+  border-left: 3px solid var(--info) !important;
 }
 [data-sonner-toast][data-type="info"] [data-icon] svg {
-  color: hsl(217 91% 60%);
+  color: var(--info);
 }
 
-/* Warning toast — amber accent */
+/* Warning toast */
 [data-sonner-toast][data-type="warning"] {
-  border-left: 3px solid hsl(38 92% 50%) !important;
+  border-left: 3px solid var(--warning) !important;
 }
 [data-sonner-toast][data-type="warning"] [data-icon] svg {
-  color: hsl(38 92% 50%);
+  color: var(--warning);
 }
 
 /* Toast description text */
@@ -209,15 +283,15 @@
   color: hsl(0 0% 40%) !important;
 }
 
-/* ── Flash animation for Optimistic UI / Soft Retention ── */
+/* ── Flash animation for Optimistic UI ── */
 @keyframes flash-success {
   0% {
-    box-shadow: 0 0 0 0 hsla(152, 69%, 46%, 0.4);
-    border-color: hsl(152, 69%, 46%);
+    box-shadow: 0 0 0 0 oklch(0.586 0.156 152 / 0.4);
+    border-color: var(--success);
   }
   30% {
-    box-shadow: 0 0 12px 4px hsla(152, 69%, 46%, 0.15);
-    border-color: hsl(152, 69%, 46%);
+    box-shadow: 0 0 12px 4px oklch(0.586 0.156 152 / 0.15);
+    border-color: var(--success);
   }
   100% {
     box-shadow: none;
@@ -227,4 +301,90 @@
 
 .animate-flash-success {
   animation: flash-success 2s ease-out forwards;
+}
+
+/* ── Auth page animations ── */
+
+/* Fade-in on mount */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 400ms ease-out both;
+}
+
+/* Staggered children */
+.animate-stagger > * {
+  animation: fade-in-up 400ms ease-out both;
+}
+.animate-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.animate-stagger > *:nth-child(2) { animation-delay: 60ms; }
+.animate-stagger > *:nth-child(3) { animation-delay: 120ms; }
+.animate-stagger > *:nth-child(4) { animation-delay: 180ms; }
+.animate-stagger > *:nth-child(5) { animation-delay: 240ms; }
+.animate-stagger > *:nth-child(6) { animation-delay: 300ms; }
+.animate-stagger > *:nth-child(7) { animation-delay: 360ms; }
+
+/* Gentle pulse for confirmation states */
+@keyframes gentle-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.animate-gentle-pulse {
+  animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+/* Scale-in for success icons */
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 500ms cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+/* Checkmark draw animation */
+@keyframes draw-check {
+  from { stroke-dashoffset: 24; }
+  to { stroke-dashoffset: 0; }
+}
+
+.animate-draw-check {
+  stroke-dasharray: 24;
+  animation: draw-check 400ms ease-out 300ms both;
+}
+
+/* Slide-down for mobile menu */
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    max-height: 300px;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-down {
+  animation: slide-down 200ms ease-out both;
+  overflow: hidden;
 }

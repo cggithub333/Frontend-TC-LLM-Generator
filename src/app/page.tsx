@@ -148,7 +148,7 @@ export default function HomePage() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="border-t border-border bg-background px-6 pb-6 pt-4 md:hidden">
+          <div className="border-t border-border bg-background px-6 pb-6 pt-4 md:hidden animate-slide-down">
             <div className="flex flex-col gap-4">
               <a
                 href="#features"
@@ -185,7 +185,7 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-7xl px-6 pb-24 pt-24 sm:pt-32 lg:pt-40">
           <div className="mx-auto max-w-3xl text-center">
             <AnimatedSection delay={100}>
-              <h1 className="font-heading text-4xl font-extrabold leading-[1.15] tracking-tight sm:text-5xl lg:text-6xl">
+              <h1 className="font-heading text-4xl leading-[1.15] tracking-tight sm:text-5xl lg:text-6xl">
                 Test cases from user stories,{" "}
                 <span className="text-primary">in seconds.</span>
               </h1>
@@ -217,13 +217,13 @@ export default function HomePage() {
             delay={400}
             className="relative mx-auto mt-16 max-w-5xl"
           >
-            <div className="rounded-2xl border border-border bg-card p-2 shadow-2xl shadow-black/5 dark:shadow-black/20">
+            <div className="rounded-xl border border-border bg-card p-2 shadow-2xl shadow-black/5 dark:shadow-black/20">
               <div className="overflow-hidden rounded-xl border border-border">
                 {/* Browser bar */}
                 <div className="flex items-center gap-2 border-b border-border bg-muted/50 px-4 py-3">
-                  <div className="h-3 w-3 rounded-full bg-red-400" />
-                  <div className="h-3 w-3 rounded-full bg-yellow-400" />
-                  <div className="h-3 w-3 rounded-full bg-green-400" />
+                  <div className="h-3 w-3 rounded-full bg-destructive/60" />
+                  <div className="h-3 w-3 rounded-full bg-warning/60" />
+                  <div className="h-3 w-3 rounded-full bg-success/60" />
                   <div className="ml-3 flex h-7 flex-1 items-center rounded-md bg-background px-3 text-xs text-muted-foreground">
                     quraex.com/workspaces
                   </div>
@@ -251,7 +251,7 @@ export default function HomePage() {
               <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
                 Features
               </p>
-              <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2 className="mt-3 text-3xl tracking-tight sm:text-4xl">
                 Everything You Need for Modern QA
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
@@ -264,7 +264,7 @@ export default function HomePage() {
           <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((feature, idx) => (
               <AnimatedSection key={feature.title} delay={idx * 100}>
-                <div className="group h-full rounded-2xl border border-border bg-card p-6 transition-all hover:border-border/80 hover:shadow-md">
+                <div className="group h-full rounded-xl border border-border bg-card p-6 transition-all hover:border-border/80 hover:shadow-md">
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                     <feature.icon className="h-6 w-6" />
                   </div>
@@ -290,7 +290,7 @@ export default function HomePage() {
               <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
                 How It Works
               </p>
-              <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2 className="mt-3 text-3xl tracking-tight sm:text-4xl">
                 Three Steps to Better Testing
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
@@ -307,8 +307,8 @@ export default function HomePage() {
             <div className="grid gap-8 lg:grid-cols-3">
               {steps.map((item, idx) => (
                 <AnimatedSection key={item.step} delay={idx * 150}>
-                  <div className="relative rounded-2xl border border-border bg-card p-8 text-center transition-all hover:shadow-md">
-                    <div className="relative z-10 mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+                  <div className="relative rounded-xl border border-border bg-card p-8 text-center transition-all hover:shadow-md">
+                    <div className="relative z-10 mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-primary text-primary-foreground">
                       <item.icon className="h-7 w-7" />
                     </div>
                     <span className="mb-2 inline-block text-xs font-bold uppercase tracking-widest text-muted-foreground">

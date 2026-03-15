@@ -26,7 +26,7 @@ export default function AuthLayout({
       </div>
 
       {/* Left branding panel — streamlined */}
-      <div className="hidden lg:flex lg:w-[420px] xl:w-[480px] shrink-0 relative overflow-hidden bg-primary dark:bg-primary/10">
+      <div className="hidden lg:flex lg:w-[420px] xl:w-[480px] shrink-0 relative overflow-hidden bg-primary dark:bg-primary">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.12)_0%,_transparent_60%)]" />
 
         <div className="relative z-10 flex flex-col justify-between p-10 xl:p-14 w-full">
@@ -43,7 +43,7 @@ export default function AuthLayout({
 
           <div className="space-y-8">
             <div>
-              <h2 className="text-3xl xl:text-4xl font-bold text-white leading-tight">
+              <h2 className="text-3xl xl:text-4xl text-white leading-tight">
                 Ship with
                 <br />
                 confidence.
