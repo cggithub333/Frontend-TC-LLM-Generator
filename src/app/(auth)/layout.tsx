@@ -4,9 +4,9 @@ import Link from "next/link";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/ui/logo";
 import {
   ArrowLeft,
-  CheckCircle2,
   Quote,
 } from "lucide-react";
 
@@ -18,7 +18,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID} locale="en">
     <div className="bg-background min-h-screen flex transition-colors duration-300">
       {/* Theme toggle */}
       <div className="fixed top-5 right-5 z-50">
@@ -31,14 +31,7 @@ export default function AuthLayout({
 
         <div className="relative z-10 flex flex-col justify-between p-10 xl:p-14 w-full">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                <CheckCircle2 className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-lg font-bold text-white tracking-tight">
-                QA Artifacts
-              </span>
-            </Link>
+            <Logo variant="white" />
             <Link
               href="/"
               className="flex items-center gap-1.5 text-sm font-medium text-white/50 hover:text-white transition-colors"
@@ -60,11 +53,11 @@ export default function AuthLayout({
               </p>
             </div>
 
-            {/* Social proof — more useful than generic features */}
+            {/* Social proof */}
             <div className="rounded-xl bg-white/10 backdrop-blur-sm p-5 space-y-3">
               <Quote className="h-5 w-5 text-white/50" />
               <p className="text-sm text-white/90 leading-relaxed italic">
-                &ldquo;QA Artifacts cut our test planning time by 60%. The AI-generated test cases catch edge cases we used to miss.&rdquo;
+                &ldquo;QuraEx cut our test planning time by 60%. The AI-generated test cases catch edge cases we used to miss.&rdquo;
               </p>
               <div className="flex items-center gap-3 pt-1">
                 <div className="size-8 rounded-full bg-white/20 flex items-center justify-center text-xs font-semibold text-white">
@@ -79,7 +72,7 @@ export default function AuthLayout({
           </div>
 
           <p className="text-xs text-white/40 font-medium">
-            &copy; 2026 QA Artifacts Inc.
+            &copy; 2026 QuraEx.
           </p>
         </div>
       </div>
@@ -105,4 +98,3 @@ export default function AuthLayout({
     </GoogleOAuthProvider>
   );
 }
-

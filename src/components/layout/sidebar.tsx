@@ -269,7 +269,7 @@ export function Sidebar() {
             isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
           )}
         >
-          QA Artifacts
+          QuraEx
         </span>
       </div>
 

@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Logo } from "@/components/ui/logo";
 import {
   Eye,
   EyeOff,
@@ -22,6 +23,7 @@ import {
   AlertCircle,
   Check,
   AlertTriangle,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRegister } from "@/hooks/use-auth";
@@ -73,9 +75,6 @@ function SignUpContent() {
   // Post-submit state
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const [expirySeconds, setExpirySeconds] = useState(0);
-
-  // Verified success state
-  const [redirectCountdown, setRedirectCountdown] = useState(5);
 
   const register = useRegister();
   const isLoading = register.isPending;
@@ -134,20 +133,13 @@ function SignUpContent() {
     return () => clearInterval(timer);
   }, [expirySeconds, pageState]);
 
-  // Redirect countdown for verified state
+  // Auto-redirect for verified state (1.5s)
   useEffect(() => {
     if (pageState !== "verified") return;
-    const timer = setInterval(() => {
-      setRedirectCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          router.push("/login");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
+    const timer = setTimeout(() => {
+      router.push("/login");
+    }, 1500);
+    return () => clearTimeout(timer);
   }, [pageState, router]);
 
   const handleSignupSuccess = useCallback((data: SignupResponse) => {
@@ -244,20 +236,8 @@ function SignUpContent() {
         <div className="max-w-md w-full text-center space-y-8">
           {/* Success Icon */}
           <div className="flex justify-center">
-            <div className="w-20 h-20 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center animate-pulse">
-              <svg
-                className="w-10 h-10 text-emerald-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M5 13l4 4L19 7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                />
-              </svg>
+            <div className="w-20 h-20 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center">
+              <CheckCircle2 className="w-10 h-10 text-emerald-500" />
             </div>
           </div>
 
@@ -267,27 +247,9 @@ function SignUpContent() {
               Account Created Successfully!
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              Your email has been verified and your account is now active. You
-              can start using QA Artifacts right away.
+              Your email has been verified and your account is now active.
+              Redirecting to login&hellip;
             </p>
-          </div>
-
-          {/* Redirection & Countdown */}
-          <div className="bg-muted/50 border border-border rounded-2xl p-6 space-y-4">
-            <p className="text-sm text-muted-foreground">
-              You will be redirected to the login page in{" "}
-              <span className="text-foreground font-bold text-lg">
-                {redirectCountdown}
-              </span>{" "}
-              seconds...
-            </p>
-            {/* Visual Countdown Progress */}
-            <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-foreground transition-all duration-1000 ease-linear rounded-full"
-                style={{ width: `${(redirectCountdown / 5) * 100}%` }}
-              />
-            </div>
           </div>
 
           {/* Manual Navigation */}
@@ -296,7 +258,7 @@ function SignUpContent() {
               href="/login"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
             >
-              Didn&apos;t get redirected? Click here to login manually.
+              Click here to login manually
             </Link>
           </div>
         </div>
@@ -310,29 +272,14 @@ function SignUpContent() {
       <>
         {/* Mobile logo */}
         <header className="flex items-center gap-3 mb-10 lg:hidden">
-          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
-            <CheckCircle2 className="h-5 w-5" />
-          </div>
-          <span className="text-xl font-bold tracking-tight">QA Artifacts</span>
+          <Logo href={undefined} />
         </header>
 
         <div className="text-center space-y-6">
           {/* Email icon */}
           <div className="flex justify-center">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-              <svg
-                className="w-8 h-8 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
+              <Mail className="w-8 h-8 text-primary" />
             </div>
           </div>
 
@@ -377,46 +324,9 @@ function SignUpContent() {
           {/* Cooldown / Resend */}
           <div className="space-y-3">
             {cooldownSeconds > 0 ? (
-              <div className="flex flex-col items-center gap-3">
-                {/* SVG circular countdown */}
-                <svg className="w-16 h-16" viewBox="0 0 100 100">
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="45"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    className="text-muted opacity-20"
-                  />
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="45"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeDasharray={2 * Math.PI * 45}
-                    strokeDashoffset={
-                      2 * Math.PI * 45 * (1 - cooldownSeconds / 60)
-                    }
-                    strokeLinecap="round"
-                    className="text-primary transition-all duration-1000 ease-linear"
-                    transform="rotate(-90 50 50)"
-                  />
-                  <text
-                    x="50"
-                    y="55"
-                    textAnchor="middle"
-                    className="text-2xl font-bold fill-current"
-                  >
-                    {cooldownSeconds}
-                  </text>
-                </svg>
-                <p className="text-sm text-muted-foreground">
-                  You can resend in {cooldownSeconds}s
-                </p>
-              </div>
+              <p className="text-sm text-muted-foreground">
+                Resend in <span className="font-mono font-bold text-foreground">{cooldownSeconds}s</span>
+              </p>
             ) : (
               <Button
                 onClick={handleResend}
@@ -456,10 +366,7 @@ function SignUpContent() {
     <>
       {/* Mobile logo */}
       <header className="flex items-center gap-3 mb-10 lg:hidden">
-        <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
-          <CheckCircle2 className="h-5 w-5" />
-        </div>
-        <span className="text-xl font-bold tracking-tight">QA Artifacts</span>
+        <Logo href={undefined} />
       </header>
 
       {/* Title */}

@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "QA Artifacts - AI-Powered Testing Platform",
-  description: "Professional QA Management Platform with AI-powered test case generation",
+  title: "QuraEx - AI-Powered QA Platform",
+  description: "Generate structured test cases from user stories in seconds. QuraEx helps QA teams ship quality software with confidence.",
 };
 
 export default function RootLayout({

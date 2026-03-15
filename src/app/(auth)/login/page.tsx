@@ -7,10 +7,10 @@ import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Logo } from "@/components/ui/logo";
 import {
   Eye,
   EyeOff,
-  CheckCircle2,
   Loader2,
   AlertCircle,
 } from "lucide-react";
@@ -63,10 +63,7 @@ export default function LoginPage() {
     <>
       {/* Mobile logo */}
       <header className="flex items-center gap-3 mb-10 lg:hidden">
-        <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
-          <CheckCircle2 className="h-5 w-5" />
-        </div>
-        <span className="text-xl font-bold tracking-tight">QA Artifacts</span>
+        <Logo href={undefined} />
       </header>
 
       {/* Title */}
@@ -75,7 +72,7 @@ export default function LoginPage() {
           Welcome back
         </h1>
         <p className="text-muted-foreground mt-2 text-sm sm:text-base leading-relaxed">
-          Enter your credentials to access your workspace.
+          Sign in to your account.
         </p>
       </div>
 
@@ -196,7 +193,6 @@ export default function LoginPage() {
             onSuccess={handleGoogleSuccess}
             onError={() => setError("Google login failed. Please try again.")}
             size="large"
-            width={420}
             theme="outline"
             text="signin_with"
           />

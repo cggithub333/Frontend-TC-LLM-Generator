@@ -35,7 +35,7 @@ const settingsTabs = [
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("general");
   const [settings, setSettings] = useState({
-    workspaceName: "QA Artifacts Production",
+    workspaceName: "QuraEx Production",
     workspaceUrl: "acme-corp",
     timezone: "pst",
     language: "en-us",
@@ -141,7 +141,7 @@ export default function SettingsPage() {
                         <Label>Workspace URL</Label>
                         <div className="flex rounded-lg shadow-sm">
                           <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 bg-muted text-muted-foreground text-sm">
-                            app.qa-artifacts.com/
+                            app.quraex.com/
                           </span>
                           <Input
                             className="rounded-l-none"

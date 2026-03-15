@@ -105,7 +105,7 @@ export function AdminSidebar() {
           )}
         >
           <span className="font-bold text-lg tracking-tight block leading-tight">
-            QA Artifacts
+            QuraEx
           </span>
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             Super Admin Panel

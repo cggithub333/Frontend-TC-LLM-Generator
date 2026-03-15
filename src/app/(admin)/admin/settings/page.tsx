@@ -25,7 +25,7 @@ import {
 
 export default function AdminSettingsPage() {
   // General settings
-  const [platformName, setPlatformName] = useState("QA Artifacts");
+  const [platformName, setPlatformName] = useState("QuraEx");
   const [platformDesc, setPlatformDesc] = useState(
     "AI-powered test case generation platform for QA teams"
   );
