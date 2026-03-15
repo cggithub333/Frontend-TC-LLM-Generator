@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 # ==========================================
 # Stage 1: Install dependencies
 # ==========================================
@@ -9,7 +10,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Install production + dev dependencies (needed for build)
-RUN npm ci
+# BuildKit cache mount keeps the npm HTTP cache between builds
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --prefer-offline
 
 # ==========================================
 # Stage 2: Build the Next.js application
