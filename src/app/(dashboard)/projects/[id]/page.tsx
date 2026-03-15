@@ -10,6 +10,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { UserPlus, Layers, AlertCircle, FileText, Plus, Folder } from "lucide-react";
+import { getStatusStyles } from "@/lib/status-styles";
 import { useProject } from "@/hooks/use-projects";
 import { useStoriesByProject } from "@/hooks/use-stories";
 import { useTestSuitesByProject } from "@/hooks/use-test-suites";
@@ -84,10 +85,10 @@ export default function ProjectDetailPage() {
           {/* Test Suites Card */}
           <div className="xl:col-span-1 bg-card rounded-xl border shadow-sm p-5 flex flex-col">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-lg">Test Suites</h3>
+              <h3 className="font-semibold text-lg">Test Suites</h3>
               <Link
                 href="/suites"
-                className="text-primary text-sm font-bold hover:underline"
+                className="text-primary text-sm font-medium hover:underline"
               >
                 View All
               </Link>
@@ -123,7 +124,7 @@ export default function ProjectDetailPage() {
                         <Layers className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold">{suite.name}</p>
+                        <p className="text-sm font-medium">{suite.name}</p>
                         <p className="text-xs text-muted-foreground">
                           {suite.description || "No description"}
                         </p>
@@ -135,14 +136,14 @@ export default function ProjectDetailPage() {
             </div>
           </div>
 
-          {/* Current Test Plan Card */}
-          <div className="xl:col-span-2 bg-card rounded-xl border shadow-sm p-6 flex flex-col justify-between">
+          {/* Current Test Plan Card — visually prominent */}
+          <div className="xl:col-span-2 bg-card rounded-xl border border-l-4 border-l-primary shadow-sm p-6 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-6">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-bold text-lg">Current Test Plan</h3>
+                  <h3 className="font-semibold text-lg">Current Test Plan</h3>
                   {currentPlan && (
-                    <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-[10px] font-bold px-2 py-0.5">
+                    <Badge className={cn(getStatusStyles(currentPlan.status), "text-[10px] font-semibold px-2 py-0.5")}>
                       {currentPlan.status?.toUpperCase() ?? "ACTIVE"}
                     </Badge>
                   )}
@@ -174,11 +175,11 @@ export default function ProjectDetailPage() {
           {/* Recent User Stories Card */}
           <div className="xl:col-span-2 bg-card rounded-xl border shadow-sm overflow-hidden flex flex-col">
             <div className="p-5 border-b flex justify-between items-center">
-              <h3 className="font-bold text-lg">Recent User Stories</h3>
+              <h3 className="font-semibold text-lg">Recent User Stories</h3>
               <div className="flex gap-2">
                 <Link
                   href={`/projects/${projectId}/stories`}
-                  className="text-primary text-sm font-bold hover:underline"
+                  className="text-primary text-sm font-medium hover:underline"
                 >
                   View All
                 </Link>
@@ -231,13 +232,8 @@ export default function ProjectDetailPage() {
                           <Badge
                             variant="outline"
                             className={cn(
-                              "text-xs font-bold",
-                              story.status === "DONE" &&
-                                "bg-green-50 text-green-700 dark:bg-green-900/20",
-                              story.status === "IN_PROGRESS" &&
-                                "bg-blue-50 text-blue-700 dark:bg-blue-900/20",
-                              story.status === "DRAFT" &&
-                                "bg-slate-50 text-slate-600 dark:bg-slate-800",
+                              "text-xs font-semibold",
+                              getStatusStyles(story.status),
                             )}
                           >
                             {story.status}
@@ -257,7 +253,7 @@ export default function ProjectDetailPage() {
           {/* Project Team Card */}
           <div className="xl:col-span-1 bg-card rounded-xl border shadow-sm p-5 flex flex-col">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-lg">Project Team</h3>
+              <h3 className="font-semibold text-lg">Project Team</h3>
               <button className="size-8 rounded-full bg-primary/10 text-primary hover:bg-primary/20 flex items-center justify-center transition-colors">
                 <UserPlus className="h-4 w-4" />
               </button>
@@ -289,15 +285,12 @@ export default function ProjectDetailPage() {
                     className="flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="size-10 rounded-full flex items-center justify-center font-bold text-sm ring-2 ring-white dark:ring-gray-800 bg-primary/10 text-primary">
+                      <div className="size-10 rounded-full flex items-center justify-center font-semibold text-sm ring-2 ring-white dark:ring-gray-800 bg-primary/10 text-primary">
                         {member.userFullName?.slice(0, 2).toUpperCase() ?? "??"}
                       </div>
                       <div>
-                        <p className="text-sm font-bold">
+                        <p className="text-sm font-medium">
                           {member.userFullName}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {member.role}
                         </p>
                       </div>
                     </div>

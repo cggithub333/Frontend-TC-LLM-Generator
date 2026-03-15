@@ -7,30 +7,10 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
   CheckCircle2,
-  ShieldCheck,
-  Sparkles,
-  BarChart3,
+  Quote,
 } from "lucide-react";
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
-
-const FEATURES = [
-  {
-    icon: Sparkles,
-    title: "AI-Powered Generation",
-    description: "Auto-generate test cases from user stories with LLM",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Quality Assurance",
-    description: "Comprehensive test plans, suites, and coverage tracking",
-  },
-  {
-    icon: BarChart3,
-    title: "Insights & Reports",
-    description: "Visualize QA metrics and team performance at a glance",
-  },
-];
 
 export default function AuthLayout({
   children,
@@ -45,19 +25,9 @@ export default function AuthLayout({
         <ModeToggle />
       </div>
 
-      {/* Left branding panel */}
-      <div className="hidden lg:flex lg:w-[480px] xl:w-[560px] shrink-0 relative overflow-hidden bg-primary dark:bg-primary/10">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.15)_0%,_transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(0,0,0,0.1)_0%,_transparent_60%)]" />
-
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
-            backgroundSize: "48px 48px",
-          }}
-        />
+      {/* Left branding panel — streamlined */}
+      <div className="hidden lg:flex lg:w-[420px] xl:w-[480px] shrink-0 relative overflow-hidden bg-primary dark:bg-primary/10">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.12)_0%,_transparent_60%)]" />
 
         <div className="relative z-10 flex flex-col justify-between p-10 xl:p-14 w-full">
           <div className="flex items-center justify-between">
@@ -78,7 +48,7 @@ export default function AuthLayout({
             </Link>
           </div>
 
-          <div className="space-y-10">
+          <div className="space-y-8">
             <div>
               <h2 className="text-3xl xl:text-4xl font-bold text-white leading-tight">
                 Ship with
@@ -86,27 +56,25 @@ export default function AuthLayout({
                 confidence.
               </h2>
               <p className="mt-4 text-white/70 text-base leading-relaxed max-w-sm">
-                AI-driven test case generation that transforms your user stories
-                into thorough quality assurance coverage.
+                Transform user stories into comprehensive test coverage — automatically.
               </p>
             </div>
 
-            <div className="space-y-5">
-              {FEATURES.map((f) => (
-                <div key={f.title} className="flex gap-4 items-start">
-                  <div className="w-9 h-9 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0 mt-0.5">
-                    <f.icon className="h-4.5 w-4.5 text-white/90" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-white">
-                      {f.title}
-                    </p>
-                    <p className="text-sm text-white/60 leading-relaxed">
-                      {f.description}
-                    </p>
-                  </div>
+            {/* Social proof — more useful than generic features */}
+            <div className="rounded-xl bg-white/10 backdrop-blur-sm p-5 space-y-3">
+              <Quote className="h-5 w-5 text-white/50" />
+              <p className="text-sm text-white/90 leading-relaxed italic">
+                &ldquo;QA Artifacts cut our test planning time by 60%. The AI-generated test cases catch edge cases we used to miss.&rdquo;
+              </p>
+              <div className="flex items-center gap-3 pt-1">
+                <div className="size-8 rounded-full bg-white/20 flex items-center justify-center text-xs font-semibold text-white">
+                  TN
                 </div>
-              ))}
+                <div>
+                  <p className="text-xs font-medium text-white">Thanh Nguyen</p>
+                  <p className="text-xs text-white/50">QA Lead, FPT Software</p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -137,3 +105,4 @@ export default function AuthLayout({
     </GoogleOAuthProvider>
   );
 }
+

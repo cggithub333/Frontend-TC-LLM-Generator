@@ -248,7 +248,7 @@ export function Sidebar() {
       {/* Toggle Button */}
       <button
         onClick={toggleSidebar}
-        className="absolute -right-3 top-7 z-50 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card shadow-md hover:bg-accent transition-colors"
+        className="absolute -right-4 top-6 z-50 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card shadow-md hover:bg-accent transition-colors"
         aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         {isCollapsed ? (

@@ -18,11 +18,9 @@ import {
   Search,
   Plus,
   LayoutDashboard,
-  ArrowUpDown,
-  SlidersHorizontal,
-  Sparkles,
   ArrowRight,
   X,
+  Lightbulb,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,8 +44,6 @@ interface EntityEvent {
 }
 
 type SortKey = "name" | "updatedAt" | "createdAt";
-type SortDir = "asc" | "desc";
-type RoleFilter = "all" | "owner" | "member";
 
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: "updatedAt", label: "Last Updated" },
@@ -64,8 +60,6 @@ export default function WorkspacesPage() {
     null,
   );
   const [sortKey, setSortKey] = useState<SortKey>("updatedAt");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
 
   const { data: user } = useCurrentUser();
@@ -101,14 +95,6 @@ export default function WorkspacesPage() {
 
     let result = [...workspaces];
 
-    // Role filter
-    if (roleFilter !== "all" && user) {
-      result = result.filter((ws) => {
-        const isOwner = ws.ownerUserId === user.id;
-        return roleFilter === "owner" ? isOwner : !isOwner;
-      });
-    }
-
     // Search filter
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -119,7 +105,7 @@ export default function WorkspacesPage() {
       );
     }
 
-    // Sort
+    // Sort (descending by default)
     result.sort((a, b) => {
       let cmp = 0;
       if (sortKey === "name") {
@@ -129,11 +115,11 @@ export default function WorkspacesPage() {
       } else if (sortKey === "createdAt") {
         cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       }
-      return sortDir === "desc" ? -cmp : cmp;
+      return sortKey === "name" ? cmp : -cmp;
     });
 
     return result;
-  }, [workspaces, searchQuery, sortKey, sortDir, roleFilter, user]);
+  }, [workspaces, searchQuery, sortKey]);
 
   const handleEdit = useCallback((workspace: Workspace) => {
     setSelectedWorkspace(workspace);
@@ -149,15 +135,6 @@ export default function WorkspacesPage() {
     refetch();
   }, [refetch]);
 
-  const toggleSortDir = () => {
-    setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-  };
-
-  // Active filter count for indicator
-  const activeFilterCount =
-    (searchQuery.trim() ? 1 : 0) +
-    (roleFilter !== "all" ? 1 : 0) +
-    (sortKey !== "updatedAt" ? 1 : 0);
 
   let content;
 
@@ -169,11 +146,11 @@ export default function WorkspacesPage() {
     // First-time user experience — enhanced empty state with onboarding
     content = (
       <div className="flex flex-col items-center justify-center py-20 px-4">
-        <div className="size-24 rounded-full bg-gradient-to-br from-primary/20 to-blue-500/20 flex items-center justify-center mb-8 animate-pulse">
-          <Sparkles className="h-12 w-12 text-primary" />
+        <div className="size-20 rounded-full bg-primary/10 flex items-center justify-center mb-8">
+          <LayoutDashboard className="h-10 w-10 text-primary" />
         </div>
         <h3 className="text-2xl font-bold mb-3">
-          Welcome{user?.name ? `, ${user.name.split(" ")[0]}` : ""}! 👋
+          Welcome{user?.name ? `, ${user.name.split(" ")[0]}` : ""}!
         </h3>
         <p className="text-muted-foreground text-center max-w-lg mb-8 leading-relaxed">
           Get started by creating your first workspace. Workspaces help you organize
@@ -222,20 +199,13 @@ export default function WorkspacesPage() {
         </div>
         <h3 className="text-xl font-bold mb-2">No workspaces found</h3>
         <p className="text-muted-foreground text-center max-w-md mb-6">
-          {searchQuery.trim()
-            ? `No results for "${searchQuery}". Try a different search term.`
-            : roleFilter !== "all"
-              ? `No workspaces where you are ${roleFilter === "owner" ? "the owner" : "a member"}.`
-              : "Try adjusting your filters."}
+          No results for &ldquo;{searchQuery}&rdquo;. Try a different search term.
         </p>
         <Button
           variant="outline"
-          onClick={() => {
-            setSearchQuery("");
-            setRoleFilter("all");
-          }}
+          onClick={() => setSearchQuery("")}
         >
-          Clear Filters
+          Clear Search
         </Button>
       </div>
     );
@@ -246,11 +216,11 @@ export default function WorkspacesPage() {
         {!welcomeDismissed && workspaces && workspaces.length <= 3 && (
           <div className="mb-6 relative rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 to-blue-500/5 p-4 flex items-center gap-4">
             <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-              <Sparkles className="h-5 w-5 text-primary" />
+              <Lightbulb className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium">
-                💡 Quick tip: Organize your test cases by creating separate workspaces for different teams or products.
+                Quick tip: Organize your test cases by creating separate workspaces for different teams or products.
               </p>
             </div>
             <button
@@ -263,9 +233,9 @@ export default function WorkspacesPage() {
           </div>
         )}
 
-        {/* Control Bar: Search + Sort + Filter — all grouped together */}
+        {/* Control Bar — simplified: Search + Sort + Count */}
         <div className="flex flex-wrap items-center gap-3 mb-6">
-          {/* Search — primary action, placed left-most */}
+          {/* Search */}
           <div className="flex items-center gap-2 flex-1 min-w-[200px] max-w-sm">
             <div className="flex w-full items-stretch rounded-lg h-9 border border-input dark:border-white/10 bg-background dark:bg-muted/50">
               <div className="text-muted-foreground flex items-center justify-center pl-3">
@@ -283,60 +253,27 @@ export default function WorkspacesPage() {
           </div>
 
           {/* Sort dropdown */}
-          <div className="flex items-center gap-1.5">
-            <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-            <Select value={sortKey} onValueChange={(val) => setSortKey(val as SortKey)}>
-              <SelectTrigger className="w-[160px] h-8 bg-transparent border-border" aria-label="Sort workspaces by">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                {SORT_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <button
-              onClick={toggleSortDir}
-              className="p-1.5 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
-              aria-label={`Sort ${sortDir === "asc" ? "descending" : "ascending"}`}
-              title={sortDir === "asc" ? "Oldest first" : "Newest first"}
-            >
-              <ArrowUpDown className="h-4 w-4" />
-            </button>
-          </div>
+          <Select value={sortKey} onValueChange={(val) => setSortKey(val as SortKey)}>
+            <SelectTrigger className="w-[160px] h-8 bg-transparent border-border" aria-label="Sort workspaces by">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              {SORT_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-          {/* Role filter pills */}
-          <div className="flex items-center gap-1">
-            {(["all", "owner", "member"] as RoleFilter[]).map((role) => (
-              <button
-                key={role}
-                onClick={() => setRoleFilter(role)}
-                className={`text-xs font-medium px-3 py-1.5 rounded-full transition-colors ${
-                  roleFilter === role
-                    ? "bg-primary/10 text-primary border border-primary/30"
-                    : "bg-muted text-muted-foreground hover:bg-accent border border-transparent"
-                }`}
-              >
-                {role === "all" ? "All" : role === "owner" ? "Owner" : "Member"}
-              </button>
-            ))}
-          </div>
-
-          {/* Active filter indicator + count */}
+          {/* Count + Reset */}
           <div className="flex items-center gap-3 ml-auto">
-            {activeFilterCount > 0 && (
+            {searchQuery.trim() && (
               <button
-                onClick={() => {
-                  setSortKey("updatedAt");
-                  setSortDir("desc");
-                  setRoleFilter("all");
-                  setSearchQuery("");
-                }}
+                onClick={() => setSearchQuery("")}
                 className="text-xs text-muted-foreground hover:text-foreground underline transition-colors"
               >
-                Reset filters
+                Clear search
               </button>
             )}
             <span className="text-xs text-muted-foreground">
@@ -362,11 +299,11 @@ export default function WorkspacesPage() {
             aria-label="Create new workspace"
           >
             {/* Glow ring on hover */}
-            <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5" />
+            <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-primary/10 via-transparent to-primary/5" />
             <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
               <Plus className="h-8 w-8 text-primary" />
             </div>
-            <span className="text-base font-bold text-foreground/80 group-hover:text-primary transition-colors">
+            <span className="text-base font-semibold text-foreground/80 group-hover:text-primary transition-colors">
               Create Workspace
             </span>
             <span className="text-xs text-muted-foreground mt-1">

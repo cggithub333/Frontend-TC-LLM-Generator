@@ -5,7 +5,7 @@
 
 export function LoadingSkeleton() {
   return (
-    <div className="p-8">
+    <div className="p-8" role="status" aria-live="polite" aria-label="Loading workspaces">
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {[...Array(6)].map((_, i) => (
           <div
