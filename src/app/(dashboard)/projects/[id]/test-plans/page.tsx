@@ -477,12 +477,12 @@ export default function ProjectTestPlansPage() {
               <div
                 key={col.key}
                 className={cn(
-                  "flex flex-col rounded-xl border border-border bg-muted/30 min-h-[400px] border-t-4",
+                  "flex flex-col rounded-xl bg-muted/20 dark:bg-zinc-900/50 min-h-[400px] border-t-2",
                   col.accent
                 )}
               >
                 {/* Column Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
+                <div className="flex items-center justify-between px-4 py-3">
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-semibold">{col.label}</h3>
                     <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full font-medium">
@@ -504,8 +504,8 @@ export default function ProjectTestPlansPage() {
                         key={plan.testPlanId}
                         onClick={() => handlePlanClick(plan.testPlanId)}
                         className={cn(
-                          "w-full text-left bg-card border border-border rounded-xl p-4 shadow-sm cursor-pointer group",
-                          "transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-primary/40",
+                          "w-full text-left bg-card dark:bg-zinc-800 border border-border dark:border-zinc-700 rounded-lg p-4 shadow-sm cursor-pointer group",
+                          "transition-all duration-150 hover:shadow-md hover:-translate-y-0.5 hover:border-primary/40",
                           selectedPlanId === plan.testPlanId && "ring-2 ring-primary/50 border-primary/40"
                         )}
                       >

@@ -128,7 +128,7 @@ export default function TestPlansPage() {
       </header>
 
       {/* Content */}
-      <div className="p-6 max-w-7xl mx-auto">
+      <div className="p-6">
         {/* Search and Filters */}
         <div className="flex items-center gap-3 mb-6">
           <div className="relative flex-1 max-w-lg">
