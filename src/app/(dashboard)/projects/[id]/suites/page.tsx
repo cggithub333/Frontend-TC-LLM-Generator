@@ -13,6 +13,8 @@ import {
   PenLine,
   ChevronRight,
   Trash2,
+  MoreHorizontal,
+  Pencil,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,11 +27,29 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import {
   useTestSuitesByProject,
   useCreateTestSuite,
   useDeleteTestSuite,
+  useUpdateTestSuite,
   useTestCasesInSuite,
   useAddTestCaseToSuite,
   useRemoveTestCaseFromSuite,
@@ -163,7 +183,7 @@ function AddTestCasesDrawer({
   }
 
   const toggleSelect = (id: string) => {
-    if (existingTestCaseIds.has(id)) return; // Can't select already-in-suite
+    if (existingTestCaseIds.has(id)) return;
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -173,7 +193,6 @@ function AddTestCasesDrawer({
   };
 
   const toggleGroup = (group: GroupedTestCases) => {
-    // Only toggle TCs not already in suite
     const selectableTcIds = group.testCases
       .filter((tc) => !existingTestCaseIds.has(tc.testCaseId))
       .map((tc) => tc.testCaseId);
@@ -288,7 +307,7 @@ function AddTestCasesDrawer({
                             : false
                       }
                       onCheckedChange={(e) => {
-                        e; // prevent default
+                        e;
                         toggleGroup(group);
                       }}
                       onClick={(e) => e.stopPropagation()}
@@ -340,7 +359,6 @@ function AddTestCasesDrawer({
                             <p className="text-sm font-medium">
                               {tc.title}
                             </p>
-                            {/* Detail summary */}
                             {tc.preconditions && (
                               <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
                                 <span className="font-medium text-foreground/70">Pre:</span> {tc.preconditions}
@@ -436,6 +454,13 @@ export default function ProjectTestSuitesPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [expandedTcId, setExpandedTcId] = useState<string | null>(null);
 
+  // ── Rename state (Polish 5) ──
+  const [renamingSuiteId, setRenamingSuiteId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
+
+  // ── Delete confirm state (Polish 5) ──
+  const [deletingSuiteId, setDeletingSuiteId] = useState<string | null>(null);
+
   // Data
   const { data: suitesData, isLoading: suitesLoading } =
     useTestSuitesByProject(projectId, { size: 100 });
@@ -455,7 +480,8 @@ export default function ProjectTestSuitesPage() {
   );
 
   const removeFromSuite = useRemoveTestCaseFromSuite();
-  const deleteSuite = useDeleteTestSuite();
+  const deleteSuiteMutation = useDeleteTestSuite();
+  const updateSuiteMutation = useUpdateTestSuite();
 
   const handleRemoveTC = async (testCaseId: string) => {
     if (!selectedSuiteId) return;
@@ -470,18 +496,57 @@ export default function ProjectTestSuitesPage() {
     }
   };
 
-  const handleDeleteSuite = async (suiteId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!confirm("Are you sure you want to delete this suite?")) return;
+  // ── Delete Suite — opens AlertDialog ──
+  const handleDeleteSuite = (suiteId: string) => {
+    setDeletingSuiteId(suiteId);
+  };
+
+  const confirmDeleteSuite = async () => {
+    if (!deletingSuiteId) return;
     try {
-      await deleteSuite.mutateAsync(suiteId);
+      await deleteSuiteMutation.mutateAsync(deletingSuiteId);
       toast.success("Suite deleted");
-      if (selectedSuiteId === suiteId) {
-        setSelectedSuiteId(suites.length > 1 ? suites.find(s => s.testSuiteId !== suiteId)?.testSuiteId ?? null : null);
+      if (selectedSuiteId === deletingSuiteId) {
+        setSelectedSuiteId(
+          suites.length > 1
+            ? suites.find((s) => s.testSuiteId !== deletingSuiteId)?.testSuiteId ?? null
+            : null
+        );
       }
     } catch {
       toast.error("Failed to delete suite");
+    } finally {
+      setDeletingSuiteId(null);
     }
+  };
+
+  // ── Rename Suite — inline edit flow ──
+  const handleStartRename = (suite: { testSuiteId: string; name: string }) => {
+    setRenamingSuiteId(suite.testSuiteId);
+    setRenameValue(suite.name);
+  };
+
+  const handleConfirmRename = async () => {
+    if (!renamingSuiteId || !renameValue.trim()) {
+      setRenamingSuiteId(null);
+      return;
+    }
+    try {
+      await updateSuiteMutation.mutateAsync({
+        id: renamingSuiteId,
+        name: renameValue.trim(),
+      });
+      toast.success("Suite renamed");
+    } catch {
+      toast.error("Failed to rename suite");
+    } finally {
+      setRenamingSuiteId(null);
+    }
+  };
+
+  const handleCancelRename = () => {
+    setRenamingSuiteId(null);
+    setRenameValue("");
   };
 
   const toggleExpand = (tcId: string) => {
@@ -521,7 +586,7 @@ export default function ProjectTestSuitesPage() {
         {/* Suite List */}
         <div className="flex-1 overflow-y-auto py-2 space-y-1">
           {suitesLoading ? (
-            /* Skeleton loading — better perceived performance */
+            /* Skeleton loading */
             <div className="space-y-1">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="flex items-center gap-3 px-4 py-2.5 animate-pulse">
@@ -557,6 +622,7 @@ export default function ProjectTestSuitesPage() {
           ) : (
             suites.map((suite) => {
               const isActive = suite.testSuiteId === selectedSuiteId;
+              const isRenaming = renamingSuiteId === suite.testSuiteId;
               return (
                 <button
                   key={suite.testSuiteId}
@@ -564,39 +630,86 @@ export default function ProjectTestSuitesPage() {
                   className={cn(
                     "group w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left transition-all duration-150",
                     isActive
-                      ? "bg-primary/10 text-primary"
+                      ? "bg-primary/15 text-primary font-semibold ring-1 ring-primary/20"
                       : "text-foreground hover:bg-accent"
                   )}
                 >
                   {isActive ? (
-                    <FolderOpen className="h-4 w-4 shrink-0" />
+                    <FolderOpen className="h-4 w-4 shrink-0 text-primary" />
                   ) : (
-                    <Folder className="h-4 w-4 shrink-0" />
+                    <Folder className="h-4 w-4 shrink-0 text-muted-foreground" />
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium truncate">
-                      {suite.name}
-                    </p>
-                    {suite.description && (
-                      <p className="text-xs text-muted-foreground truncate">
+                    {isRenaming ? (
+                      <input
+                        autoFocus
+                        value={renameValue}
+                        onChange={(e) => setRenameValue(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleConfirmRename();
+                          if (e.key === "Escape") handleCancelRename();
+                        }}
+                        onBlur={handleConfirmRename}
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-sm font-medium bg-transparent border-b border-primary outline-none w-full py-0.5"
+                      />
+                    ) : (
+                      <p className="text-sm font-medium truncate">
+                        {suite.name}
+                      </p>
+                    )}
+                    {suite.description && !isRenaming && (
+                      <p className={cn("text-xs truncate", isActive ? "text-primary/70" : "text-muted-foreground")}>
                         {suite.description}
                       </p>
                     )}
                   </div>
-                  {/* Badge TC count — only for selected suite (workaround) */}
-                  {isActive && !tcsLoading && (
-                    <Badge variant="secondary" className="text-[10px] shrink-0 tabular-nums">
+                  {/* Badge TC count — only for selected suite */}
+                  {isActive && !tcsLoading && !isRenaming && (
+                    <Badge variant="secondary" className="text-[10px] shrink-0 tabular-nums bg-primary/20 text-primary border-primary/30">
                       {suiteTestCases.length}
                     </Badge>
                   )}
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    onClick={(e) => handleDeleteSuite(suite.testSuiteId, e)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-destructive/10 hover:text-destructive"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </span>
+                  {/* Context menu — MoreHorizontal trigger */}
+                  {!isRenaming && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          className={cn(
+                            "p-1 rounded-md transition-opacity",
+                            "text-muted-foreground hover:text-foreground hover:bg-accent",
+                            "opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+                          )}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreHorizontal className="h-3.5 w-3.5" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleStartRename(suite);
+                          }}
+                          className="gap-2 text-sm"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                          Rename
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteSuite(suite.testSuiteId);
+                          }}
+                          className="gap-2 text-sm text-destructive focus:text-destructive"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </button>
               );
             })
@@ -657,7 +770,6 @@ export default function ProjectTestSuitesPage() {
                     <div className="p-4 rounded-2xl bg-primary/10">
                       <FileText className="h-12 w-12 text-primary" />
                     </div>
-                    {/* Decorative dot */}
                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-amber-400 rounded-full" />
                   </div>
                   <p className="text-lg font-bold">No test cases yet</p>
@@ -675,7 +787,13 @@ export default function ProjectTestSuitesPage() {
                   </Button>
                 </div>
               ) : (
-                <table className="w-full text-left">
+                <table className="w-full table-fixed text-left">
+                  <colgroup>
+                    <col className="w-[50%]" />
+                    <col className="w-[30%]" />
+                    <col className="w-20" />
+                    <col className="w-14" />
+                  </colgroup>
                   <thead>
                     <tr className="bg-muted/50 border-b">
                       <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
@@ -684,10 +802,10 @@ export default function ProjectTestSuitesPage() {
                       <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                         Story
                       </th>
-                      <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 w-20">
+                      <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                         Type
                       </th>
-                      <th className="px-6 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 w-12">
+                      <th className="px-6 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                         {/* Actions — no label */}
                       </th>
                     </tr>
@@ -697,7 +815,7 @@ export default function ProjectTestSuitesPage() {
                       const isExpanded = expandedTcId === tc.testCaseId;
                       return (
                         <Fragment key={tc.testCaseId}>
-                          {/* ── Summary Row (always visible) ── */}
+                          {/* ── Summary Row ── */}
                           <tr
                             role="button"
                             tabIndex={0}
@@ -724,21 +842,21 @@ export default function ProjectTestSuitesPage() {
                                     isExpanded && "rotate-90"
                                   )}
                                 />
-                                <span className="truncate max-w-md">{tc.title}</span>
+                                <span className="truncate">{tc.title}</span>
                               </div>
                             </td>
 
                             {/* Story */}
                             <td className="px-6 py-4 text-sm text-muted-foreground">
-                              <p className="truncate max-w-[200px]">{tc.userStoryTitle ?? "—"}</p>
+                              <p className="truncate">{tc.userStoryTitle ?? "—"}</p>
                             </td>
 
-                            {/* Type Badge */}
+                            {/* Type Badge — Polish 3 */}
                             <td className="px-6 py-4">
                               {tc.generatedByAi ? (
                                 <Badge
                                   variant="secondary"
-                                  className="text-[10px] px-1.5 py-0 bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+                                  className="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 border border-purple-200 dark:border-purple-800/50"
                                 >
                                   <Sparkles className="h-3 w-3 mr-0.5" />
                                   AI
@@ -746,15 +864,14 @@ export default function ProjectTestSuitesPage() {
                               ) : (
                                 <Badge
                                   variant="secondary"
-                                  className="text-[10px] px-1.5 py-0"
+                                  className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700"
                                 >
-                                  <PenLine className="h-3 w-3 mr-0.5" />
                                   Manual
                                 </Badge>
                               )}
                             </td>
 
-                            {/* Actions — Icon, reveal on hover */}
+                            {/* Actions — Trash icon reveal on hover */}
                             <td className="px-6 py-4 text-right">
                               <button
                                 className={cn(
@@ -764,7 +881,7 @@ export default function ProjectTestSuitesPage() {
                                   "hover:text-destructive hover:bg-destructive/10"
                                 )}
                                 onClick={(e) => {
-                                  e.stopPropagation(); // Prevent row expand
+                                  e.stopPropagation();
                                   handleRemoveTC(tc.testCaseId);
                                 }}
                                 title="Remove from suite"
@@ -774,7 +891,7 @@ export default function ProjectTestSuitesPage() {
                             </td>
                           </tr>
 
-                          {/* ── Expand Panel (detail accordion) ── */}
+                          {/* ── Expand Panel (accordion detail) — Polish 1 ── */}
                           <tr>
                             <td colSpan={4} className="p-0">
                               <div
@@ -784,11 +901,11 @@ export default function ProjectTestSuitesPage() {
                                 )}
                               >
                                 <div className="overflow-hidden">
-                                  <div className="px-6 py-4 ml-6 border-l-2 border-primary/30 space-y-3 bg-muted/20">
+                                  <div className="px-6 py-4 ml-6 border-l-2 border-primary/30 space-y-3 bg-zinc-950/[0.04] dark:bg-zinc-950/40 border-b border-border/40">
                                     {/* Preconditions */}
                                     {tc.preconditions && (
                                       <div>
-                                        <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
                                           Preconditions
                                         </span>
                                         <p className="text-sm text-foreground/80 mt-0.5 whitespace-pre-wrap">
@@ -800,7 +917,7 @@ export default function ProjectTestSuitesPage() {
                                     {/* Steps */}
                                     {tc.steps && (
                                       <div>
-                                        <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
                                           Steps
                                         </span>
                                         <p className="text-sm text-foreground/80 mt-0.5 whitespace-pre-wrap">
@@ -812,7 +929,7 @@ export default function ProjectTestSuitesPage() {
                                     {/* Expected Result */}
                                     {tc.expectedResult && (
                                       <div>
-                                        <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
                                           Expected Result
                                         </span>
                                         <p className="text-sm text-foreground/80 mt-0.5 whitespace-pre-wrap">
@@ -821,7 +938,7 @@ export default function ProjectTestSuitesPage() {
                                       </div>
                                     )}
 
-                                    {/* Fallback when no detail */}
+                                    {/* Fallback */}
                                     {!tc.preconditions && !tc.steps && !tc.expectedResult && (
                                       <p className="text-sm text-muted-foreground italic">
                                         No additional details available.
@@ -851,6 +968,27 @@ export default function ProjectTestSuitesPage() {
         projectId={projectId}
         existingTestCaseIds={existingTCIds}
       />
+
+      {/* ─── Delete Suite Confirmation (AlertDialog — Polish 5) ─── */}
+      <AlertDialog open={!!deletingSuiteId} onOpenChange={(open) => !open && setDeletingSuiteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete test suite?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this test suite. Test cases inside will not be deleted, only removed from this suite.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteSuite}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

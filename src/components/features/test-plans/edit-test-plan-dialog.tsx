@@ -13,75 +13,55 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, BookOpen, Folder, Loader2 } from "lucide-react";
+import { AlertCircle, BookOpen, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useCreateTestPlan } from "@/hooks/use-test-plans";
+import { useUpdateTestPlan } from "@/hooks/use-test-plans";
 import { useStoriesByProject } from "@/hooks/use-stories";
-import { useTestSuitesByProject } from "@/hooks/use-test-suites";
-import type { CreateTestPlanInput, TestPlanStatus } from "@/types/test-plan.types";
+import type { TestPlan, UpdateTestPlanInput } from "@/types/test-plan.types";
 import { toast } from "sonner";
 
-interface CreateTestPlanDialogProps {
-  projectId: string;
+interface EditTestPlanDialogProps {
+  plan: TestPlan;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
 }
 
-const STATUS_OPTIONS: { value: TestPlanStatus; label: string }[] = [
-  { value: "DRAFT", label: "Draft" },
-  { value: "IN_PROGRESS", label: "In Progress" },
-  { value: "COMPLETED", label: "Completed" },
-];
-
-const DEFAULT_FORM: Omit<CreateTestPlanInput, "projectId"> = {
-  name: "",
-  description: "",
-  status: "DRAFT",
-  storyIds: [],
-  suiteIds: [],
-};
-
-export function CreateTestPlanDialog({
-  projectId,
+export function EditTestPlanDialog({
+  plan,
   open,
   onOpenChange,
   onSuccess,
-}: CreateTestPlanDialogProps) {
-  const [form, setForm] = useState(DEFAULT_FORM);
+}: EditTestPlanDialogProps) {
+  const [form, setForm] = useState<UpdateTestPlanInput>({
+    name: plan.name,
+    description: plan.description ?? "",
+    storyIds: plan.storyIds ?? [],
+  });
   const [nameError, setNameError] = useState<string | null>(null);
   const [nameTouched, setNameTouched] = useState(false);
 
-  const createTestPlan = useCreateTestPlan();
+  const updateTestPlan = useUpdateTestPlan();
   const { data: storiesData, isLoading: storiesLoading } = useStoriesByProject(
-    projectId,
+    plan.projectId,
     { size: 100 }
   );
   const stories = storiesData?.items ?? [];
 
-  const { data: suitesData, isLoading: suitesLoading } = useTestSuitesByProject(
-    projectId,
-    { size: 100 }
-  );
-  const suites = suitesData?.items ?? [];
-
-  // Reset form when dialog closes
+  // Reset form when dialog opens with new plan data
   useEffect(() => {
-    if (!open) {
-      setForm(DEFAULT_FORM);
+    if (open) {
+      setForm({
+        name: plan.name,
+        description: plan.description ?? "",
+        storyIds: plan.storyIds ?? [],
+      });
       setNameError(null);
       setNameTouched(false);
     }
-  }, [open]);
+  }, [open, plan.name, plan.description, plan.storyIds]);
 
   const validateName = (value: string) => {
     if (!value.trim()) return "Name is required";
@@ -89,14 +69,17 @@ export function CreateTestPlanDialog({
     return null;
   };
 
-  const handleNameChange = useCallback((value: string) => {
-    setForm((prev) => ({ ...prev, name: value }));
-    if (nameTouched) setNameError(validateName(value));
-  }, [nameTouched]);
+  const handleNameChange = useCallback(
+    (value: string) => {
+      setForm((prev) => ({ ...prev, name: value }));
+      if (nameTouched) setNameError(validateName(value));
+    },
+    [nameTouched]
+  );
 
   const handleNameBlur = useCallback(() => {
     setNameTouched(true);
-    setNameError(validateName(form.name));
+    setNameError(validateName(form.name ?? ""));
   }, [form.name]);
 
   const toggleStory = useCallback((storyId: string) => {
@@ -111,51 +94,44 @@ export function CreateTestPlanDialog({
     });
   }, []);
 
-  const toggleSuite = useCallback((suiteId: string) => {
-    setForm((prev) => {
-      const ids = prev.suiteIds ?? [];
-      return {
-        ...prev,
-        suiteIds: ids.includes(suiteId)
-          ? ids.filter((id) => id !== suiteId)
-          : [...ids, suiteId],
-      };
-    });
-  }, []);
-
   const handleClose = useCallback(() => {
-    if (!createTestPlan.isPending) onOpenChange(false);
-  }, [onOpenChange, createTestPlan.isPending]);
+    if (!updateTestPlan.isPending) onOpenChange(false);
+  }, [onOpenChange, updateTestPlan.isPending]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
       setNameTouched(true);
-      const error = validateName(form.name);
+      const error = validateName(form.name ?? "");
       if (error) {
         setNameError(error);
         return;
       }
 
       try {
-        await createTestPlan.mutateAsync({ projectId, ...form });
+        await updateTestPlan.mutateAsync({
+          id: plan.testPlanId,
+          name: form.name,
+          description: form.description,
+          storyIds: form.storyIds,
+        });
         onOpenChange(false);
         onSuccess?.();
-        toast.success("Test plan created successfully");
-      } catch (err) {
-        toast.error("Failed to create test plan");
+        toast.success("Test plan updated successfully");
+      } catch {
+        toast.error("Failed to update test plan");
       }
     },
-    [form, projectId, createTestPlan, onOpenChange, onSuccess]
+    [form, plan.testPlanId, updateTestPlan, onOpenChange, onSuccess]
   );
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-[560px] p-0 gap-0 max-h-[90vh] flex flex-col">
         <DialogHeader className="px-6 py-5 border-b space-y-1 flex-shrink-0">
-          <DialogTitle className="text-lg font-bold">Create Test Plan</DialogTitle>
+          <DialogTitle className="text-lg font-bold">Edit Test Plan</DialogTitle>
           <DialogDescription className="text-xs">
-            Define a test plan and select the stories to cover
+            Update the plan details and linked stories
           </DialogDescription>
         </DialogHeader>
 
@@ -166,11 +142,11 @@ export function CreateTestPlanDialog({
           <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
             {/* Name */}
             <div className="space-y-1.5">
-              <Label htmlFor="plan-name" className="text-sm font-semibold">
+              <Label htmlFor="edit-plan-name" className="text-sm font-semibold">
                 Name <span className="text-destructive">*</span>
               </Label>
               <Input
-                id="plan-name"
+                id="edit-plan-name"
                 value={form.name}
                 onChange={(e) => handleNameChange(e.target.value)}
                 onBlur={handleNameBlur}
@@ -178,7 +154,7 @@ export function CreateTestPlanDialog({
                 className={cn(
                   nameTouched && nameError && "border-destructive"
                 )}
-                disabled={createTestPlan.isPending}
+                disabled={updateTestPlan.isPending}
               />
               {nameTouched && nameError && (
                 <p className="text-xs text-destructive flex items-center gap-1">
@@ -190,11 +166,11 @@ export function CreateTestPlanDialog({
 
             {/* Description */}
             <div className="space-y-1.5">
-              <Label htmlFor="plan-description" className="text-sm font-semibold">
+              <Label htmlFor="edit-plan-description" className="text-sm font-semibold">
                 Description
               </Label>
               <Textarea
-                id="plan-description"
+                id="edit-plan-description"
                 value={form.description}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, description: e.target.value }))
@@ -202,34 +178,8 @@ export function CreateTestPlanDialog({
                 rows={3}
                 className="resize-none"
                 placeholder="Describe what this test plan covers..."
-                disabled={createTestPlan.isPending}
+                disabled={updateTestPlan.isPending}
               />
-            </div>
-
-            {/* Status */}
-            <div className="space-y-1.5">
-              <Label className="text-sm font-semibold">Status</Label>
-              <Select
-                value={form.status}
-                onValueChange={(value) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    status: value as TestPlanStatus,
-                  }))
-                }
-                disabled={createTestPlan.isPending}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {STATUS_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
 
             {/* User Stories */}
@@ -272,7 +222,7 @@ export function CreateTestPlanDialog({
                           <Checkbox
                             checked={checked}
                             onCheckedChange={() => toggleStory(story.userStoryId)}
-                            disabled={createTestPlan.isPending}
+                            disabled={updateTestPlan.isPending}
                             className="mt-0.5"
                           />
                           <div className="flex-1 min-w-0">
@@ -292,67 +242,6 @@ export function CreateTestPlanDialog({
                 )}
               </div>
             </div>
-
-            {/* Test Suites */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm font-semibold">
-                  Test Suites
-                </Label>
-                {(form.suiteIds?.length ?? 0) > 0 && (
-                  <Badge variant="secondary" className="text-xs">
-                    {form.suiteIds?.length} selected
-                  </Badge>
-                )}
-              </div>
-
-              <div className="rounded-lg border bg-muted/30 max-h-48 overflow-y-auto">
-                {suitesLoading ? (
-                  <div className="flex items-center justify-center py-6 gap-2 text-muted-foreground text-sm">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading suites...
-                  </div>
-                ) : suites.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-6 gap-1 text-muted-foreground">
-                    <Folder className="h-5 w-5" />
-                    <p className="text-sm">No suites in this project</p>
-                  </div>
-                ) : (
-                  <div className="divide-y">
-                    {suites.map((suite) => {
-                      const checked =
-                        form.suiteIds?.includes(suite.testSuiteId) ?? false;
-                      return (
-                        <label
-                          key={suite.testSuiteId}
-                          className={cn(
-                            "flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-muted/50 transition-colors",
-                            checked && "bg-primary/5"
-                          )}
-                        >
-                          <Checkbox
-                            checked={checked}
-                            onCheckedChange={() => toggleSuite(suite.testSuiteId)}
-                            disabled={createTestPlan.isPending}
-                            className="mt-0.5"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium line-clamp-1">
-                              {suite.name}
-                            </p>
-                            {suite.description && (
-                              <p className="text-xs text-muted-foreground line-clamp-1">
-                                {suite.description}
-                              </p>
-                            )}
-                          </div>
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
 
           <DialogFooter className="px-6 py-4 border-t gap-2 sm:gap-0 flex-shrink-0">
@@ -360,18 +249,18 @@ export function CreateTestPlanDialog({
               type="button"
               variant="ghost"
               onClick={handleClose}
-              disabled={createTestPlan.isPending}
+              disabled={updateTestPlan.isPending}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={createTestPlan.isPending}>
-              {createTestPlan.isPending ? (
+            <Button type="submit" disabled={updateTestPlan.isPending}>
+              {updateTestPlan.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Creating...
+                  Saving...
                 </>
               ) : (
-                "Create Test Plan"
+                "Save Changes"
               )}
             </Button>
           </DialogFooter>
