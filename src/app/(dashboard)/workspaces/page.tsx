@@ -292,22 +292,17 @@ export default function WorkspacesPage() {
               onDelete={handleDelete}
             />
           ))}
-          {/* Create Workspace Card — prominent CTA */}
+          {/* Create Workspace Card */}
           <button
             onClick={() => setCreateOpen(true)}
-            className="group relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-card/50 p-6 hover:border-primary/60 hover:bg-primary/5 transition-all duration-300 cursor-pointer min-h-[220px] focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+            className="group relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-primary/25 bg-primary/[0.02] p-6 hover:border-primary/50 hover:bg-primary/[0.06] transition-all duration-200 cursor-pointer min-h-[180px] focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
             aria-label="Create new workspace"
           >
-            {/* Glow ring on hover */}
-            <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-primary/10 via-transparent to-primary/5" />
-            <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
-              <Plus className="h-8 w-8 text-primary" />
+            <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-primary/15 transition-all duration-200">
+              <Plus className="h-6 w-6 text-primary transition-transform duration-200 group-hover:rotate-90" />
             </div>
-            <span className="text-base font-semibold text-foreground/80 group-hover:text-primary transition-colors">
-              Create Workspace
-            </span>
-            <span className="text-xs text-muted-foreground mt-1">
-              Start a new project space
+            <span className="text-sm font-medium text-foreground/70 group-hover:text-primary transition-colors duration-150">
+              New Workspace
             </span>
           </button>
         </div>
