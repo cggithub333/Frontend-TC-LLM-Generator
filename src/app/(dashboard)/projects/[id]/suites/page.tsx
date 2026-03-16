@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { Fragment, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import {
   Plus,
@@ -65,7 +65,7 @@ function CreateSuiteInline({
   };
 
   return (
-    <div className="px-3 pb-3">
+    <div className="px-4 pb-3">
       <div className="flex gap-2">
         <Input
           placeholder="Suite name..."
@@ -434,6 +434,7 @@ export default function ProjectTestSuitesPage() {
   const [selectedSuiteId, setSelectedSuiteId] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [expandedTcId, setExpandedTcId] = useState<string | null>(null);
 
   // Data
   const { data: suitesData, isLoading: suitesLoading } =
@@ -483,17 +484,21 @@ export default function ProjectTestSuitesPage() {
     }
   };
 
+  const toggleExpand = (tcId: string) => {
+    setExpandedTcId((prev) => (prev === tcId ? null : tcId));
+  };
+
   // Auto-select first suite
   if (suites.length > 0 && !selectedSuiteId && !suitesLoading) {
     setSelectedSuiteId(suites[0].testSuiteId);
   }
 
   return (
-    <div className="flex h-[calc(100vh-0px)]">
-      {/* ─── Left Pane: Suite List (30%) ─── */}
-      <div className="w-[300px] shrink-0 border-r border-border flex flex-col bg-card/50">
+    <div className="flex h-screen">
+      {/* ─── Left Pane: Suite List ─── */}
+      <div className="w-72 shrink-0 border-r border-border flex flex-col bg-card/50">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center justify-between px-4 py-5 border-b">
           <h1 className="text-lg font-bold tracking-tight">Test Suites</h1>
           <Button
             size="sm"
@@ -514,10 +519,19 @@ export default function ProjectTestSuitesPage() {
         )}
 
         {/* Suite List */}
-        <div className="flex-1 overflow-y-auto p-2 space-y-1">
+        <div className="flex-1 overflow-y-auto py-2 space-y-1">
           {suitesLoading ? (
-            <div className="flex items-center justify-center py-10">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            /* Skeleton loading — better perceived performance */
+            <div className="space-y-1">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center gap-3 px-4 py-2.5 animate-pulse">
+                  <div className="w-4 h-4 bg-muted rounded" />
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-3.5 bg-muted rounded w-3/4" />
+                    <div className="h-2.5 bg-muted rounded w-1/2" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : suites.length === 0 ? (
             <div className="text-center py-10 px-4">
@@ -548,7 +562,7 @@ export default function ProjectTestSuitesPage() {
                   key={suite.testSuiteId}
                   onClick={() => setSelectedSuiteId(suite.testSuiteId)}
                   className={cn(
-                    "group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-150",
+                    "group w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left transition-all duration-150",
                     isActive
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-accent"
@@ -569,6 +583,12 @@ export default function ProjectTestSuitesPage() {
                       </p>
                     )}
                   </div>
+                  {/* Badge TC count — only for selected suite (workaround) */}
+                  {isActive && !tcsLoading && (
+                    <Badge variant="secondary" className="text-[10px] shrink-0 tabular-nums">
+                      {suiteTestCases.length}
+                    </Badge>
+                  )}
                   <span
                     role="button"
                     tabIndex={0}
@@ -584,7 +604,7 @@ export default function ProjectTestSuitesPage() {
         </div>
       </div>
 
-      {/* ─── Right Pane: Suite Detail (70%) ─── */}
+      {/* ─── Right Pane: Suite Detail ─── */}
       <div className="flex-1 flex flex-col min-w-0">
         {!selectedSuite ? (
           <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
@@ -605,7 +625,7 @@ export default function ProjectTestSuitesPage() {
         ) : (
           <>
             {/* Detail Header */}
-            <div className="flex items-center justify-between p-6 border-b">
+            <div className="flex items-center justify-between px-6 py-5 border-b">
               <div>
                 <h2 className="text-xl font-bold tracking-tight">
                   {selectedSuite.name}
@@ -657,69 +677,164 @@ export default function ProjectTestSuitesPage() {
               ) : (
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="bg-muted/50 text-xs text-muted-foreground uppercase font-medium border-b">
-                      <th className="px-6 py-3 font-semibold">Title</th>
-                      <th className="px-6 py-3 font-semibold">Story</th>
-                      <th className="px-6 py-3 font-semibold">Preconditions</th>
-                      <th className="px-6 py-3 font-semibold">Expected Result</th>
-                      <th className="px-6 py-3 font-semibold">Type</th>
-                      <th className="px-6 py-3 font-semibold w-20">Actions</th>
+                    <tr className="bg-muted/50 border-b">
+                      <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                        Title
+                      </th>
+                      <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                        Story
+                      </th>
+                      <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 w-20">
+                        Type
+                      </th>
+                      <th className="px-6 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 w-12">
+                        {/* Actions — no label */}
+                      </th>
                     </tr>
                   </thead>
-                  <tbody className="text-sm divide-y">
-                    {suiteTestCases.map((tc: TestCase) => (
-                      <tr
-                        key={tc.testCaseId}
-                        className="hover:bg-muted/30 transition-colors duration-150"
-                      >
-                        <td className="px-6 py-3.5 font-medium max-w-[250px]">
-                          <p className="truncate">{tc.title}</p>
-                          {tc.steps && (
-                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                              Steps: {tc.steps}
-                            </p>
-                          )}
-                        </td>
-                        <td className="px-6 py-3.5 text-muted-foreground max-w-[180px] truncate">
-                          {tc.userStoryTitle ?? "—"}
-                        </td>
-                        <td className="px-6 py-3.5 text-muted-foreground max-w-[180px]">
-                          <p className="line-clamp-2 text-xs">{tc.preconditions ?? "—"}</p>
-                        </td>
-                        <td className="px-6 py-3.5 text-muted-foreground max-w-[180px]">
-                          <p className="line-clamp-2 text-xs">{tc.expectedResult ?? "—"}</p>
-                        </td>
-                        <td className="px-6 py-3.5">
-                          {tc.generatedByAi ? (
-                            <Badge
-                              variant="secondary"
-                              className="text-[10px] px-1.5 py-0 bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
-                            >
-                              <Sparkles className="h-3 w-3 mr-0.5" />
-                              AI
-                            </Badge>
-                          ) : (
-                            <Badge
-                              variant="secondary"
-                              className="text-[10px] px-1.5 py-0"
-                            >
-                              <PenLine className="h-3 w-3 mr-0.5" />
-                              Manual
-                            </Badge>
-                          )}
-                        </td>
-                        <td className="px-6 py-3.5">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
-                            onClick={() => handleRemoveTC(tc.testCaseId)}
+                  <tbody className="text-sm">
+                    {suiteTestCases.map((tc: TestCase) => {
+                      const isExpanded = expandedTcId === tc.testCaseId;
+                      return (
+                        <Fragment key={tc.testCaseId}>
+                          {/* ── Summary Row (always visible) ── */}
+                          <tr
+                            role="button"
+                            tabIndex={0}
+                            className={cn(
+                              "group cursor-pointer transition-colors duration-150 border-b border-border/50",
+                              isExpanded
+                                ? "bg-muted/50"
+                                : "hover:bg-muted/40"
+                            )}
+                            onClick={() => toggleExpand(tc.testCaseId)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                toggleExpand(tc.testCaseId);
+                              }
+                            }}
                           >
-                            Remove
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
+                            {/* Title + Chevron */}
+                            <td className="px-6 py-4 text-sm font-medium text-foreground">
+                              <div className="flex items-center gap-2">
+                                <ChevronRight
+                                  className={cn(
+                                    "h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200",
+                                    isExpanded && "rotate-90"
+                                  )}
+                                />
+                                <span className="truncate max-w-md">{tc.title}</span>
+                              </div>
+                            </td>
+
+                            {/* Story */}
+                            <td className="px-6 py-4 text-sm text-muted-foreground">
+                              <p className="truncate max-w-[200px]">{tc.userStoryTitle ?? "—"}</p>
+                            </td>
+
+                            {/* Type Badge */}
+                            <td className="px-6 py-4">
+                              {tc.generatedByAi ? (
+                                <Badge
+                                  variant="secondary"
+                                  className="text-[10px] px-1.5 py-0 bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+                                >
+                                  <Sparkles className="h-3 w-3 mr-0.5" />
+                                  AI
+                                </Badge>
+                              ) : (
+                                <Badge
+                                  variant="secondary"
+                                  className="text-[10px] px-1.5 py-0"
+                                >
+                                  <PenLine className="h-3 w-3 mr-0.5" />
+                                  Manual
+                                </Badge>
+                              )}
+                            </td>
+
+                            {/* Actions — Icon, reveal on hover */}
+                            <td className="px-6 py-4 text-right">
+                              <button
+                                className={cn(
+                                  "p-1.5 rounded-md transition-all duration-150",
+                                  "text-zinc-400 dark:text-zinc-500",
+                                  "opacity-0 group-hover:opacity-100",
+                                  "hover:text-destructive hover:bg-destructive/10"
+                                )}
+                                onClick={(e) => {
+                                  e.stopPropagation(); // Prevent row expand
+                                  handleRemoveTC(tc.testCaseId);
+                                }}
+                                title="Remove from suite"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </td>
+                          </tr>
+
+                          {/* ── Expand Panel (detail accordion) ── */}
+                          <tr>
+                            <td colSpan={4} className="p-0">
+                              <div
+                                className={cn(
+                                  "grid transition-[grid-template-rows] duration-200 ease-in-out",
+                                  isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                                )}
+                              >
+                                <div className="overflow-hidden">
+                                  <div className="px-6 py-4 ml-6 border-l-2 border-primary/30 space-y-3 bg-muted/20">
+                                    {/* Preconditions */}
+                                    {tc.preconditions && (
+                                      <div>
+                                        <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                                          Preconditions
+                                        </span>
+                                        <p className="text-sm text-foreground/80 mt-0.5 whitespace-pre-wrap">
+                                          {tc.preconditions}
+                                        </p>
+                                      </div>
+                                    )}
+
+                                    {/* Steps */}
+                                    {tc.steps && (
+                                      <div>
+                                        <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                                          Steps
+                                        </span>
+                                        <p className="text-sm text-foreground/80 mt-0.5 whitespace-pre-wrap">
+                                          {tc.steps}
+                                        </p>
+                                      </div>
+                                    )}
+
+                                    {/* Expected Result */}
+                                    {tc.expectedResult && (
+                                      <div>
+                                        <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                                          Expected Result
+                                        </span>
+                                        <p className="text-sm text-foreground/80 mt-0.5 whitespace-pre-wrap">
+                                          {tc.expectedResult}
+                                        </p>
+                                      </div>
+                                    )}
+
+                                    {/* Fallback when no detail */}
+                                    {!tc.preconditions && !tc.steps && !tc.expectedResult && (
+                                      <p className="text-sm text-muted-foreground italic">
+                                        No additional details available.
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </Fragment>
+                      );
+                    })}
                   </tbody>
                 </table>
               )}
