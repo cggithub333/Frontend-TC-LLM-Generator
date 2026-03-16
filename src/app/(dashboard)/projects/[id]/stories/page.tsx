@@ -43,6 +43,9 @@ import {
   Pencil,
   Trash2,
   FileText,
+  ArrowRight,
+  Lightbulb,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { LoadingSkeleton } from "@/components/features/workspaces/loading-skeleton";
@@ -71,7 +74,7 @@ function AcItemWithTestCases({
   onDeleteTestCase: (tc: TestCase) => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { data: testCasesData } = useTestCasesByAcceptanceCriteria(
+  const { data: testCasesData, isLoading: tcLoading } = useTestCasesByAcceptanceCriteria(
     criteria.acceptanceCriteriaId,
   );
   const testCasesCount = testCasesData?.items?.length || 0;
@@ -119,23 +122,30 @@ function AcItemWithTestCases({
                 )}
               </Badge>
             ) : (
-              <span className="mt-1 text-[10px] text-muted-foreground/60 italic">
-                No tests yet
-              </span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddTestCase(story, criteria.acceptanceCriteriaId);
+                }}
+                className="mt-1 text-[10px] text-primary/60 hover:text-primary font-medium transition-colors duration-150 underline-offset-2 hover:underline"
+              >
+                + Add first test case
+              </button>
             )}
           </div>
         </button>
         <Button
           variant="ghost"
-          size="icon"
-          className="h-6 w-6 opacity-40 group-hover:opacity-100 transition-opacity"
+          size="sm"
+          className="h-7 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 text-xs gap-1 text-muted-foreground hover:text-primary"
           title="Add Test Case for this AC"
           onClick={(e) => {
             e.stopPropagation();
             onAddTestCase(story, criteria.acceptanceCriteriaId);
           }}
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-3.5 w-3.5" />
+          <span className="hidden lg:inline">Add Test</span>
         </Button>
       </div>
 
@@ -143,13 +153,36 @@ function AcItemWithTestCases({
       <div
         className={cn(
           "grid transition-[grid-template-rows] duration-200 ease-in-out",
-          isExpanded && testCasesCount > 0 ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+          isExpanded && (testCasesCount > 0 || tcLoading) ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         )}
       >
         <div className="overflow-hidden">
-          {testCasesCount > 0 && (
+          {(testCasesCount > 0 || tcLoading) && (
             <div className="pl-10 pr-2 pb-2 space-y-2 border-l-2 border-border ml-2.5">
-              {testCasesData?.items.map((tc) => (
+              {tcLoading ? (
+                /* ── Skeleton Loading ── */
+                <>
+                  {[1, 2].map((i) => (
+                    <div key={i} className="bg-card border border-border rounded-md p-3 animate-pulse">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-3.5 h-3.5 bg-muted rounded" />
+                        <div className="h-4 bg-muted rounded w-3/5" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 mt-2">
+                        <div className="space-y-1.5">
+                          <div className="h-2.5 bg-muted rounded w-12" />
+                          <div className="h-3 bg-muted rounded w-full" />
+                        </div>
+                        <div className="space-y-1.5">
+                          <div className="h-2.5 bg-muted rounded w-16" />
+                          <div className="h-3 bg-muted rounded w-4/5" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              ) : (
+              testCasesData?.items.map((tc) => (
                 <div
                   key={tc.testCaseId}
                   className="bg-card border border-border rounded-md p-3 text-sm shadow-sm group/tc transition-all duration-200 hover:border-primary/30"
@@ -205,7 +238,8 @@ function AcItemWithTestCases({
                     )}
                   </div>
                 </div>
-              ))}
+              )))
+              }
             </div>
           )}
         </div>
@@ -258,6 +292,9 @@ export default function ProjectStoriesPage() {
   // Soft Retention: flash animation state
   const [flashStoryId, setFlashStoryId] = useState<string | null>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Tip banner dismissal (Phase 2 onboarding)
+  const [tipDismissed, setTipDismissed] = useState(false);
 
   const stories = storiesData?.items || [];
 
@@ -415,6 +452,27 @@ export default function ProjectStoriesPage() {
           </Button>
         </div>
       </div>
+
+      {/* Tip Banner — shown to returning users with 1-3 stories */}
+      {stories.length > 0 && stories.length <= 3 && !tipDismissed && (
+        <div className="relative rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 to-blue-500/5 p-4 flex items-center gap-4">
+          <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+            <Lightbulb className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium">
+              Tip: Expand a story and click <strong>+</strong> next to any Acceptance Criteria
+              to create test cases directly.
+            </p>
+          </div>
+          <button
+            onClick={() => setTipDismissed(true)}
+            className="shrink-0 p-1 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       {/* Stories List */}
       <div className="space-y-4">
@@ -645,19 +703,46 @@ export default function ProjectStoriesPage() {
           );
         })}
         {filteredStories.length === 0 && stories.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="p-4 rounded-full bg-primary/10 mb-6">
-              <FileText className="h-12 w-12 text-primary" />
+          <div className="flex flex-col items-center justify-center py-20 px-4">
+            {/* Icon — large circular */}
+            <div className="size-20 rounded-full bg-primary/10 flex items-center justify-center mb-8">
+              <FileText className="h-10 w-10 text-primary" />
             </div>
-            <h2 className="text-xl font-bold mb-2">No user stories yet</h2>
-            <p className="text-muted-foreground max-w-md mb-8">
-              User stories help define what your users need. Create your first
-              one to start building acceptance criteria and generating test cases.
+
+            {/* Title */}
+            <h3 className="text-2xl font-bold mb-3">
+              Start with a User Story
+            </h3>
+
+            {/* Description */}
+            <p className="text-muted-foreground text-center max-w-lg mb-8 leading-relaxed">
+              User stories capture what your users need. Write one, add acceptance
+              criteria, then generate test cases — manually or with AI.
             </p>
+
+            {/* Flow Steps 1-2-3 */}
+            <div className="flex flex-wrap items-center gap-3 mb-10 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5 bg-primary/10 text-primary rounded-full px-3 py-1.5 font-medium">
+                <span className="size-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px] font-bold">1</span>
+                Write story
+              </span>
+              <ArrowRight className="h-4 w-4 hidden sm:block" />
+              <span className="flex items-center gap-1.5 bg-muted rounded-full px-3 py-1.5">
+                <span className="size-5 rounded-full bg-muted-foreground/20 flex items-center justify-center text-[10px] font-bold">2</span>
+                Add criteria
+              </span>
+              <ArrowRight className="h-4 w-4 hidden sm:block" />
+              <span className="flex items-center gap-1.5 bg-muted rounded-full px-3 py-1.5">
+                <span className="size-5 rounded-full bg-muted-foreground/20 flex items-center justify-center text-[10px] font-bold">3</span>
+                Generate tests
+              </span>
+            </div>
+
+            {/* Primary CTA */}
             <Button
-              size="lg"
               onClick={() => setCreateModalOpen(true)}
-              className="gap-2 shadow-lg shadow-primary/20"
+              size="lg"
+              className="gap-2 text-base px-8 py-6"
             >
               <Plus className="h-5 w-5" />
               Create Your First Story

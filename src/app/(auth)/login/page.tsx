@@ -13,11 +13,13 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { AuthDivider } from "@/components/ui/auth-divider";
 import { Loader2 } from "lucide-react";
 import { useLogin, useLoginGoogle } from "@/hooks/use-auth";
+import { cn } from "@/lib/utils";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [redirecting, setRedirecting] = useState(false);
 
   const login = useLogin();
@@ -28,6 +30,19 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setFieldErrors({});
+
+    // Client-side pre-validation
+    const errors: Record<string, string> = {};
+    if (!email.trim()) errors.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = "Invalid email format";
+    if (!password) errors.password = "Password is required";
+    else if (password.length < 6) errors.password = "Password must be at least 6 characters";
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
 
     login.mutate(
       { email, password },
@@ -37,7 +52,19 @@ export default function LoginPage() {
           const dest = data?.role === "ADMIN" ? "/admin/overview" : "/workspaces";
           setTimeout(() => { window.location.href = dest; }, 300);
         },
-        onError: (err) => setError(err.message),
+        onError: (err: any) => {
+          // Parse backend field-level validation errors
+          const apiErrors = err?.response?.data?.errors;
+          if (Array.isArray(apiErrors) && apiErrors.length > 0) {
+            const mapped: Record<string, string> = {};
+            apiErrors.forEach((e: { field: string; message: string }) => {
+              mapped[e.field] = e.message;
+            });
+            setFieldErrors(mapped);
+          } else {
+            setError(err.message || "Login failed");
+          }
+        },
       }
     );
   };
@@ -93,13 +120,22 @@ export default function LoginPage() {
             required
             autoComplete="email"
             disabled={isLoading}
-            className="h-11"
+            className={cn(
+              "h-11 transition-colors duration-150",
+              fieldErrors.email && "border-destructive/50 focus-visible:ring-destructive/30"
+            )}
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
               setError("");
+              if (fieldErrors.email) setFieldErrors((p) => ({ ...p, email: "" }));
             }}
           />
+          {fieldErrors.email && (
+            <p className="text-xs text-destructive/80 mt-1 animate-in fade-in-0 slide-in-from-top-1 duration-200">
+              {fieldErrors.email}
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -113,11 +149,15 @@ export default function LoginPage() {
             required
             autoComplete="current-password"
             disabled={isLoading}
-            className="h-11"
+            className={cn(
+              "h-11 transition-colors duration-150",
+              fieldErrors.password && "border-destructive/50 focus-visible:ring-destructive/30"
+            )}
             value={password}
             onChange={(e) => {
               setPassword(e.target.value);
               setError("");
+              if (fieldErrors.password) setFieldErrors((p) => ({ ...p, password: "" }));
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -126,6 +166,11 @@ export default function LoginPage() {
               }
             }}
           />
+          {fieldErrors.password && (
+            <p className="text-xs text-destructive/80 mt-1 animate-in fade-in-0 slide-in-from-top-1 duration-200">
+              {fieldErrors.password}
+            </p>
+          )}
         </div>
 
         <div className="flex justify-end">
@@ -137,7 +182,11 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <Button type="submit" className="w-full h-11" disabled={isLoading || redirecting}>
+        <Button
+          type="submit"
+          className={cn("w-full h-11", (isLoading || redirecting) && "cursor-not-allowed")}
+          disabled={isLoading || redirecting}
+        >
           {redirecting ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />

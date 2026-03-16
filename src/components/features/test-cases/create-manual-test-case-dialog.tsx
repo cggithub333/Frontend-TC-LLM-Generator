@@ -134,7 +134,7 @@ export function CreateManualTestCaseDialog({
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && handleClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>{isEditMode ? "Edit Test Case" : "Create Test Case"}</DialogTitle>
           <DialogDescription>
@@ -142,7 +142,7 @@ export function CreateManualTestCaseDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="flex-1 overflow-y-auto space-y-6 py-4">
           <div className="space-y-2">
             <Label htmlFor="acceptanceCriteria">Acceptance Criteria *</Label>
             <Select value={selectedAcId} onValueChange={setSelectedAcId}>
@@ -188,7 +188,7 @@ export function CreateManualTestCaseDialog({
             <Label htmlFor="steps">Steps</Label>
             <Textarea
               id="steps"
-              placeholder="Step 1: ...&#10;Step 2: ..."
+              placeholder={"Step 1: ...\nStep 2: ..."}
               value={steps}
               onChange={(e) => setSteps(e.target.value)}
               className="resize-none"
@@ -209,7 +209,7 @@ export function CreateManualTestCaseDialog({
           </div>
         </div>
 
-        <DialogFooter className="gap-2 sm:gap-0">
+        <DialogFooter className="gap-2 sm:gap-0 border-t pt-4 shrink-0">
           <Button variant="outline" onClick={handleClose}>
             Cancel
           </Button>

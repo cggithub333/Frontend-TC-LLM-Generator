@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Sparkles, X, Plus, Loader2 } from "lucide-react";
+import { Sparkles, X, Plus, Loader2, FileText } from "lucide-react";
 import { useProjects } from "@/hooks/use-projects";
 
 interface CreateStoryModalProps {
@@ -153,6 +153,16 @@ export function CreateStoryModal({
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto py-4 space-y-5">
+          {/* ── SECTION 1: Story Details ── */}
+          <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="size-6 rounded bg-primary/10 flex items-center justify-center">
+              <FileText className="h-3.5 w-3.5 text-primary" />
+            </div>
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+              Story Details
+            </span>
+          </div>
           {/* Project Selector - only show in create mode without defaultProjectId */}
           {!isEditMode && !defaultProjectId && (
             <div className="space-y-2">
@@ -255,8 +265,21 @@ export function CreateStoryModal({
               />
             </div>
           </div>
+          </div>
 
-          {/* Acceptance Criteria */}
+          {/* ── Visual Divider ── */}
+          <div className="relative py-2">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-background px-3 text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                Acceptance Criteria
+              </span>
+            </div>
+          </div>
+
+          {/* ── SECTION 2: Acceptance Criteria ── */}
           <div className="pt-2">
             <div className="flex items-center justify-between mb-3">
               <label className="text-sm font-bold">Acceptance Criteria</label>
@@ -277,9 +300,11 @@ export function CreateStoryModal({
                   key={criterion.id}
                   className="flex items-start gap-3 group"
                 >
-                  <div className="mt-3 w-1.5 h-1.5 rounded-full bg-muted-foreground/50 shrink-0" />
+                  <span className="mt-3 text-xs font-bold text-muted-foreground/50 tabular-nums w-4 text-right shrink-0">
+                    {index + 1}
+                  </span>
                   <Textarea
-                    className="flex-1 bg-transparent border-0 border-b border-transparent focus:border-border rounded-none px-0 focus-visible:ring-0 min-h-[56px] resize-none"
+                    className="flex-1 bg-transparent border-0 border-b border-transparent focus:border-primary/30 rounded-none px-0 focus-visible:ring-0 min-h-[56px] resize-none transition-colors duration-150"
                     rows={2}
                     placeholder={
                       index === 0
@@ -296,7 +321,7 @@ export function CreateStoryModal({
                     <button
                       type="button"
                       onClick={() => removeCriterion(criterion.id)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-destructive"
+                      className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 p-1 hover:text-destructive rounded hover:bg-destructive/10"
                     >
                       <X className="h-4 w-4" />
                     </button>

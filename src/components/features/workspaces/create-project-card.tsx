@@ -12,7 +12,7 @@ interface CreateProjectCardProps {
 export function CreateProjectCard({ onClick }: CreateProjectCardProps) {
   return (
     <button
-      className="group relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-primary/25 bg-primary/[0.02] p-5 hover:border-primary/50 hover:bg-primary/[0.06] transition-all duration-200 h-full min-h-[240px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+      className="group relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-primary/25 bg-primary/[0.02] p-5 hover:border-primary/50 hover:bg-primary/[0.06] transition-all duration-200 h-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
       onClick={onClick}
       aria-label="Create new project"
     >
