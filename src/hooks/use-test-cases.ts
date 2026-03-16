@@ -26,21 +26,38 @@ export function useTestCasesByProject(projectId: string) {
     queryKey: ["testCases", "by-project", projectId],
     queryFn: async (): Promise<TestCase[]> => {
       // Step 1: Get all stories in the project
-      const { data: storiesPage } = await axios.get<PagedResponse<{ userStoryId: string }>>(
+      const { data: storiesRes } = await axios.get<PagedResponse<{ userStoryId: string }>>(
         `/user-stories/project/${projectId}`,
         { params: { page: 0, size: 200 } }
       );
-      const stories = storiesPage?._embedded?.userStoryResponses ?? [];
+
+      // Handle both ApiResponse wrapper (data.content) and HATEOAS (_embedded) formats
+      const rawData = (storiesRes as any)?.data ?? storiesRes;
+      const stories: { userStoryId: string }[] =
+        rawData?.content ??
+        rawData?._embedded?.userStoryResponses ??
+        storiesRes?._embedded?.userStoryResponses ??
+        [];
+
       if (stories.length === 0) return [];
 
       // Step 2: Fetch TCs per story in parallel
       const results = await Promise.all(
         stories.map((s) =>
           axios
-            .get<PagedResponse<TestCase>>(`/test-cases/user-story/${s.userStoryId}`, {
+            .get(`/test-cases/user-story/${s.userStoryId}`, {
               params: { page: 0, size: 200 },
             })
-            .then((r) => extractPage(r.data).items)
+            .then((r) => {
+              // Handle both ApiResponse wrapper and HATEOAS formats
+              const raw = (r.data as any)?.data ?? r.data;
+              const items: TestCase[] =
+                raw?.content ??
+                raw?._embedded?.testCaseResponses ??
+                r.data?._embedded?.testCaseResponses ??
+                [];
+              return items;
+            })
             .catch(() => [] as TestCase[])
         )
       );

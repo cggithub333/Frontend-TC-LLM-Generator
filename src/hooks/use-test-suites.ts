@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "@/lib/axios";
 import type { TestSuite, CreateTestSuiteInput, UpdateTestSuiteInput } from "@/types/test-suite.types";
+import type { TestCase } from "@/types/test-case.types";
 import type { PagedResponse, PaginatedResult, PaginationParams } from "@/types/pagination.types";
 import { extractPage } from "@/types/pagination.types";
 
@@ -88,9 +89,27 @@ export function useDeleteTestSuite() {
 export function useTestCasesInSuite(suiteId: string) {
   return useQuery({
     queryKey: ["testSuites", suiteId, "testCases"],
-    queryFn: async () => {
+    queryFn: async (): Promise<TestCase[]> => {
       const { data } = await axios.get(`/test-suites/${suiteId}/test-cases`);
-      return data;
+      
+      // Handle ApiResponse wrapper: { success, data: { content: [...] } }
+      // or CollectionModel: { success, data: { _embedded: { testCaseResponses: [...] } } }
+      const inner = data?.data ?? data;
+      
+      // content array (ApiResponse<Page/Collection>)
+      if (Array.isArray(inner?.content)) return inner.content as TestCase[];
+      
+      // _embedded (HATEOAS CollectionModel)
+      const embedded = inner?._embedded ?? data?._embedded;
+      if (embedded) {
+        const key = Object.keys(embedded)[0];
+        return key ? (embedded[key] as TestCase[]) : [];
+      }
+
+      // Fallback: direct array
+      if (Array.isArray(inner)) return inner;
+      if (Array.isArray(data)) return data;
+      return [];
     },
     enabled: !!suiteId,
   });

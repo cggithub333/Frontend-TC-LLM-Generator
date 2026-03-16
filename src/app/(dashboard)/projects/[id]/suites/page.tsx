@@ -12,6 +12,7 @@ import {
   Sparkles,
   PenLine,
   ChevronRight,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,7 @@ import { cn } from "@/lib/utils";
 import {
   useTestSuitesByProject,
   useCreateTestSuite,
+  useDeleteTestSuite,
   useTestCasesInSuite,
   useAddTestCaseToSuite,
   useRemoveTestCaseFromSuite,
@@ -126,22 +128,21 @@ function AddTestCasesDrawer({
   const { data: allTestCases, isLoading } = useTestCasesByProject(projectId);
   const addToSuite = useAddTestCaseToSuite();
 
-  // ── Filter available TCs (exclude already in suite) ──
-  const availableTestCases = useMemo(() => {
+  // ── Filter by search only — show ALL TCs, mark already-added ones visually ──
+  const filteredTestCases = useMemo(() => {
     const cases = allTestCases ?? [];
+    if (search === "") return cases;
     return cases.filter(
       (tc) =>
-        !existingTestCaseIds.has(tc.testCaseId) &&
-        (search === "" ||
-          tc.title.toLowerCase().includes(search.toLowerCase()) ||
-          tc.userStoryTitle?.toLowerCase().includes(search.toLowerCase()))
+        tc.title.toLowerCase().includes(search.toLowerCase()) ||
+        tc.userStoryTitle?.toLowerCase().includes(search.toLowerCase())
     );
-  }, [allTestCases, existingTestCaseIds, search]);
+  }, [allTestCases, search]);
 
   // ── Group by User Story ──
   const grouped: GroupedTestCases[] = useMemo(() => {
     const map = new Map<string, GroupedTestCases>();
-    for (const tc of availableTestCases) {
+    for (const tc of filteredTestCases) {
       const key = tc.userStoryId ?? "ungrouped";
       if (!map.has(key)) {
         map.set(key, {
@@ -153,7 +154,7 @@ function AddTestCasesDrawer({
       map.get(key)!.testCases.push(tc);
     }
     return Array.from(map.values());
-  }, [availableTestCases]);
+  }, [filteredTestCases]);
 
   // ── Auto-expand all groups initially ──
   const allGroupIds = useMemo(() => new Set(grouped.map(g => g.storyId)), [grouped]);
@@ -162,6 +163,7 @@ function AddTestCasesDrawer({
   }
 
   const toggleSelect = (id: string) => {
+    if (existingTestCaseIds.has(id)) return; // Can't select already-in-suite
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -171,14 +173,18 @@ function AddTestCasesDrawer({
   };
 
   const toggleGroup = (group: GroupedTestCases) => {
-    const groupTcIds = group.testCases.map((tc) => tc.testCaseId);
-    const allSelected = groupTcIds.every((id) => selected.has(id));
+    // Only toggle TCs not already in suite
+    const selectableTcIds = group.testCases
+      .filter((tc) => !existingTestCaseIds.has(tc.testCaseId))
+      .map((tc) => tc.testCaseId);
+    if (selectableTcIds.length === 0) return;
+    const allSelected = selectableTcIds.every((id) => selected.has(id));
     setSelected((prev) => {
       const next = new Set(prev);
       if (allSelected) {
-        groupTcIds.forEach((id) => next.delete(id));
+        selectableTcIds.forEach((id) => next.delete(id));
       } else {
-        groupTcIds.forEach((id) => next.add(id));
+        selectableTcIds.forEach((id) => next.add(id));
       }
       return next;
     });
@@ -248,21 +254,23 @@ function AddTestCasesDrawer({
               <div className="p-3 rounded-2xl bg-primary/10 w-fit mx-auto mb-3">
                 <FileText className="h-8 w-8 text-primary" />
               </div>
-              <p className="font-medium">No test cases available</p>
+              <p className="font-medium">No test cases found</p>
               <p className="text-sm mt-1">
-                All test cases are already in this suite, or none exist yet.
+                Create test cases from your stories first.
               </p>
             </div>
           ) : (
             grouped.map((group) => {
               const isExpanded = expandedGroups.has(group.storyId);
               const groupTcIds = group.testCases.map((tc) => tc.testCaseId);
-              const allInGroupSelected = groupTcIds.every((id) =>
-                selected.has(id)
+              const selectableTcIds = groupTcIds.filter(
+                (id) => !existingTestCaseIds.has(id)
               );
+              const allInGroupSelected = selectableTcIds.length > 0 &&
+                selectableTcIds.every((id) => selected.has(id));
               const someInGroupSelected =
                 !allInGroupSelected &&
-                groupTcIds.some((id) => selected.has(id));
+                selectableTcIds.some((id) => selected.has(id));
 
               return (
                 <div key={group.storyId} className="mb-1">
@@ -306,28 +314,57 @@ function AddTestCasesDrawer({
                   {/* Group Items */}
                   {isExpanded && (
                     <div className="ml-6 space-y-1 mt-1">
-                      {group.testCases.map((tc) => (
+                      {group.testCases.map((tc) => {
+                        const isInSuite = existingTestCaseIds.has(tc.testCaseId);
+                        return (
                         <label
                           key={tc.testCaseId}
                           className={cn(
-                            "flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all duration-150",
-                            selected.has(tc.testCaseId)
-                              ? "border-primary bg-primary/5"
-                              : "border-border hover:border-primary/30 hover:bg-muted/30"
+                            "flex items-start gap-3 p-3 rounded-xl border transition-all duration-150",
+                            isInSuite
+                              ? "border-border bg-muted/30 opacity-60 cursor-not-allowed"
+                              : selected.has(tc.testCaseId)
+                                ? "border-primary bg-primary/5 cursor-pointer"
+                                : "border-border hover:border-primary/30 hover:bg-muted/30 cursor-pointer"
                           )}
                         >
                           <Checkbox
-                            checked={selected.has(tc.testCaseId)}
+                            checked={isInSuite || selected.has(tc.testCaseId)}
                             onCheckedChange={() =>
                               toggleSelect(tc.testCaseId)
                             }
+                            disabled={isInSuite}
                             className="mt-0.5"
                           />
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium truncate">
+                            <p className="text-sm font-medium">
                               {tc.title}
                             </p>
-                            <div className="mt-1">
+                            {/* Detail summary */}
+                            {tc.preconditions && (
+                              <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                                <span className="font-medium text-foreground/70">Pre:</span> {tc.preconditions}
+                              </p>
+                            )}
+                            {tc.steps && (
+                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                                <span className="font-medium text-foreground/70">Steps:</span> {tc.steps}
+                              </p>
+                            )}
+                            {tc.expectedResult && (
+                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                                <span className="font-medium text-foreground/70">Expected:</span> {tc.expectedResult}
+                              </p>
+                            )}
+                            <div className="mt-1.5 flex items-center gap-1.5">
+                              {isInSuite && (
+                                <Badge
+                                  variant="outline"
+                                  className="text-[10px] px-1.5 py-0 border-green-500/30 text-green-600 dark:text-green-400"
+                                >
+                                  Already in suite
+                                </Badge>
+                              )}
                               {tc.generatedByAi ? (
                                 <Badge
                                   variant="secondary"
@@ -345,10 +382,16 @@ function AddTestCasesDrawer({
                                   Manual
                                 </Badge>
                               )}
+                              {tc.testCaseTypeName && (
+                                <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                                  {tc.testCaseTypeName}
+                                </Badge>
+                              )}
                             </div>
                           </div>
                         </label>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -401,15 +444,9 @@ export default function ProjectTestSuitesPage() {
     (s) => s.testSuiteId === selectedSuiteId
   );
 
-  const { data: suiteTCsRaw, isLoading: tcsLoading } = useTestCasesInSuite(
+  const { data: suiteTestCases = [], isLoading: tcsLoading } = useTestCasesInSuite(
     selectedSuiteId ?? ""
   );
-  const suiteTestCases: TestCase[] = useMemo(() => {
-    if (!suiteTCsRaw) return [];
-    if (Array.isArray(suiteTCsRaw)) return suiteTCsRaw;
-    if (suiteTCsRaw.items) return suiteTCsRaw.items;
-    return [];
-  }, [suiteTCsRaw]);
 
   const existingTCIds = useMemo(
     () => new Set(suiteTestCases.map((tc: TestCase) => tc.testCaseId)),
@@ -417,6 +454,7 @@ export default function ProjectTestSuitesPage() {
   );
 
   const removeFromSuite = useRemoveTestCaseFromSuite();
+  const deleteSuite = useDeleteTestSuite();
 
   const handleRemoveTC = async (testCaseId: string) => {
     if (!selectedSuiteId) return;
@@ -428,6 +466,20 @@ export default function ProjectTestSuitesPage() {
       toast.success("Removed from suite");
     } catch {
       toast.error("Failed to remove");
+    }
+  };
+
+  const handleDeleteSuite = async (suiteId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm("Are you sure you want to delete this suite?")) return;
+    try {
+      await deleteSuite.mutateAsync(suiteId);
+      toast.success("Suite deleted");
+      if (selectedSuiteId === suiteId) {
+        setSelectedSuiteId(suites.length > 1 ? suites.find(s => s.testSuiteId !== suiteId)?.testSuiteId ?? null : null);
+      }
+    } catch {
+      toast.error("Failed to delete suite");
     }
   };
 
@@ -496,7 +548,7 @@ export default function ProjectTestSuitesPage() {
                   key={suite.testSuiteId}
                   onClick={() => setSelectedSuiteId(suite.testSuiteId)}
                   className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-150",
+                    "group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-150",
                     isActive
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-accent"
@@ -507,7 +559,7 @@ export default function ProjectTestSuitesPage() {
                   ) : (
                     <Folder className="h-4 w-4 shrink-0" />
                   )}
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium truncate">
                       {suite.name}
                     </p>
@@ -517,6 +569,14 @@ export default function ProjectTestSuitesPage() {
                       </p>
                     )}
                   </div>
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => handleDeleteSuite(suite.testSuiteId, e)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </span>
                 </button>
               );
             })
@@ -600,6 +660,8 @@ export default function ProjectTestSuitesPage() {
                     <tr className="bg-muted/50 text-xs text-muted-foreground uppercase font-medium border-b">
                       <th className="px-6 py-3 font-semibold">Title</th>
                       <th className="px-6 py-3 font-semibold">Story</th>
+                      <th className="px-6 py-3 font-semibold">Preconditions</th>
+                      <th className="px-6 py-3 font-semibold">Expected Result</th>
                       <th className="px-6 py-3 font-semibold">Type</th>
                       <th className="px-6 py-3 font-semibold w-20">Actions</th>
                     </tr>
@@ -610,11 +672,22 @@ export default function ProjectTestSuitesPage() {
                         key={tc.testCaseId}
                         className="hover:bg-muted/30 transition-colors duration-150"
                       >
-                        <td className="px-6 py-3.5 font-medium">
-                          {tc.title}
+                        <td className="px-6 py-3.5 font-medium max-w-[250px]">
+                          <p className="truncate">{tc.title}</p>
+                          {tc.steps && (
+                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                              Steps: {tc.steps}
+                            </p>
+                          )}
                         </td>
-                        <td className="px-6 py-3.5 text-muted-foreground">
+                        <td className="px-6 py-3.5 text-muted-foreground max-w-[180px] truncate">
                           {tc.userStoryTitle ?? "—"}
+                        </td>
+                        <td className="px-6 py-3.5 text-muted-foreground max-w-[180px]">
+                          <p className="line-clamp-2 text-xs">{tc.preconditions ?? "—"}</p>
+                        </td>
+                        <td className="px-6 py-3.5 text-muted-foreground max-w-[180px]">
+                          <p className="line-clamp-2 text-xs">{tc.expectedResult ?? "—"}</p>
                         </td>
                         <td className="px-6 py-3.5">
                           {tc.generatedByAi ? (
