@@ -37,6 +37,7 @@ import {
 import Link from "next/link";
 import { CreateStoryModal } from "@/components/features/stories/create-story-modal";
 import type { StoryFormData } from "@/components/features/stories/create-story-modal";
+import { StoryDetailPanel } from "@/components/features/stories/story-detail-panel";
 import {
   useStories,
   useCreateStory,
@@ -80,6 +81,7 @@ export default function StoriesPage() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editingStory, setEditingStory] = useState<UserStory | null>(null);
   const [deleteConfirmStory, setDeleteConfirmStory] = useState<UserStory | null>(null);
+  const [selectedStoryId, setSelectedStoryId] = useState<string | null>(null);
 
   const { data: storiesData, isLoading, error } = useStories();
   const createStory = useCreateStory();
@@ -309,12 +311,15 @@ export default function StoriesPage() {
                       >
                         {story.jiraIssueKey ?? `US-${story.userStoryId.slice(0, 6).toUpperCase()}`}
                       </Badge>
-                      <Link
-                        href={`/stories/${story.userStoryId}`}
-                        className="font-bold text-lg hover:text-primary transition-colors hover:underline underline-offset-2"
+                      <button
+                        className="font-bold text-lg text-left hover:text-primary transition-colors hover:underline underline-offset-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedStoryId(story.userStoryId);
+                        }}
                       >
                         {story.title}
-                      </Link>
+                      </button>
                       {story.status && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -593,6 +598,20 @@ export default function StoriesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Story Detail Side Panel */}
+      <StoryDetailPanel
+        storyId={selectedStoryId}
+        onClose={() => setSelectedStoryId(null)}
+        onEdit={(story) => {
+          setSelectedStoryId(null);
+          setEditingStory(story);
+        }}
+        onDelete={(story) => {
+          setSelectedStoryId(null);
+          setDeleteConfirmStory(story);
+        }}
+      />
     </div>
   );
 }

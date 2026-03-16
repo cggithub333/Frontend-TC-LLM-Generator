@@ -237,9 +237,8 @@ export default function TestPlanDetailPage() {
                 ) : (
                   <div className="space-y-2">
                     {stories.map((story) => (
-                      <Link
+                      <div
                         key={story.userStoryId}
-                        href={`/stories/${story.userStoryId}`}
                         className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors group"
                       >
                         <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
@@ -256,7 +255,7 @@ export default function TestPlanDetailPage() {
                         <Badge variant="outline" className="text-[10px] shrink-0">
                           {story.status}
                         </Badge>
-                      </Link>
+                      </div>
                     ))}
                   </div>
                 )}

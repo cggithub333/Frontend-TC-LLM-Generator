@@ -222,7 +222,7 @@ export default function ProjectDetailPage() {
                       >
                         <td className="px-5 py-3 font-medium">
                           <Link
-                            href={`/stories/${story.userStoryId}`}
+                            href={`/projects/${params.id}/stories`}
                             className="hover:text-primary"
                           >
                             {story.title}

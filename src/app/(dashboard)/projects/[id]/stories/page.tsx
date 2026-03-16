@@ -14,6 +14,7 @@ import {
 import { useUpdateAcceptanceCriteria } from "@/hooks/use-acceptance-criteria";
 import { CreateStoryModal } from "@/components/features/stories/create-story-modal";
 import type { StoryFormData } from "@/components/features/stories/create-story-modal";
+import { StoryDetailPanel } from "@/components/features/stories/story-detail-panel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -47,7 +48,7 @@ import {
   Lightbulb,
   X,
 } from "lucide-react";
-import Link from "next/link";
+// Link removed — story titles now open side panel via onClick
 import { LoadingSkeleton } from "@/components/features/workspaces/loading-skeleton";
 import { CreateManualTestCaseDialog } from "@/components/features/test-cases/create-manual-test-case-dialog";
 
@@ -296,6 +297,9 @@ export default function ProjectStoriesPage() {
   // Tip banner dismissal (Phase 2 onboarding)
   const [tipDismissed, setTipDismissed] = useState(false);
 
+  // Story Detail Panel state
+  const [selectedStoryId, setSelectedStoryId] = useState<string | null>(null);
+
   const stories = storiesData?.items || [];
 
   const toggleExpand = (id: string) => {
@@ -512,13 +516,15 @@ export default function ProjectStoriesPage() {
                     >
                       {story.jiraIssueKey ?? `US-${story.userStoryId.slice(0, 6).toUpperCase()}`}
                     </Badge>
-                    <Link
-                      href={`/stories/${story.userStoryId}`}
-                      className="font-bold text-lg group-hover:text-primary transition-colors duration-150 hover:underline underline-offset-2"
-                      onClick={(e) => e.stopPropagation()}
+                    <button
+                      className="font-bold text-lg text-left group-hover:text-primary transition-colors duration-150 hover:underline underline-offset-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedStoryId(story.userStoryId);
+                      }}
                     >
                       {story.title}
-                    </Link>
+                    </button>
                     {story.status && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
@@ -885,6 +891,20 @@ export default function ProjectStoriesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Story Detail Side Panel */}
+      <StoryDetailPanel
+        storyId={selectedStoryId}
+        onClose={() => setSelectedStoryId(null)}
+        onEdit={(story) => {
+          setSelectedStoryId(null);
+          setEditingStory(story);
+        }}
+        onDelete={(story) => {
+          setSelectedStoryId(null);
+          setDeleteConfirmStory(story);
+        }}
+      />
     </div>
   );
 }
