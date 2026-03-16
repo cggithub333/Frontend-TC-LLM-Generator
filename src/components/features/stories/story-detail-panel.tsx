@@ -14,13 +14,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { useStory } from "@/hooks/use-stories";
 import { useUpdateAcceptanceCriteria } from "@/hooks/use-acceptance-criteria";
-import { useTestCasesByAcceptanceCriteria } from "@/hooks/use-test-cases";
+import { useTestCasesByAcceptanceCriteria, useTestCasesByUserStory } from "@/hooks/use-test-cases";
+import { SuitePickerDialog } from "@/components/features/test-suites/suite-picker-dialog";
 import {
   Sparkles,
   Pencil,
   ChevronDown,
   ChevronUp,
   ClipboardList,
+  FolderPlus,
 } from "lucide-react";
 import type { UserStory, StoryStatus, AcceptanceCriteria } from "@/types/story.types";
 
@@ -238,6 +240,19 @@ export function StoryDetailPanel({
     });
   };
 
+  /* ---------- Suite picker state ---------- */
+  const [suitePickerOpen, setSuitePickerOpen] = useState(false);
+
+  // Fetch all TCs for this story to get IDs for the suite picker
+  const { data: storyTCData } = useTestCasesByUserStory(
+    story?.userStoryId ?? "",
+    { size: 200 }
+  );
+  const storyTestCaseIds = useMemo(
+    () => (storyTCData?.items ?? []).map((tc) => tc.testCaseId),
+    [storyTCData]
+  );
+
   /* ---------- Render ---------- */
   return (
     <Sheet open={isOpen} onOpenChange={(val) => !val && onClose()}>
@@ -402,6 +417,20 @@ export function StoryDetailPanel({
                 Generate AI Test Cases
               </Button>
 
+              {/* Add to Suite CTA */}
+              <Button
+                variant="outline"
+                className="w-full gap-2"
+                size="lg"
+                disabled={storyTestCaseIds.length === 0}
+                onClick={() => setSuitePickerOpen(true)}
+              >
+                <FolderPlus className="h-4 w-4" />
+                {storyTestCaseIds.length > 0
+                  ? `Add ${storyTestCaseIds.length} Test Case${storyTestCaseIds.length !== 1 ? "s" : ""} to Suite`
+                  : "No Test Cases to Add"}
+              </Button>
+
               {/* Secondary actions */}
               <div className="flex items-center justify-between">
                 <Button
@@ -424,6 +453,16 @@ export function StoryDetailPanel({
 
             {/* Spacer for comfortable scroll end */}
             <div className="h-8" aria-hidden />
+
+            {/* Suite Picker Dialog */}
+            {story.projectId && (
+              <SuitePickerDialog
+                projectId={story.projectId}
+                testCaseIds={storyTestCaseIds}
+                open={suitePickerOpen}
+                onOpenChange={setSuitePickerOpen}
+              />
+            )}
           </div>
         )}
       </SheetContent>

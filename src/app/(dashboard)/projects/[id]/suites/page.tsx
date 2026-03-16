@@ -7,16 +7,23 @@ import {
   Folder,
   FolderOpen,
   Search,
-  X,
   Loader2,
-  AlertCircle,
   FileText,
   Sparkles,
   PenLine,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import {
   useTestSuitesByProject,
@@ -25,11 +32,14 @@ import {
   useAddTestCaseToSuite,
   useRemoveTestCaseFromSuite,
 } from "@/hooks/use-test-suites";
-import { useTestCases } from "@/hooks/use-test-cases";
+import { useTestCasesByProject } from "@/hooks/use-test-cases";
 import { toast } from "sonner";
 import type { TestCase } from "@/types/test-case.types";
 
-// ──────── Create Suite Dialog (inline) ────────
+/* ================================================================== */
+/*  CreateSuiteInline                                                  */
+/* ================================================================== */
+
 function CreateSuiteInline({
   projectId,
   onCreated,
@@ -80,25 +90,45 @@ function CreateSuiteInline({
   );
 }
 
-// ──────── Add Test Cases Drawer ────────
+/* ================================================================== */
+/*  Grouped Test Case interface                                        */
+/* ================================================================== */
+
+interface GroupedTestCases {
+  storyId: string;
+  storyTitle: string;
+  testCases: TestCase[];
+}
+
+/* ================================================================== */
+/*  AddTestCasesDrawer — Sheet, project-scoped, grouped, parallel add  */
+/* ================================================================== */
+
 function AddTestCasesDrawer({
   open,
   onClose,
   suiteId,
+  projectId,
   existingTestCaseIds,
 }: {
   open: boolean;
   onClose: () => void;
   suiteId: string;
+  projectId: string;
   existingTestCaseIds: Set<string>;
 }) {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const { data: allTestCases, isLoading } = useTestCases({ size: 200 });
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+  const [isAdding, setIsAdding] = useState(false);
+
+  // ── Project-scoped test cases (instead of global) ──
+  const { data: allTestCases, isLoading } = useTestCasesByProject(projectId);
   const addToSuite = useAddTestCaseToSuite();
 
+  // ── Filter available TCs (exclude already in suite) ──
   const availableTestCases = useMemo(() => {
-    const cases = allTestCases?.items ?? [];
+    const cases = allTestCases ?? [];
     return cases.filter(
       (tc) =>
         !existingTestCaseIds.has(tc.testCaseId) &&
@@ -107,6 +137,29 @@ function AddTestCasesDrawer({
           tc.userStoryTitle?.toLowerCase().includes(search.toLowerCase()))
     );
   }, [allTestCases, existingTestCaseIds, search]);
+
+  // ── Group by User Story ──
+  const grouped: GroupedTestCases[] = useMemo(() => {
+    const map = new Map<string, GroupedTestCases>();
+    for (const tc of availableTestCases) {
+      const key = tc.userStoryId ?? "ungrouped";
+      if (!map.has(key)) {
+        map.set(key, {
+          storyId: key,
+          storyTitle: tc.userStoryTitle ?? "Ungrouped",
+          testCases: [],
+        });
+      }
+      map.get(key)!.testCases.push(tc);
+    }
+    return Array.from(map.values());
+  }, [availableTestCases]);
+
+  // ── Auto-expand all groups initially ──
+  const allGroupIds = useMemo(() => new Set(grouped.map(g => g.storyId)), [grouped]);
+  if (expandedGroups.size === 0 && allGroupIds.size > 0 && open) {
+    setExpandedGroups(new Set(allGroupIds));
+  }
 
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
@@ -117,52 +170,66 @@ function AddTestCasesDrawer({
     });
   };
 
-  const handleAddToSuite = async () => {
-    try {
-      for (const testCaseId of selected) {
-        await addToSuite.mutateAsync({ suiteId, testCaseId });
+  const toggleGroup = (group: GroupedTestCases) => {
+    const groupTcIds = group.testCases.map((tc) => tc.testCaseId);
+    const allSelected = groupTcIds.every((id) => selected.has(id));
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (allSelected) {
+        groupTcIds.forEach((id) => next.delete(id));
+      } else {
+        groupTcIds.forEach((id) => next.add(id));
       }
+      return next;
+    });
+  };
+
+  const toggleExpand = (storyId: string) => {
+    setExpandedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(storyId)) next.delete(storyId);
+      else next.add(storyId);
+      return next;
+    });
+  };
+
+  // ── Parallel add (Promise.all) ──
+  const handleAddToSuite = async () => {
+    if (selected.size === 0) return;
+    setIsAdding(true);
+    try {
+      await Promise.all(
+        Array.from(selected).map((testCaseId) =>
+          addToSuite.mutateAsync({ suiteId, testCaseId })
+        )
+      );
       toast.success(`Added ${selected.size} test case(s) to suite`);
       setSelected(new Set());
       onClose();
     } catch {
-      toast.error("Failed to add test cases");
+      toast.error("Some test cases failed to add");
+    } finally {
+      setIsAdding(false);
     }
   };
 
-  if (!open) return null;
-
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-        onClick={onClose}
-      />
-      {/* Drawer */}
-      <div className="fixed inset-y-0 right-0 w-full max-w-lg bg-card border-l border-border z-50 flex flex-col shadow-2xl animate-in slide-in-from-right duration-300">
+    <Sheet open={open} onOpenChange={(val) => !val && onClose()}>
+      <SheetContent className="flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b">
-          <div>
-            <h3 className="text-lg font-bold">Add Test Cases</h3>
-            <p className="text-sm text-muted-foreground">
-              Select test cases to add to this suite
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg hover:bg-muted transition-colors duration-150"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+        <SheetHeader>
+          <SheetTitle>Add Test Cases</SheetTitle>
+          <SheetDescription>
+            Select test cases from this project to add to the suite
+          </SheetDescription>
+        </SheetHeader>
 
         {/* Search */}
-        <div className="p-4 border-b">
+        <div className="px-6 py-3 border-b">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search test cases..."
+              placeholder="Search test cases or stories..."
               className="pl-9"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -170,15 +237,15 @@ function AddTestCasesDrawer({
           </div>
         </div>
 
-        {/* List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        {/* Grouped List */}
+        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-1">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
-          ) : availableTestCases.length === 0 ? (
+          ) : grouped.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              <div className="p-3 rounded-full bg-primary/10 w-fit mx-auto mb-3">
+              <div className="p-3 rounded-2xl bg-primary/10 w-fit mx-auto mb-3">
                 <FileText className="h-8 w-8 text-primary" />
               </div>
               <p className="font-medium">No test cases available</p>
@@ -187,59 +254,120 @@ function AddTestCasesDrawer({
               </p>
             </div>
           ) : (
-            availableTestCases.map((tc) => (
-              <label
-                key={tc.testCaseId}
-                className={cn(
-                  "flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all duration-150",
-                  selected.has(tc.testCaseId)
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/30 hover:bg-muted/30"
-                )}
-              >
-                <input
-                  type="checkbox"
-                  checked={selected.has(tc.testCaseId)}
-                  onChange={() => toggleSelect(tc.testCaseId)}
-                  className="mt-0.5 rounded border-border"
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium truncate">{tc.title}</p>
-                  {tc.userStoryTitle && (
-                    <p className="text-xs text-muted-foreground truncate mt-0.5">
-                      Story: {tc.userStoryTitle}
-                    </p>
+            grouped.map((group) => {
+              const isExpanded = expandedGroups.has(group.storyId);
+              const groupTcIds = group.testCases.map((tc) => tc.testCaseId);
+              const allInGroupSelected = groupTcIds.every((id) =>
+                selected.has(id)
+              );
+              const someInGroupSelected =
+                !allInGroupSelected &&
+                groupTcIds.some((id) => selected.has(id));
+
+              return (
+                <div key={group.storyId} className="mb-1">
+                  {/* Group Header */}
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-muted/50 transition-colors"
+                    onClick={() => toggleExpand(group.storyId)}
+                  >
+                    <Checkbox
+                      checked={
+                        allInGroupSelected
+                          ? true
+                          : someInGroupSelected
+                            ? "indeterminate"
+                            : false
+                      }
+                      onCheckedChange={(e) => {
+                        e; // prevent default
+                        toggleGroup(group);
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="mr-1"
+                    />
+                    <ChevronRight
+                      className={cn(
+                        "h-4 w-4 transition-transform duration-200 text-muted-foreground",
+                        isExpanded && "rotate-90"
+                      )}
+                    />
+                    <span className="text-sm font-semibold truncate flex-1 text-left">
+                      {group.storyTitle}
+                    </span>
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] shrink-0"
+                    >
+                      {group.testCases.length}
+                    </Badge>
+                  </button>
+
+                  {/* Group Items */}
+                  {isExpanded && (
+                    <div className="ml-6 space-y-1 mt-1">
+                      {group.testCases.map((tc) => (
+                        <label
+                          key={tc.testCaseId}
+                          className={cn(
+                            "flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all duration-150",
+                            selected.has(tc.testCaseId)
+                              ? "border-primary bg-primary/5"
+                              : "border-border hover:border-primary/30 hover:bg-muted/30"
+                          )}
+                        >
+                          <Checkbox
+                            checked={selected.has(tc.testCaseId)}
+                            onCheckedChange={() =>
+                              toggleSelect(tc.testCaseId)
+                            }
+                            className="mt-0.5"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium truncate">
+                              {tc.title}
+                            </p>
+                            <div className="mt-1">
+                              {tc.generatedByAi ? (
+                                <Badge
+                                  variant="secondary"
+                                  className="text-[10px] px-1.5 py-0 bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+                                >
+                                  <Sparkles className="h-3 w-3 mr-0.5" />
+                                  AI
+                                </Badge>
+                              ) : (
+                                <Badge
+                                  variant="secondary"
+                                  className="text-[10px] px-1.5 py-0"
+                                >
+                                  <PenLine className="h-3 w-3 mr-0.5" />
+                                  Manual
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
                   )}
-                  <div className="mt-1">
-                    {tc.generatedByAi ? (
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
-                        <Sparkles className="h-3 w-3 mr-0.5" />
-                        AI
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                        <PenLine className="h-3 w-3 mr-0.5" />
-                        Manual
-                      </Badge>
-                    )}
-                  </div>
                 </div>
-              </label>
-            ))
+              );
+            })
           )}
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t flex items-center justify-between">
+        <div className="px-6 py-4 border-t flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
             {selected.size} case(s) selected
           </p>
           <Button
             onClick={handleAddToSuite}
-            disabled={selected.size === 0 || addToSuite.isPending}
+            disabled={selected.size === 0 || isAdding}
             className="gap-2"
           >
-            {addToSuite.isPending ? (
+            {isAdding ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Plus className="h-4 w-4" />
@@ -247,12 +375,15 @@ function AddTestCasesDrawer({
             Add to Suite
           </Button>
         </div>
-      </div>
-    </>
+      </SheetContent>
+    </Sheet>
   );
 }
 
-// ──────── Main Page ────────
+/* ================================================================== */
+/*  Main Page                                                          */
+/* ================================================================== */
+
 export default function ProjectTestSuitesPage() {
   const params = useParams();
   const projectId = params.id as string;
@@ -311,7 +442,7 @@ export default function ProjectTestSuitesPage() {
       <div className="w-[300px] shrink-0 border-r border-border flex flex-col bg-card/50">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
-          <h1 className="text-lg font-bold">Test Suites</h1>
+          <h1 className="text-lg font-bold tracking-tight">Test Suites</h1>
           <Button
             size="sm"
             variant="ghost"
@@ -338,7 +469,7 @@ export default function ProjectTestSuitesPage() {
             </div>
           ) : suites.length === 0 ? (
             <div className="text-center py-10 px-4">
-              <div className="p-3 rounded-full bg-primary/10 w-fit mx-auto mb-3">
+              <div className="p-3 rounded-2xl bg-primary/10 w-fit mx-auto mb-3">
                 <Folder className="h-8 w-8 text-primary" />
               </div>
               <p className="text-sm font-medium text-muted-foreground mb-1">
@@ -377,7 +508,9 @@ export default function ProjectTestSuitesPage() {
                     <Folder className="h-4 w-4 shrink-0" />
                   )}
                   <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">{suite.name}</p>
+                    <p className="text-sm font-medium truncate">
+                      {suite.name}
+                    </p>
                     {suite.description && (
                       <p className="text-xs text-muted-foreground truncate">
                         {suite.description}
@@ -395,7 +528,7 @@ export default function ProjectTestSuitesPage() {
       <div className="flex-1 flex flex-col min-w-0">
         {!selectedSuite ? (
           <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
-            <div className="p-4 rounded-full bg-primary/10 mb-4">
+            <div className="p-3 rounded-2xl bg-primary/10 mb-4">
               <Folder className="h-12 w-12 text-primary" />
             </div>
             <p className="text-lg font-semibold">
@@ -414,7 +547,9 @@ export default function ProjectTestSuitesPage() {
             {/* Detail Header */}
             <div className="flex items-center justify-between p-6 border-b">
               <div>
-                <h2 className="text-xl font-bold">{selectedSuite.name}</h2>
+                <h2 className="text-xl font-bold tracking-tight">
+                  {selectedSuite.name}
+                </h2>
                 {selectedSuite.description && (
                   <p className="text-sm text-muted-foreground mt-0.5">
                     {selectedSuite.description}
@@ -438,12 +573,17 @@ export default function ProjectTestSuitesPage() {
                 </div>
               ) : suiteTestCases.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                  <div className="p-4 rounded-full bg-primary/10 mb-4">
-                    <FileText className="h-12 w-12 text-primary" />
+                  <div className="relative mb-6">
+                    <div className="p-4 rounded-2xl bg-primary/10">
+                      <FileText className="h-12 w-12 text-primary" />
+                    </div>
+                    {/* Decorative dot */}
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-amber-400 rounded-full" />
                   </div>
-                  <p className="text-lg font-semibold">No test cases</p>
-                  <p className="text-sm mt-1 mb-4">
-                    Add test cases from your project to this suite
+                  <p className="text-lg font-bold">No test cases yet</p>
+                  <p className="text-sm mt-1 mb-6 max-w-sm text-center">
+                    Add test cases from your stories to organize them in this
+                    suite
                   </p>
                   <Button
                     variant="outline"
@@ -478,12 +618,18 @@ export default function ProjectTestSuitesPage() {
                         </td>
                         <td className="px-6 py-3.5">
                           {tc.generatedByAi ? (
-                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
+                            <Badge
+                              variant="secondary"
+                              className="text-[10px] px-1.5 py-0 bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+                            >
                               <Sparkles className="h-3 w-3 mr-0.5" />
                               AI
                             </Badge>
                           ) : (
-                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                            <Badge
+                              variant="secondary"
+                              className="text-[10px] px-1.5 py-0"
+                            >
                               <PenLine className="h-3 w-3 mr-0.5" />
                               Manual
                             </Badge>
@@ -509,11 +655,12 @@ export default function ProjectTestSuitesPage() {
         )}
       </div>
 
-      {/* ─── Add Test Cases Drawer ─── */}
+      {/* ─── Add Test Cases Drawer (Sheet) ─── */}
       <AddTestCasesDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         suiteId={selectedSuiteId ?? ""}
+        projectId={projectId}
         existingTestCaseIds={existingTCIds}
       />
     </div>

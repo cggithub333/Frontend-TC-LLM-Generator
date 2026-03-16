@@ -16,6 +16,40 @@ export function useTestCases(params?: PaginationParams) {
   });
 }
 
+/**
+ * Project-scoped test cases — fetches stories in the project,
+ * then fetches TCs per story in parallel.
+ * Workaround until backend supports GET /projects/{id}/test-cases
+ */
+export function useTestCasesByProject(projectId: string) {
+  return useQuery({
+    queryKey: ["testCases", "by-project", projectId],
+    queryFn: async (): Promise<TestCase[]> => {
+      // Step 1: Get all stories in the project
+      const { data: storiesPage } = await axios.get<PagedResponse<{ userStoryId: string }>>(
+        `/user-stories/project/${projectId}`,
+        { params: { page: 0, size: 200 } }
+      );
+      const stories = storiesPage?._embedded?.userStoryResponses ?? [];
+      if (stories.length === 0) return [];
+
+      // Step 2: Fetch TCs per story in parallel
+      const results = await Promise.all(
+        stories.map((s) =>
+          axios
+            .get<PagedResponse<TestCase>>(`/test-cases/user-story/${s.userStoryId}`, {
+              params: { page: 0, size: 200 },
+            })
+            .then((r) => extractPage(r.data).items)
+            .catch(() => [] as TestCase[])
+        )
+      );
+      return results.flat();
+    },
+    enabled: !!projectId,
+  });
+}
+
 export function useTestCasesByAcceptanceCriteria(
   acceptanceCriteriaId: string,
   params?: PaginationParams
