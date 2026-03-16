@@ -98,10 +98,41 @@ export default function TeamManagementPage() {
 
   if (projectsLoading || membersLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading team members...</p>
+      <div className="p-8 space-y-6">
+        {/* Skeleton Header */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="h-8 w-48 bg-muted rounded-lg animate-pulse" />
+          <div className="flex-1" />
+          <div className="h-10 w-64 bg-muted rounded-lg animate-pulse" />
+          <div className="h-10 w-36 bg-muted rounded-lg animate-pulse" />
+        </div>
+        {/* Skeleton Stats */}
+        <div className="flex gap-6">
+          <div className="flex-1 min-w-[200px] rounded-xl p-6 bg-card border border-border">
+            <div className="h-4 w-28 bg-muted rounded animate-pulse mb-3" />
+            <div className="h-7 w-12 bg-muted rounded animate-pulse" />
+          </div>
+          <div className="flex-1 min-w-[200px] rounded-xl p-6 bg-card border border-border">
+            <div className="h-4 w-28 bg-muted rounded animate-pulse mb-3" />
+            <div className="h-7 w-12 bg-muted rounded animate-pulse" />
+          </div>
+        </div>
+        {/* Skeleton Table */}
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b">
+            <div className="h-5 w-32 bg-muted rounded animate-pulse" />
+          </div>
+          <div className="p-6 space-y-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-40 bg-muted rounded animate-pulse" />
+                  <div className="h-3 w-24 bg-muted rounded animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );

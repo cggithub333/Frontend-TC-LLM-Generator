@@ -11,9 +11,12 @@ import {
   Loader2,
   AlertCircle,
   FileText,
+  Sparkles,
+  PenLine,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import {
   useTestSuitesByProject,
@@ -133,7 +136,7 @@ function AddTestCasesDrawer({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/40 z-40"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
         onClick={onClose}
       />
       {/* Drawer */}
@@ -148,7 +151,7 @@ function AddTestCasesDrawer({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-muted transition-colors"
+            className="p-2 rounded-lg hover:bg-muted transition-colors duration-150"
           >
             <X className="h-5 w-5" />
           </button>
@@ -175,7 +178,9 @@ function AddTestCasesDrawer({
             </div>
           ) : availableTestCases.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              <FileText className="h-8 w-8 mx-auto mb-3 opacity-40" />
+              <div className="p-3 rounded-full bg-primary/10 w-fit mx-auto mb-3">
+                <FileText className="h-8 w-8 text-primary" />
+              </div>
               <p className="font-medium">No test cases available</p>
               <p className="text-sm mt-1">
                 All test cases are already in this suite, or none exist yet.
@@ -186,10 +191,10 @@ function AddTestCasesDrawer({
               <label
                 key={tc.testCaseId}
                 className={cn(
-                  "flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all",
+                  "flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all duration-150",
                   selected.has(tc.testCaseId)
                     ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/30"
+                    : "border-border hover:border-primary/30 hover:bg-muted/30"
                 )}
               >
                 <input
@@ -205,9 +210,19 @@ function AddTestCasesDrawer({
                       Story: {tc.userStoryTitle}
                     </p>
                   )}
-                  <p className="text-xs text-muted-foreground/60 mt-0.5">
-                    {tc.generatedByAi ? "🤖 AI Generated" : "✍️ Manual"}
-                  </p>
+                  <div className="mt-1">
+                    {tc.generatedByAi ? (
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
+                        <Sparkles className="h-3 w-3 mr-0.5" />
+                        AI
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                        <PenLine className="h-3 w-3 mr-0.5" />
+                        Manual
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </label>
             ))
@@ -323,7 +338,9 @@ export default function ProjectTestSuitesPage() {
             </div>
           ) : suites.length === 0 ? (
             <div className="text-center py-10 px-4">
-              <Folder className="h-8 w-8 mx-auto mb-3 text-muted-foreground/40" />
+              <div className="p-3 rounded-full bg-primary/10 w-fit mx-auto mb-3">
+                <Folder className="h-8 w-8 text-primary" />
+              </div>
               <p className="text-sm font-medium text-muted-foreground mb-1">
                 No suites yet
               </p>
@@ -348,7 +365,7 @@ export default function ProjectTestSuitesPage() {
                   key={suite.testSuiteId}
                   onClick={() => setSelectedSuiteId(suite.testSuiteId)}
                   className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all",
+                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-150",
                     isActive
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-accent"
@@ -378,7 +395,9 @@ export default function ProjectTestSuitesPage() {
       <div className="flex-1 flex flex-col min-w-0">
         {!selectedSuite ? (
           <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
-            <Folder className="h-12 w-12 mb-4 opacity-30" />
+            <div className="p-4 rounded-full bg-primary/10 mb-4">
+              <Folder className="h-12 w-12 text-primary" />
+            </div>
             <p className="text-lg font-semibold">
               {suites.length === 0
                 ? "Create your first suite"
@@ -419,7 +438,9 @@ export default function ProjectTestSuitesPage() {
                 </div>
               ) : suiteTestCases.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                  <FileText className="h-12 w-12 mb-4 opacity-30" />
+                  <div className="p-4 rounded-full bg-primary/10 mb-4">
+                    <FileText className="h-12 w-12 text-primary" />
+                  </div>
                   <p className="text-lg font-semibold">No test cases</p>
                   <p className="text-sm mt-1 mb-4">
                     Add test cases from your project to this suite
@@ -447,7 +468,7 @@ export default function ProjectTestSuitesPage() {
                     {suiteTestCases.map((tc: TestCase) => (
                       <tr
                         key={tc.testCaseId}
-                        className="hover:bg-muted/30 transition-colors"
+                        className="hover:bg-muted/30 transition-colors duration-150"
                       >
                         <td className="px-6 py-3.5 font-medium">
                           {tc.title}
@@ -456,17 +477,27 @@ export default function ProjectTestSuitesPage() {
                           {tc.userStoryTitle ?? "—"}
                         </td>
                         <td className="px-6 py-3.5">
-                          <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground font-medium">
-                            {tc.generatedByAi ? "AI" : "Manual"}
-                          </span>
+                          {tc.generatedByAi ? (
+                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
+                              <Sparkles className="h-3 w-3 mr-0.5" />
+                              AI
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                              <PenLine className="h-3 w-3 mr-0.5" />
+                              Manual
+                            </Badge>
+                          )}
                         </td>
                         <td className="px-6 py-3.5">
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
                             onClick={() => handleRemoveTC(tc.testCaseId)}
-                            className="text-xs text-destructive hover:underline"
                           >
                             Remove
-                          </button>
+                          </Button>
                         </td>
                       </tr>
                     ))}

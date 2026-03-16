@@ -10,7 +10,7 @@ interface RoleConfig {
 export const MEMBER_ROLE_CONFIG: Record<string, RoleConfig> = {
   Lead: {
     label: "Lead",
-    badgeClass: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+    badgeClass: "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary",
   },
   Contributor: {
     label: "Contributor",

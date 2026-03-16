@@ -45,7 +45,7 @@ export function MemberTableRow({ member, onMenuClick }: MemberTableRowProps) {
   );
 
   return (
-    <tr className="hover:bg-muted/50 transition-colors">
+    <tr className="hover:bg-muted/50 transition-colors duration-150">
       {/* Member */}
       <td className="px-6 py-4">
         <div className="flex items-center gap-3">

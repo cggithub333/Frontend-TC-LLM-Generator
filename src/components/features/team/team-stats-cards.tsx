@@ -21,7 +21,7 @@ export function TeamStatsCards({ stats }: TeamStatsCardsProps) {
           </p>
           <Users className="h-5 w-5 text-primary" aria-hidden="true" />
         </div>
-        <p className="text-3xl font-bold">
+        <p className="text-2xl font-bold">
           {stats.totalMembers}
         </p>
       </div>
@@ -34,7 +34,7 @@ export function TeamStatsCards({ stats }: TeamStatsCardsProps) {
           </p>
           <Info className="h-5 w-5 text-primary" aria-hidden="true" />
         </div>
-        <p className="text-3xl font-bold">
+        <p className="text-2xl font-bold">
           {stats.availableSlots}
         </p>
       </div>

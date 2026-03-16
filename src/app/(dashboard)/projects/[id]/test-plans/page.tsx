@@ -12,6 +12,7 @@ import {
   Folder,
   Calendar,
   User,
+  GripVertical,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,13 +39,13 @@ function StatusBadge({ status }: { status: string }) {
       label: "Draft",
     },
     IN_PROGRESS: {
-      bg: "bg-blue-50 dark:bg-blue-900/30",
-      text: "text-blue-700 dark:text-blue-300",
+      bg: "bg-primary/10 dark:bg-primary/20",
+      text: "text-primary",
       label: "In Progress",
     },
     COMPLETED: {
-      bg: "bg-green-50 dark:bg-green-900/30",
-      text: "text-green-700 dark:text-green-300",
+      bg: "bg-emerald-50 dark:bg-emerald-900/30",
+      text: "text-emerald-700 dark:text-emerald-300",
       label: "Completed",
     },
   };
@@ -57,6 +58,13 @@ function StatusBadge({ status }: { status: string }) {
     </Badge>
   );
 }
+
+// ──────── Kanban Column Definition ────────
+const KANBAN_COLUMNS: { key: string; label: string; accent: string }[] = [
+  { key: "DRAFT", label: "Draft", accent: "border-t-slate-400" },
+  { key: "IN_PROGRESS", label: "In Progress", accent: "border-t-primary" },
+  { key: "COMPLETED", label: "Completed", accent: "border-t-emerald-500" },
+];
 
 // ──────── Import Suites Drawer ────────
 function ImportSuitesDrawer({
@@ -115,7 +123,7 @@ function ImportSuitesDrawer({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" onClick={onClose} />
       <div className="fixed inset-y-0 right-0 w-full max-w-lg bg-card border-l border-border z-50 flex flex-col shadow-2xl animate-in slide-in-from-right duration-300">
         <div className="flex items-center justify-between p-5 border-b">
           <div>
@@ -126,7 +134,7 @@ function ImportSuitesDrawer({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-muted transition-colors"
+            className="p-2 rounded-lg hover:bg-muted transition-colors duration-150"
           >
             <X className="h-5 w-5" />
           </button>
@@ -151,7 +159,9 @@ function ImportSuitesDrawer({
             </div>
           ) : availableSuites.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              <Folder className="h-8 w-8 mx-auto mb-3 opacity-40" />
+              <div className="p-3 rounded-full bg-primary/10 w-fit mx-auto mb-3">
+                <Folder className="h-8 w-8 text-primary" />
+              </div>
               <p className="font-medium">No suites available</p>
               <p className="text-sm mt-1">
                 All suites are already in this plan, or none exist yet.
@@ -162,10 +172,10 @@ function ImportSuitesDrawer({
               <label
                 key={suite.testSuiteId}
                 className={cn(
-                  "flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all",
+                  "flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all duration-150",
                   selected.has(suite.testSuiteId)
                     ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/30"
+                    : "border-border hover:border-primary/30 hover:bg-muted/30"
                 )}
               >
                 <input
@@ -209,6 +219,144 @@ function ImportSuitesDrawer({
   );
 }
 
+// ──────── Plan Detail Drawer ────────
+function PlanDetailDrawer({
+  open,
+  onClose,
+  plan,
+  planSuites,
+  suitesLoading,
+  onImportClick,
+  onRemoveSuite,
+}: {
+  open: boolean;
+  onClose: () => void;
+  plan: any;
+  planSuites: TestSuite[];
+  suitesLoading: boolean;
+  onImportClick: () => void;
+  onRemoveSuite: (testSuiteId: string) => void;
+}) {
+  if (!open || !plan) return null;
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" onClick={onClose} />
+      <div className="fixed inset-y-0 right-0 w-full max-w-2xl bg-card border-l border-border z-50 flex flex-col shadow-2xl animate-in slide-in-from-right duration-300">
+        {/* Header */}
+        <div className="flex items-start justify-between p-6 border-b">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <h2 className="text-xl font-bold">{plan.name}</h2>
+              <StatusBadge status={plan.status} />
+            </div>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <User className="h-3.5 w-3.5" />
+                {plan.createdByUserFullName}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Calendar className="h-3.5 w-3.5" />
+                {new Date(plan.createdAt).toLocaleDateString()}
+              </span>
+            </div>
+            {plan.description && (
+              <p className="text-sm text-muted-foreground">{plan.description}</p>
+            )}
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-muted transition-colors duration-150"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Suites Section */}
+        <div className="flex items-center justify-between p-4 border-b">
+          <h3 className="font-semibold text-sm">Attached Test Suites</h3>
+          <Button
+            size="sm"
+            onClick={onImportClick}
+            className="gap-1.5"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Import Suites
+          </Button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto">
+          {suitesLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : planSuites.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+              <div className="p-3 rounded-full bg-primary/10 mb-4">
+                <Folder className="h-10 w-10 text-primary" />
+              </div>
+              <p className="text-lg font-semibold">No suites attached</p>
+              <p className="text-sm mt-1 mb-4">
+                Import test suites to build your execution campaign
+              </p>
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={onImportClick}
+              >
+                <Plus className="h-4 w-4" />
+                Import Test Suites
+              </Button>
+            </div>
+          ) : (
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-muted/50 text-xs text-muted-foreground uppercase font-medium border-b">
+                  <th className="px-6 py-3 font-semibold">Suite Name</th>
+                  <th className="px-6 py-3 font-semibold">Description</th>
+                  <th className="px-6 py-3 font-semibold">Created</th>
+                  <th className="px-6 py-3 font-semibold w-20">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm divide-y">
+                {planSuites.map((suite: TestSuite) => (
+                  <tr
+                    key={suite.testSuiteId}
+                    className="hover:bg-muted/30 transition-colors duration-150"
+                  >
+                    <td className="px-6 py-3.5 font-medium">
+                      <div className="flex items-center gap-2">
+                        <Folder className="h-4 w-4 text-muted-foreground" />
+                        {suite.name}
+                      </div>
+                    </td>
+                    <td className="px-6 py-3.5 text-muted-foreground">
+                      {suite.description ?? "—"}
+                    </td>
+                    <td className="px-6 py-3.5 text-muted-foreground">
+                      {new Date(suite.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-3.5">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => onRemoveSuite(suite.testSuiteId)}
+                      >
+                        Remove
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ──────── Main Page ────────
 export default function ProjectTestPlansPage() {
   const params = useParams();
@@ -217,6 +365,7 @@ export default function ProjectTestPlansPage() {
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [detailDrawerOpen, setDetailDrawerOpen] = useState(false);
 
   const { data, isLoading, error } = useTestPlansByProject(projectId, {
     size: 50,
@@ -251,210 +400,158 @@ export default function ProjectTestPlansPage() {
     }
   };
 
-  // Auto-select first plan
-  if (plans.length > 0 && !selectedPlanId && !isLoading) {
-    setSelectedPlanId(plans[0].testPlanId);
-  }
+  // Group plans by status for Kanban
+  const plansByStatus = useMemo(() => {
+    const groups: Record<string, typeof plans> = {
+      DRAFT: [],
+      IN_PROGRESS: [],
+      COMPLETED: [],
+    };
+    for (const plan of plans) {
+      const key = plan.status in groups ? plan.status : "DRAFT";
+      groups[key].push(plan);
+    }
+    return groups;
+  }, [plans]);
+
+  const handlePlanClick = (planId: string) => {
+    setSelectedPlanId(planId);
+    setDetailDrawerOpen(true);
+  };
 
   return (
-    <div className="flex h-[calc(100vh-0px)]">
-      {/* ─── Left Pane: Plan List (30%) ─── */}
-      <div className="w-[300px] shrink-0 border-r border-border flex flex-col bg-card/50">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h1 className="text-lg font-bold">Test Plans</h1>
+    <div className="p-6 space-y-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Test Plans</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Organize test suites into execution campaigns
+          </p>
+        </div>
+        <Button
+          onClick={() => setCreateOpen(true)}
+          className="gap-2 shadow-md shadow-primary/20"
+        >
+          <Plus className="h-4 w-4" />
+          New Plan
+        </Button>
+      </div>
+
+      {/* Loading State */}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+      ) : error ? (
+        <div className="text-center py-20">
+          <AlertCircle className="h-8 w-8 mx-auto mb-3 text-muted-foreground/40" />
+          <p className="text-sm text-muted-foreground">
+            Failed to load test plans
+          </p>
+        </div>
+      ) : plans.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="p-4 rounded-full bg-primary/10 mb-6">
+            <ClipboardList className="h-12 w-12 text-primary" />
+          </div>
+          <h2 className="text-xl font-bold mb-2">No test plans yet</h2>
+          <p className="text-muted-foreground max-w-md mb-6">
+            Create your first test plan to organize test suites into execution campaigns.
+          </p>
           <Button
-            size="sm"
-            variant="ghost"
-            className="h-8 w-8 p-0"
+            size="lg"
             onClick={() => setCreateOpen(true)}
+            className="gap-2 shadow-lg shadow-primary/20"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-5 w-5" />
+            Create Your First Plan
           </Button>
         </div>
-
-        <div className="flex-1 overflow-y-auto p-2 space-y-1">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-10">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            </div>
-          ) : error ? (
-            <div className="text-center py-10">
-              <AlertCircle className="h-8 w-8 mx-auto mb-3 text-muted-foreground/40" />
-              <p className="text-sm text-muted-foreground">
-                Failed to load
-              </p>
-            </div>
-          ) : plans.length === 0 ? (
-            <div className="text-center py-10 px-4">
-              <ClipboardList className="h-8 w-8 mx-auto mb-3 text-muted-foreground/40" />
-              <p className="text-sm font-medium text-muted-foreground mb-1">
-                No test plans yet
-              </p>
-              <p className="text-xs text-muted-foreground/70 mb-3">
-                Create your first test plan
-              </p>
-              <Button
-                size="sm"
-                variant="outline"
-                className="gap-1.5"
-                onClick={() => setCreateOpen(true)}
-              >
-                <Plus className="h-3.5 w-3.5" />
-                New Plan
-              </Button>
-            </div>
-          ) : (
-            plans.map((plan) => {
-              const isActive = plan.testPlanId === selectedPlanId;
-              return (
-                <button
-                  key={plan.testPlanId}
-                  onClick={() => setSelectedPlanId(plan.testPlanId)}
-                  className={cn(
-                    "w-full flex flex-col gap-1.5 px-3 py-2.5 rounded-xl text-left transition-all",
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground hover:bg-accent"
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    <StatusBadge status={plan.status} />
-                    <span className="text-sm font-medium truncate flex-1">
-                      {plan.name}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {new Date(plan.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                </button>
-              );
-            })
-          )}
-        </div>
-      </div>
-
-      {/* ─── Right Pane: Plan Detail (70%) ─── */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {!selectedPlan ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
-            <ClipboardList className="h-12 w-12 mb-4 opacity-30" />
-            <p className="text-lg font-semibold">
-              {plans.length === 0
-                ? "Create your first test plan"
-                : "Select a plan"}
-            </p>
-            <p className="text-sm mt-1">
-              {plans.length === 0
-                ? "Organize test suites into execution campaigns"
-                : "Choose a plan from the left to view details"}
-            </p>
-          </div>
-        ) : (
-          <>
-            {/* Detail Header */}
-            <div className="flex items-center justify-between p-6 border-b">
-              <div>
-                <div className="flex items-center gap-3 mb-1">
-                  <h2 className="text-xl font-bold">{selectedPlan.name}</h2>
-                  <StatusBadge status={selectedPlan.status} />
-                </div>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1.5">
-                    <User className="h-3.5 w-3.5" />
-                    {selectedPlan.createdByUserFullName}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="h-3.5 w-3.5" />
-                    {new Date(selectedPlan.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                {selectedPlan.description && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {selectedPlan.description}
-                  </p>
+      ) : (
+        /* ─── Kanban Board ─── */
+        <div className="grid grid-cols-3 gap-5">
+          {KANBAN_COLUMNS.map((col) => {
+            const columnPlans = plansByStatus[col.key] || [];
+            return (
+              <div
+                key={col.key}
+                className={cn(
+                  "flex flex-col rounded-xl border border-border bg-muted/30 min-h-[400px] border-t-4",
+                  col.accent
                 )}
-              </div>
-              <Button
-                onClick={() => setDrawerOpen(true)}
-                className="gap-2 shadow-md shadow-primary/20"
               >
-                <Plus className="h-4 w-4" />
-                Import Test Suites
-              </Button>
-            </div>
+                {/* Column Header */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-semibold">{col.label}</h3>
+                    <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full font-medium">
+                      {columnPlans.length}
+                    </span>
+                  </div>
+                </div>
 
-            {/* Suites Table */}
-            <div className="flex-1 overflow-y-auto">
-              {suitesLoading ? (
-                <div className="flex items-center justify-center py-16">
-                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                </div>
-              ) : planSuites.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                  <Folder className="h-12 w-12 mb-4 opacity-30" />
-                  <p className="text-lg font-semibold">No suites attached</p>
-                  <p className="text-sm mt-1 mb-4">
-                    Import test suites to build your execution campaign
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="gap-2"
-                    onClick={() => setDrawerOpen(true)}
-                  >
-                    <Plus className="h-4 w-4" />
-                    Import Test Suites
-                  </Button>
-                </div>
-              ) : (
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="bg-muted/50 text-xs text-muted-foreground uppercase font-medium border-b">
-                      <th className="px-6 py-3 font-semibold">Suite Name</th>
-                      <th className="px-6 py-3 font-semibold">Description</th>
-                      <th className="px-6 py-3 font-semibold">Created</th>
-                      <th className="px-6 py-3 font-semibold w-20">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-sm divide-y">
-                    {planSuites.map((suite: TestSuite) => (
-                      <tr
-                        key={suite.testSuiteId}
-                        className="hover:bg-muted/30 transition-colors"
+                {/* Column Content */}
+                <div className="flex-1 p-3 space-y-2.5 overflow-y-auto">
+                  {columnPlans.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-muted-foreground/60">
+                      <ClipboardList className="h-8 w-8 mb-2" />
+                      <p className="text-xs font-medium">No plans</p>
+                    </div>
+                  ) : (
+                    columnPlans.map((plan) => (
+                      <button
+                        key={plan.testPlanId}
+                        onClick={() => handlePlanClick(plan.testPlanId)}
+                        className={cn(
+                          "w-full text-left bg-card border border-border rounded-xl p-4 shadow-sm cursor-pointer group",
+                          "transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-primary/40",
+                          selectedPlanId === plan.testPlanId && "ring-2 ring-primary/50 border-primary/40"
+                        )}
                       >
-                        <td className="px-6 py-3.5 font-medium">
-                          <div className="flex items-center gap-2">
-                            <Folder className="h-4 w-4 text-muted-foreground" />
-                            {suite.name}
+                        <div className="flex items-start gap-2 mb-2">
+                          <GripVertical className="h-4 w-4 text-muted-foreground/30 mt-0.5 shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold truncate group-hover:text-primary transition-colors duration-150">
+                              {plan.name}
+                            </p>
+                            {plan.description && (
+                              <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                                {plan.description}
+                              </p>
+                            )}
                           </div>
-                        </td>
-                        <td className="px-6 py-3.5 text-muted-foreground">
-                          {suite.description ?? "—"}
-                        </td>
-                        <td className="px-6 py-3.5 text-muted-foreground">
-                          {new Date(suite.createdAt).toLocaleDateString()}
-                        </td>
-                        <td className="px-6 py-3.5">
-                          <button
-                            onClick={() =>
-                              handleRemoveSuite(suite.testSuiteId)
-                            }
-                            className="text-xs text-destructive hover:underline"
-                          >
-                            Remove
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </>
-        )}
-      </div>
+                        </div>
+                        <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-2 pt-2 border-t border-border/50">
+                          <span className="flex items-center gap-1">
+                            <User className="h-3 w-3" />
+                            {plan.createdByUserFullName?.split(" ")[0] ?? "—"}
+                          </span>
+                          <span className="flex items-center gap-1 ml-auto">
+                            <Calendar className="h-3 w-3" />
+                            {new Date(plan.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ─── Plan Detail Drawer ─── */}
+      <PlanDetailDrawer
+        open={detailDrawerOpen}
+        onClose={() => setDetailDrawerOpen(false)}
+        plan={selectedPlan}
+        planSuites={planSuites}
+        suitesLoading={suitesLoading}
+        onImportClick={() => setDrawerOpen(true)}
+        onRemoveSuite={handleRemoveSuite}
+      />
 
       {/* ─── Import Suites Drawer ─── */}
       <ImportSuitesDrawer

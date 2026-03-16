@@ -53,6 +53,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { UserStory, AcceptanceCriteria } from "@/types/story.types";
 import type { TestCase } from "@/types/test-case.types";
 import { useTestCasesByAcceptanceCriteria, useDeleteTestCase } from "@/hooks/use-test-cases";
+import { cn } from "@/lib/utils";
 
 function AcItemWithTestCases({
   criteria,
@@ -77,15 +78,15 @@ function AcItemWithTestCases({
 
   return (
     <div className="w-full flex flex-col gap-1">
-      <div className="flex items-start gap-3 w-full group hover:bg-muted/30 p-2 -m-2 rounded-lg transition-colors">
+      <div className="flex items-start gap-3 w-full group hover:bg-muted/30 p-2 -m-2 rounded-lg transition-colors duration-150">
         <button
           onClick={() => toggleACCompletion(criteria)}
           className="flex items-start gap-3 flex-1 text-sm text-left"
         >
           <div
-            className={`mt-0.5 w-5 h-5 flex items-center justify-center rounded shrink-0 transition-all ${
+            className={`mt-0.5 w-5 h-5 flex items-center justify-center rounded shrink-0 transition-all duration-150 ${
               criteria.completed
-                ? "bg-primary text-white"
+                ? "bg-primary text-white scale-100"
                 : "border-2 border-muted-foreground/30 group-hover:border-primary/50"
             }`}
           >
@@ -138,67 +139,77 @@ function AcItemWithTestCases({
         </Button>
       </div>
 
-      {isExpanded && testCasesCount > 0 && (
-        <div className="pl-10 pr-2 pb-2 space-y-2 relative before:absolute before:left-[19px] before:top-0 before:bottom-4 before:w-px before:bg-border">
-          {testCasesData?.items.map((tc) => (
-            <div
-              key={tc.testCaseId}
-              className="bg-card border border-border rounded-md p-3 text-sm shadow-sm relative before:absolute before:left-[-21px] before:top-1/2 before:w-5 before:h-px before:bg-border group/tc"
-            >
-              <div className="font-semibold flex items-center gap-2 mb-1.5">
-                <ClipboardList className="w-3.5 h-3.5 text-muted-foreground" />
-                {tc.title}
-                {tc.generatedByAi && (
-                  <Badge
-                    variant="outline"
-                    className="text-[9px] h-4 px-1 py-0 bg-purple-50 text-purple-600 border-purple-200"
-                  >
-                    AI Generated
-                  </Badge>
-                )}
-                <div className="ml-auto flex items-center gap-1 opacity-0 group-hover/tc:opacity-100 transition-opacity">
-                  <button
-                    className="p-1 rounded hover:bg-muted transition-colors"
-                    title="Edit Test Case"
-                    onClick={(e) => { e.stopPropagation(); onEditTestCase(tc, story); }}
-                  >
-                    <Pencil className="w-3 h-3 text-muted-foreground" />
-                  </button>
-                  <button
-                    className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors"
-                    title="Delete Test Case"
-                    onClick={(e) => { e.stopPropagation(); onDeleteTestCase(tc); }}
-                  >
-                    <Trash2 className="w-3 h-3 text-red-400" />
-                  </button>
+      {/* Animated test cases expansion */}
+      <div
+        className={cn(
+          "grid transition-[grid-template-rows] duration-200 ease-in-out",
+          isExpanded && testCasesCount > 0 ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        )}
+      >
+        <div className="overflow-hidden">
+          {testCasesCount > 0 && (
+            <div className="pl-10 pr-2 pb-2 space-y-2 border-l-2 border-border ml-2.5">
+              {testCasesData?.items.map((tc) => (
+                <div
+                  key={tc.testCaseId}
+                  className="bg-card border border-border rounded-md p-3 text-sm shadow-sm group/tc transition-all duration-200 hover:border-primary/30"
+                >
+                  <div className="font-semibold flex items-center gap-2 mb-1.5">
+                    <ClipboardList className="w-3.5 h-3.5 text-muted-foreground" />
+                    {tc.title}
+                    {tc.generatedByAi && (
+                      <Badge
+                        variant="outline"
+                        className="text-[9px] h-4 px-1 py-0 bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-700"
+                      >
+                        AI Generated
+                      </Badge>
+                    )}
+                    <div className="ml-auto flex items-center gap-1 opacity-0 group-hover/tc:opacity-100 transition-opacity">
+                      <button
+                        className="p-1 rounded hover:bg-muted transition-colors"
+                        title="Edit Test Case"
+                        onClick={(e) => { e.stopPropagation(); onEditTestCase(tc, story); }}
+                      >
+                        <Pencil className="w-3 h-3 text-muted-foreground" />
+                      </button>
+                      <button
+                        className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors"
+                        title="Delete Test Case"
+                        onClick={(e) => { e.stopPropagation(); onDeleteTestCase(tc); }}
+                      >
+                        <Trash2 className="w-3 h-3 text-red-400" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 mt-2">
+                    {tc.steps && (
+                      <div>
+                        <span className="text-[10px] font-semibold text-muted-foreground uppercase">
+                          Steps:
+                        </span>
+                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                          {tc.steps}
+                        </p>
+                      </div>
+                    )}
+                    {tc.expectedResult && (
+                      <div>
+                        <span className="text-[10px] font-semibold text-muted-foreground uppercase">
+                          Expected:
+                        </span>
+                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                          {tc.expectedResult}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3 mt-2">
-                {tc.steps && (
-                  <div>
-                    <span className="text-[10px] font-semibold text-muted-foreground uppercase">
-                      Steps:
-                    </span>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                      {tc.steps}
-                    </p>
-                  </div>
-                )}
-                {tc.expectedResult && (
-                  <div>
-                    <span className="text-[10px] font-semibold text-muted-foreground uppercase">
-                      Expected:
-                    </span>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                      {tc.expectedResult}
-                    </p>
-                  </div>
-                )}
-              </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -420,31 +431,32 @@ export default function ProjectStoriesPage() {
           return (
             <div
               key={story.userStoryId}
-              className={`bg-card border border-border rounded-xl overflow-hidden transition-all ${
+              className={cn(
+                "group bg-card border border-border rounded-xl overflow-hidden transition-all duration-200",
                 flashStoryId === story.userStoryId ? "animate-flash-success" : ""
-              }`}
+              )}
             >
               {/* Story Header */}
-              <div className="p-4 flex items-start gap-3">
+              <div className="p-4 flex items-start gap-3 hover:bg-muted/30 transition-colors duration-200 cursor-pointer">
                 <Checkbox
                   checked={isSelected}
                   onCheckedChange={() => toggleSelect(story.userStoryId)}
                   className="mt-1"
                 />
                 <div
-                  className="flex-1 min-w-0 cursor-pointer"
+                  className="flex-1 min-w-0"
                   onClick={() => toggleExpand(story.userStoryId)}
                 >
                   <div className="flex items-center gap-3 mb-1">
                     <Badge
                       variant="outline"
-                      className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 font-semibold"
+                      className="bg-primary/10 dark:bg-primary/20 text-primary border-primary/20 dark:border-primary/30 font-semibold"
                     >
                       {story.jiraIssueKey ?? `US-${story.userStoryId.slice(0, 6).toUpperCase()}`}
                     </Badge>
                     <Link
                       href={`/stories/${story.userStoryId}`}
-                      className="font-bold text-lg hover:text-primary transition-colors hover:underline underline-offset-2"
+                      className="font-bold text-lg group-hover:text-primary transition-colors duration-150 hover:underline underline-offset-2"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {story.title}
@@ -453,17 +465,18 @@ export default function ProjectStoriesPage() {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                           <button
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border cursor-pointer transition-colors hover:opacity-80 ${
+                            className={cn(
+                              "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border cursor-pointer transition-colors hover:opacity-80",
                               story.status === "DRAFT"
                                 ? "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600"
                                 : story.status === "READY"
-                                  ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800"
+                                  ? "bg-primary/10 dark:bg-primary/20 text-primary border-primary/20 dark:border-primary/30"
                                   : story.status === "IN_PROGRESS"
                                     ? "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800"
                                     : story.status === "DONE"
                                       ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
                                       : "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800"
-                            }`}
+                            )}
                           >
                             {story.status.replace("_", " ")}
                             <ChevronDown className="h-3 w-3" />
@@ -523,109 +536,118 @@ export default function ProjectStoriesPage() {
                 </Button>
               </div>
 
-              {/* Expanded Content */}
-              {isExpanded && (
-                <div className="px-4 pb-4 space-y-6">
-                  {/* User Story */}
-                  <div className="bg-muted/30 rounded-lg p-4 space-y-2">
-                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                      User Story
-                    </p>
-                    <div className="text-sm space-y-1">
-                      <p>
-                        <span className="text-muted-foreground">AS A</span>{" "}
-                        <span className="font-medium">{story.asA}</span>,
-                      </p>
-                      <p>
-                        <span className="text-muted-foreground">I WANT TO</span>{" "}
-                        <span className="font-medium">{story.iWantTo}</span>,
-                      </p>
-                      <p>
-                        <span className="text-muted-foreground">SO THAT</span>{" "}
-                        <span className="font-medium">{story.soThat}</span>.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Acceptance Criteria - Interactive */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
+              {/* Animated Expanded Content */}
+              <div
+                className={cn(
+                  "grid transition-[grid-template-rows] duration-200 ease-in-out",
+                  isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                )}
+              >
+                <div className="overflow-hidden">
+                  <div className="px-4 pb-4 space-y-6">
+                    {/* User Story */}
+                    <div className="bg-muted/30 rounded-lg p-4 space-y-2">
                       <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                        Acceptance Criteria
+                        User Story
                       </p>
-                      <div className="flex items-center gap-2">
-                        <div className="w-20 h-2 rounded-full bg-muted overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-emerald-500 transition-all duration-500 ease-out"
-                            style={{ width: stats.total > 0 ? `${(stats.completed / stats.total) * 100}%` : '0%' }}
-                          />
-                        </div>
-                        <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
-                          {stats.completed}/{stats.total} DONE
-                        </span>
+                      <div className="text-sm space-y-1">
+                        <p>
+                          <span className="text-muted-foreground">AS A</span>{" "}
+                          <span className="font-medium">{story.asA}</span>,
+                        </p>
+                        <p>
+                          <span className="text-muted-foreground">I WANT TO</span>{" "}
+                          <span className="font-medium">{story.iWantTo}</span>,
+                        </p>
+                        <p>
+                          <span className="text-muted-foreground">SO THAT</span>{" "}
+                          <span className="font-medium">{story.soThat}</span>.
+                        </p>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      {acs.map((criteria) => (
-                        <AcItemWithTestCases
-                          key={criteria.acceptanceCriteriaId}
-                          criteria={criteria}
-                          story={story}
-                          toggleACCompletion={toggleACCompletion}
-                          onAddTestCase={(story, acId) => {
-                            setTestCaseDialogStory(story);
-                            setTestCaseDialogAcId(acId);
-                            setEditingTestCase(null);
-                            setIsTestCaseDialogOpen(true);
-                          }}
-                          onEditTestCase={(tc, story) => {
-                            setEditingTestCase(tc);
-                            setTestCaseDialogStory(story);
-                            setTestCaseDialogAcId(tc.acceptanceCriteriaId || null);
-                            setIsTestCaseDialogOpen(true);
-                          }}
-                          onDeleteTestCase={(tc) => setDeleteConfirmTestCase(tc)}
-                        />
-                      ))}
+
+                    {/* Acceptance Criteria - Interactive */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                          Acceptance Criteria
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <div className="w-20 h-2 rounded-full bg-muted overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-emerald-500 transition-all duration-500 ease-out"
+                              style={{ width: stats.total > 0 ? `${(stats.completed / stats.total) * 100}%` : '0%' }}
+                            />
+                          </div>
+                          <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                            {stats.completed}/{stats.total} DONE
+                          </span>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        {acs.map((criteria) => (
+                          <AcItemWithTestCases
+                            key={criteria.acceptanceCriteriaId}
+                            criteria={criteria}
+                            story={story}
+                            toggleACCompletion={toggleACCompletion}
+                            onAddTestCase={(story, acId) => {
+                              setTestCaseDialogStory(story);
+                              setTestCaseDialogAcId(acId);
+                              setEditingTestCase(null);
+                              setIsTestCaseDialogOpen(true);
+                            }}
+                            onEditTestCase={(tc, story) => {
+                              setEditingTestCase(tc);
+                              setTestCaseDialogStory(story);
+                              setTestCaseDialogAcId(tc.acceptanceCriteriaId || null);
+                              setIsTestCaseDialogOpen(true);
+                            }}
+                            onDeleteTestCase={(tc) => setDeleteConfirmTestCase(tc)}
+                          />
+                        ))}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Generate Button - Disabled until AI is integrated */}
-                  <Button
-                    className="w-full gap-2 bg-primary/50 cursor-not-allowed"
-                    title="AI Generation is coming soon"
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    Generate Tests (Coming soon)
-                  </Button>
-
-                  {/* Story Actions */}
-                  <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                    {/* Generate Button - Disabled until AI is integrated */}
                     <Button
                       variant="outline"
-                      size="sm"
-                      className="gap-2"
-                      onClick={() => setEditingStory(story)}
+                      disabled
+                      className="w-full gap-2"
                     >
-                      <Pencil className="h-3.5 w-3.5" />
-                      Edit Story
+                      <Sparkles className="h-4 w-4" />
+                      Generate Tests
+                      <Badge variant="secondary" className="text-[9px] ml-1">Coming soon</Badge>
                     </Button>
-                    <button
-                      className="text-xs text-red-400 hover:text-red-600 dark:hover:text-red-400 transition-colors underline underline-offset-2"
-                      onClick={() => setDeleteConfirmStory(story)}
-                    >
-                      Delete Story
-                    </button>
+
+                    {/* Story Actions */}
+                    <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => setEditingStory(story)}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                        Edit Story
+                      </Button>
+                      <button
+                        className="text-xs text-red-400 hover:text-red-600 dark:hover:text-red-400 transition-colors underline underline-offset-2"
+                        onClick={() => setDeleteConfirmStory(story)}
+                      >
+                        Delete Story
+                      </button>
+                    </div>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           );
         })}
         {filteredStories.length === 0 && stories.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="p-4 rounded-full bg-muted/50 mb-6">
-              <FileText className="h-12 w-12 text-muted-foreground/50" />
+            <div className="p-4 rounded-full bg-primary/10 mb-6">
+              <FileText className="h-12 w-12 text-primary" />
             </div>
             <h2 className="text-xl font-bold mb-2">No user stories yet</h2>
             <p className="text-muted-foreground max-w-md mb-8">
