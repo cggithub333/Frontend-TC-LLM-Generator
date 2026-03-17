@@ -97,6 +97,10 @@ export default function WorkspaceMembersPage() {
 
   const members = membersResult?.items ?? [];
   const isOwner = workspace?.ownerUserId === user?.id;
+  // Admins can also manage members (matching BE authorization)
+  const currentUserMember = members.find((m) => m.userId === user?.id);
+  const isAdmin = currentUserMember?.role === "Admin";
+  const canManage = isOwner || isAdmin;
 
   const handleSendInvite = async () => {
     if (!inviteEmail.trim()) return;
@@ -173,7 +177,7 @@ export default function WorkspaceMembersPage() {
           </p>
         </div>
 
-        {isOwner && (
+        {canManage && (
           <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="gap-2">
@@ -308,7 +312,7 @@ export default function WorkspaceMembersPage() {
                     </Badge>
 
                     {/* Actions */}
-                    {isOwner && !isMemberOwner && !isCurrentUser && (
+                    {canManage && !isMemberOwner && !isCurrentUser && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -386,7 +390,7 @@ export default function WorkspaceMembersPage() {
                     Pending
                   </Badge>
 
-                  {isOwner && (
+                  {canManage && (
                     <Button
                       variant="ghost"
                       size="icon"
