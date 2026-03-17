@@ -133,8 +133,9 @@ export function InviteMemberDialog({
                 <SelectValue placeholder="Select role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Contributor">Contributor</SelectItem>
                 <SelectItem value="Lead">Lead</SelectItem>
+                <SelectItem value="Developer">Developer</SelectItem>
+                <SelectItem value="Tester">Tester</SelectItem>
                 <SelectItem value="Viewer">Viewer</SelectItem>
               </SelectContent>
             </Select>

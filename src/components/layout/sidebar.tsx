@@ -25,6 +25,7 @@ import {
 import { useSidebar } from "@/components/layout/sidebar-context";
 import { useWorkspaces } from "@/hooks/use-workspaces";
 import { useProject } from "@/hooks/use-projects";
+import { useMyProjectRole } from "@/hooks/use-my-project-role";
 
 const workspaceNavGroups = [
   {
@@ -50,7 +51,7 @@ const workspaceAdminNav = [
 ];
 
 // ──────── Project-level nav (when inside /projects/:id) ────────
-const getProjectNavGroups = (projectId: string) => [
+const getProjectNavGroups = (projectId: string, canManageTeam: boolean) => [
   {
     label: "PROJECT NAVIGATION",
     items: [
@@ -58,7 +59,9 @@ const getProjectNavGroups = (projectId: string) => [
       { name: "Stories", href: `/projects/${projectId}/stories`, icon: FileText },
       { name: "Test Plans", href: `/projects/${projectId}/test-plans`, icon: ClipboardList },
       { name: "Test Suites", href: `/projects/${projectId}/suites`, icon: Folder },
-      { name: "Team Management", href: `/projects/${projectId}/team`, icon: Users },
+      ...(canManageTeam
+        ? [{ name: "Team Management", href: `/projects/${projectId}/team`, icon: Users }]
+        : []),
     ],
   },
 ];
@@ -239,10 +242,12 @@ export function Sidebar() {
   const workspaceId = pathname.match(/\/workspaces\/([^/]+)/)?.[1] ?? null;
   const isProjectContext = !!projectId;
   const { data: project } = useProject(projectId ?? "");
+  const { data: myRole } = useMyProjectRole(projectId ?? "");
+  const canManageTeam = myRole?.canManageTeam ?? false;
 
   // ── Determine which nav items to render ──
   const navGroups = isProjectContext
-    ? getProjectNavGroups(projectId!)
+    ? getProjectNavGroups(projectId!, canManageTeam)
     : workspaceId
       ? getWorkspaceContextNavGroups(workspaceId)
       : workspaceNavGroups;

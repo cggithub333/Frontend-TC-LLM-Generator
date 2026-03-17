@@ -59,8 +59,9 @@ export function isValidEmail(email: string): boolean {
 export function sortMembersByRole(members: ProjectMember[]): ProjectMember[] {
   const rolePriority: Record<string, number> = {
     Lead: 1,
-    Contributor: 2,
-    Viewer: 3,
+    Developer: 2,
+    Tester: 3,
+    Viewer: 4,
   };
 
   return [...members].sort((a, b) => {

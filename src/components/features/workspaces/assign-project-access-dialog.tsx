@@ -58,7 +58,7 @@ export function AssignProjectAccessDialog({
 
   const getAssignment = useCallback(
     (projectId: string): { assigned: boolean; role: string } => {
-      return assignments.get(projectId) ?? { assigned: false, role: "Contributor" };
+      return assignments.get(projectId) ?? { assigned: false, role: "Developer" };
     },
     [assignments],
   );
@@ -66,7 +66,7 @@ export function AssignProjectAccessDialog({
   const toggleProject = useCallback((projectId: string) => {
     setAssignments((prev) => {
       const next = new Map(prev);
-      const current = next.get(projectId) ?? { assigned: false, role: "Contributor" };
+      const current = next.get(projectId) ?? { assigned: false, role: "Developer" };
       next.set(projectId, { ...current, assigned: !current.assigned });
       return next;
     });
@@ -75,7 +75,7 @@ export function AssignProjectAccessDialog({
   const setRole = useCallback((projectId: string, role: string) => {
     setAssignments((prev) => {
       const next = new Map(prev);
-      const current = next.get(projectId) ?? { assigned: true, role: "Contributor" };
+      const current = next.get(projectId) ?? { assigned: true, role: "Developer" };
       next.set(projectId, { ...current, role, assigned: true });
       return next;
     });
@@ -181,9 +181,10 @@ export function AssignProjectAccessDialog({
                       <SelectTrigger className="w-[110px] h-7 text-xs">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                        <SelectContent>
                         <SelectItem value="Lead">Lead</SelectItem>
-                        <SelectItem value="Contributor">Contributor</SelectItem>
+                        <SelectItem value="Developer">Developer</SelectItem>
+                        <SelectItem value="Tester">Tester</SelectItem>
                         <SelectItem value="Viewer">Viewer</SelectItem>
                       </SelectContent>
                     </Select>

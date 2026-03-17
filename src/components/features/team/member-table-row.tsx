@@ -91,7 +91,8 @@ export function MemberTableRow({ member, onMenuClick }: MemberTableRowProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="Lead">Lead</SelectItem>
-            <SelectItem value="Contributor">Contributor</SelectItem>
+            <SelectItem value="Developer">Developer</SelectItem>
+            <SelectItem value="Tester">Tester</SelectItem>
             <SelectItem value="Viewer">Viewer</SelectItem>
           </SelectContent>
         </Select>
