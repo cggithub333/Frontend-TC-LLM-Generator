@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
-import { useParams } from "next/navigation";
+import { useState, useMemo, useCallback, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { useProjectsByWorkspace } from "@/hooks/use-projects";
 import { useWorkspace } from "@/hooks/use-workspaces";
 import { useCurrentUser } from "@/hooks/use-auth";
 import { useWorkspaceMembers } from "@/hooks/use-workspace-members";
 import { useWorkspaceAccessGuard } from "@/hooks/use-workspace-access-guard";
+import { toast } from "sonner";
 import { filterProjectsByQuery } from "@/lib/utils/project.utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWebSocket } from "@/hooks/use-websocket";
@@ -56,6 +57,7 @@ const SORT_OPTIONS: { value: SortKey; label: string }[] = [
 export default function WorkspaceDetailPage() {
   const params = useParams();
   const workspaceId = params.id as string;
+  const router = useRouter();
 
   // Search, sort & filter state
   const [searchQuery, setSearchQuery] = useState("");
@@ -109,7 +111,26 @@ export default function WorkspaceDetailPage() {
   const isAdmin = currentUserMember?.role === "Admin";
   const canManage = isOwner || isAdmin;
 
-  // Real-time: redirect if this user is removed from workspace
+  // Redirect if user lost access to workspace (e.g. removed by owner)
+  useEffect(() => {
+    if (!workspaceLoading && !projectsLoading && (workspaceError || projectsError)) {
+      const errorMsg = workspaceError?.message || projectsError?.message || "";
+      if (
+        errorMsg.includes("do not have access") ||
+        errorMsg.includes("not a member") ||
+        errorMsg.includes("Forbidden") ||
+        errorMsg.includes("403")
+      ) {
+        toast.error("You have been removed from this workspace", {
+          description: "Redirecting to your workspaces...",
+          duration: 4000,
+        });
+        router.replace("/workspaces");
+      }
+    }
+  }, [workspaceError, projectsError, workspaceLoading, projectsLoading, router]);
+
+  // Polling fallback: periodically checks membership, redirects if removed
   useWorkspaceAccessGuard(workspaceId);
 
   // Filter by search + status, then sort

@@ -101,13 +101,6 @@ export default function WorkspacesPage() {
 
   const workspaces = workspacesResult?.items;
 
-  // P0: Auto-redirect if user has exactly 1 workspace
-  useEffect(() => {
-    if (!isLoading && workspaces && workspaces.length === 1 && !searchQuery.trim()) {
-      router.replace(`/workspaces/${workspaces[0].workspaceId}`);
-    }
-  }, [workspaces, isLoading, searchQuery, router]);
-
   // Check if this is close to a first-time experience (no workspaces or just created first)
   const isFirstTime = !isLoading && workspaces && workspaces.length === 0;
 
