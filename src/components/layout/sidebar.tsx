@@ -39,7 +39,7 @@ const getWorkspaceContextNavGroups = (workspaceId: string) => [
   {
     label: "WORKSPACE",
     items: [
-      { name: "Home", href: `/workspaces/${workspaceId}`, icon: Home, exactMatch: true },
+      { name: "Projects", href: `/workspaces/${workspaceId}`, icon: Layers, exactMatch: true },
       { name: "Members", href: `/workspaces/${workspaceId}/members`, icon: Users },
     ],
   },
@@ -288,6 +288,26 @@ export function Sidebar() {
 
       {/* Workspace Switcher */}
       <WorkspaceSwitcher isCollapsed={isCollapsed} />
+
+      {/* Back to Workspaces (when inside a specific workspace, not a project) */}
+      {workspaceId && !isProjectContext && (
+        <div className="px-3 mt-3">
+          <Link
+            href="/workspaces"
+            className="flex items-center gap-3 p-2.5 rounded-xl text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all group"
+          >
+            <ArrowLeft className={cn("h-4 w-4 transition-transform group-hover:-translate-x-0.5", isCollapsed && "mx-auto")} />
+            <span
+              className={cn(
+                "text-sm font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
+                isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+              )}
+            >
+              All Workspaces
+            </span>
+          </Link>
+        </div>
+      )}
 
       {/* Back to Projects (only in project context) */}
       {isProjectContext && (
