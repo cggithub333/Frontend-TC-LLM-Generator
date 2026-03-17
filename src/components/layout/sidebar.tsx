@@ -35,6 +35,16 @@ const workspaceNavGroups = [
   },
 ];
 
+const getWorkspaceContextNavGroups = (workspaceId: string) => [
+  {
+    label: "WORKSPACE",
+    items: [
+      { name: "Home", href: `/workspaces/${workspaceId}`, icon: Home, exactMatch: true },
+      { name: "Members", href: `/workspaces/${workspaceId}/members`, icon: Users },
+    ],
+  },
+];
+
 const workspaceAdminNav = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
@@ -226,13 +236,16 @@ export function Sidebar() {
 
   // ── Context Detection ──
   const projectId = pathname.match(/\/projects\/([^/]+)/)?.[1] ?? null;
+  const workspaceId = pathname.match(/\/workspaces\/([^/]+)/)?.[1] ?? null;
   const isProjectContext = !!projectId;
   const { data: project } = useProject(projectId ?? "");
 
   // ── Determine which nav items to render ──
   const navGroups = isProjectContext
     ? getProjectNavGroups(projectId!)
-    : workspaceNavGroups;
+    : workspaceId
+      ? getWorkspaceContextNavGroups(workspaceId)
+      : workspaceNavGroups;
 
   const adminItems = isProjectContext
     ? getProjectAdminNav(projectId!)

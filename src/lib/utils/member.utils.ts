@@ -67,3 +67,26 @@ export function sortMembersByRole(members: ProjectMember[]): ProjectMember[] {
     return (rolePriority[a.role] ?? 99) - (rolePriority[b.role] ?? 99);
   });
 }
+
+// ── Workspace Permission Helpers ──────────────────────────────
+
+export type WorkspaceRole = "Owner" | "Admin" | "Member";
+
+export function canInviteToWorkspace(role: string): boolean {
+  return role === "Owner" || role === "Admin";
+}
+
+export function canRemoveMember(callerRole: string, targetRole: string): boolean {
+  if (targetRole === "Owner") return false;
+  if (targetRole === "Admin") return callerRole === "Owner";
+  return callerRole === "Owner" || callerRole === "Admin";
+}
+
+export function canChangeRole(callerRole: string, targetRole: string): boolean {
+  if (targetRole === "Owner") return false;
+  return callerRole === "Owner";
+}
+
+export function canManageWorkspaceMembers(role: string): boolean {
+  return role === "Owner" || role === "Admin";
+}

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ import { Loader2 } from "lucide-react";
 import { useLogin, useLoginGoogle } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -24,6 +25,8 @@ export default function LoginPage() {
 
   const login = useLogin();
   const loginGoogle = useLoginGoogle();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
 
   const isLoading = login.isPending || loginGoogle.isPending;
 
@@ -49,7 +52,7 @@ export default function LoginPage() {
       {
         onSuccess: (data) => {
           setRedirecting(true);
-          const dest = data?.role === "ADMIN" ? "/admin/overview" : "/workspaces";
+          const dest = redirectTo || (data?.role === "ADMIN" ? "/admin/overview" : "/workspaces");
           setTimeout(() => { window.location.href = dest; }, 300);
         },
         onError: (err: any) => {
@@ -79,7 +82,7 @@ export default function LoginPage() {
     loginGoogle.mutate(response.credential, {
       onSuccess: (data) => {
         setRedirecting(true);
-        const dest = data?.role === "ADMIN" ? "/admin/overview" : "/workspaces";
+        const dest = redirectTo || (data?.role === "ADMIN" ? "/admin/overview" : "/workspaces");
         setTimeout(() => { window.location.href = dest; }, 300);
       },
       onError: (err) => setError(err.message),
@@ -235,5 +238,13 @@ export default function LoginPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginPageContent />
+    </Suspense>
   );
 }

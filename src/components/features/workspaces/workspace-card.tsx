@@ -13,6 +13,7 @@ import {
   LayoutDashboard,
   FolderKanban,
   Users,
+  UserPlus,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -28,6 +29,7 @@ interface WorkspaceCardProps {
   isOwner?: boolean;
   onEdit?: (workspace: Workspace) => void;
   onDelete?: (workspace: Workspace) => void;
+  onInvite?: (workspace: Workspace) => void;
 }
 
 function formatRelativeDate(dateStr: string): string {
@@ -60,6 +62,7 @@ export function WorkspaceCard({
   isOwner = false,
   onEdit,
   onDelete,
+  onInvite,
 }: WorkspaceCardProps) {
   const relativeDate = workspace.updatedAt
     ? formatRelativeDate(workspace.updatedAt)
@@ -75,6 +78,12 @@ export function WorkspaceCard({
     e.preventDefault();
     e.stopPropagation();
     onDelete?.(workspace);
+  };
+
+  const handleInvite = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onInvite?.(workspace);
   };
 
   return (
@@ -114,6 +123,10 @@ export function WorkspaceCard({
                 <DropdownMenuItem onClick={handleEdit}>
                   <Pencil className="h-4 w-4 mr-2" />
                   Edit Workspace
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleInvite}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Invite Member
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

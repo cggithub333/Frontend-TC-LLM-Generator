@@ -6,6 +6,7 @@ import { useCurrentUser } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { useWorkspaces } from "@/hooks/use-workspaces";
 import { useWebSocket } from "@/hooks/use-websocket";
+import { useSendWorkspaceInvitation } from "@/hooks/use-workspace-members";
 import {
   WorkspaceCard,
   CreateWorkspaceDialog,
@@ -31,6 +32,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select as RoleSelect,
+  SelectContent as RoleSelectContent,
+  SelectItem as RoleSelectItem,
+  SelectTrigger as RoleSelectTrigger,
+  SelectValue as RoleSelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 import type { Workspace } from "@/types/workspace.types";
 
 /** Generic entity event from the centralized WebSocket broadcaster */
@@ -56,6 +73,10 @@ export default function WorkspacesPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteWorkspace, setInviteWorkspace] = useState<Workspace | null>(null);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState("Member");
   const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(
     null,
   );
@@ -66,6 +87,7 @@ export default function WorkspacesPage() {
   const queryClient = useQueryClient();
   const { data: workspacesResult, isLoading, error, refetch } = useWorkspaces();
   const router = useRouter();
+  const sendInvitation = useSendWorkspaceInvitation();
 
   // Subscribe to real-time workspace events
   useWebSocket<EntityEvent>({
@@ -130,6 +152,31 @@ export default function WorkspacesPage() {
     setSelectedWorkspace(workspace);
     setDeleteOpen(true);
   }, []);
+
+  const handleInvite = useCallback((workspace: Workspace) => {
+    setInviteWorkspace(workspace);
+    setInviteEmail("");
+    setInviteRole("Member");
+    setInviteOpen(true);
+  }, []);
+
+  const handleSendInvite = async () => {
+    if (!inviteEmail.trim() || !inviteWorkspace) return;
+    try {
+      await sendInvitation.mutateAsync({
+        workspaceId: inviteWorkspace.workspaceId,
+        email: inviteEmail.trim(),
+        role: inviteRole,
+      });
+      toast.success(`Invitation sent to ${inviteEmail}`);
+      setInviteOpen(false);
+      setInviteEmail("");
+      setInviteRole("Member");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to send invitation";
+      toast.error(msg);
+    }
+  };
 
   const handleSuccess = useCallback(() => {
     refetch();
@@ -290,6 +337,7 @@ export default function WorkspacesPage() {
               isOwner={workspace.ownerUserId === user?.id}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              onInvite={handleInvite}
             />
           ))}
           {/* Create Workspace Card */}
@@ -340,6 +388,52 @@ export default function WorkspacesPage() {
         workspace={selectedWorkspace}
         onSuccess={handleSuccess}
       />
+
+      {/* Invite Member Dialog */}
+      <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Invite Member</DialogTitle>
+            <DialogDescription>
+              Send an email invitation to join <strong>{inviteWorkspace?.name}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Email address</label>
+              <Input
+                type="email"
+                placeholder="colleague@example.com"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Role</label>
+              <RoleSelect value={inviteRole} onValueChange={setInviteRole}>
+                <RoleSelectTrigger>
+                  <RoleSelectValue />
+                </RoleSelectTrigger>
+                <RoleSelectContent>
+                  <RoleSelectItem value="Admin">Admin</RoleSelectItem>
+                  <RoleSelectItem value="Member">Member</RoleSelectItem>
+                </RoleSelectContent>
+              </RoleSelect>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setInviteOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSendInvite}
+              disabled={!inviteEmail.trim() || sendInvitation.isPending}
+            >
+              {sendInvitation.isPending ? "Sending..." : "Send Invitation"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
