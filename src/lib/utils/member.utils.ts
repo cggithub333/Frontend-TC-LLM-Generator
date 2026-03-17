@@ -3,7 +3,7 @@
  */
 
 import type { ProjectMember } from "@/types/team.types";
-import { MEMBER_ROLE_CONFIG } from "@/lib/constants/member.constants";
+import { MEMBER_ROLE_CONFIG, WORKSPACE_ROLE_CONFIG } from "@/lib/constants/member.constants";
 
 /**
  * Get role badge class for a member role
@@ -89,4 +89,11 @@ export function canChangeRole(callerRole: string, targetRole: string): boolean {
 
 export function canManageWorkspaceMembers(role: string): boolean {
   return role === "Owner" || role === "Admin";
+}
+
+/**
+ * Get workspace role badge class
+ */
+export function getWorkspaceRoleBadgeClass(role: string): string {
+  return WORKSPACE_ROLE_CONFIG[role]?.badgeClass || WORKSPACE_ROLE_CONFIG.Member.badgeClass;
 }

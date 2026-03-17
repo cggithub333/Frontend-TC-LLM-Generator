@@ -92,7 +92,8 @@ export function useWorkspaceInvitations(workspaceId: string) {
       const { data } = await axios.get(
         `/workspace-invitations/workspace/${workspaceId}/pending`,
       );
-      return data?.data ?? [];
+      // axios interceptor already unwraps ApiResponse.data
+      return Array.isArray(data) ? data : data?.data ?? [];
     },
     enabled: !!workspaceId,
   });

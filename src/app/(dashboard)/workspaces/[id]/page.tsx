@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import { useProjectsByWorkspace } from "@/hooks/use-projects";
 import { useWorkspace } from "@/hooks/use-workspaces";
 import { useCurrentUser } from "@/hooks/use-auth";
+import { useWorkspaceMembers } from "@/hooks/use-workspace-members";
+import { useWorkspaceAccessGuard } from "@/hooks/use-workspace-access-guard";
 import { filterProjectsByQuery } from "@/lib/utils/project.utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWebSocket } from "@/hooks/use-websocket";
@@ -100,6 +102,15 @@ export default function WorkspaceDetailPage() {
   const isLoading = workspaceLoading || projectsLoading;
   const hasError = workspaceError || projectsError;
   const isOwner = workspace?.ownerUserId === user?.id;
+
+  // Check if current user is Admin via workspace members
+  const { data: membersResult } = useWorkspaceMembers(workspaceId);
+  const currentUserMember = (membersResult?.items ?? []).find((m: { userId: string }) => m.userId === user?.id);
+  const isAdmin = currentUserMember?.role === "Admin";
+  const canManage = isOwner || isAdmin;
+
+  // Real-time: redirect if this user is removed from workspace
+  useWorkspaceAccessGuard(workspaceId);
 
   // Filter by search + status, then sort
   const filteredProjects = useMemo(() => {
@@ -286,7 +297,7 @@ export default function WorkspaceDetailPage() {
               onDelete={handleDeleteProject}
             />
           ))}
-          <CreateProjectCard onClick={handleCreateProject} />
+          {canManage && <CreateProjectCard onClick={handleCreateProject} />}
         </div>
       </main>
     );

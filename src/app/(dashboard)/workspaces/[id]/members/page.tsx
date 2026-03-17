@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useWorkspace } from "@/hooks/use-workspaces";
 import { useCurrentUser } from "@/hooks/use-auth";
+import { useQueryClient } from "@tanstack/react-query";
+import { useWebSocket } from "@/hooks/use-websocket";
+import { useWorkspaceAccessGuard } from "@/hooks/use-workspace-access-guard";
 import {
   useWorkspaceMembers,
   useWorkspaceInvitations,
@@ -12,6 +15,8 @@ import {
   useUpdateWorkspaceMember,
   useRemoveWorkspaceMember,
 } from "@/hooks/use-workspace-members";
+import { WORKSPACE_ROLE_CONFIG } from "@/lib/constants/member.constants";
+import { AssignProjectAccessDialog } from "@/components/features/workspaces/assign-project-access-dialog";
 import type { WorkspaceMember, WorkspaceInvitation } from "@/types/workspace.types";
 import {
   Users,
@@ -25,6 +30,7 @@ import {
   Clock,
   XCircle,
   ChevronDown,
+  FolderOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,12 +76,6 @@ const ROLE_ICON: Record<string, typeof Crown> = {
   Member: User,
 };
 
-const ROLE_COLOR: Record<string, string> = {
-  Owner: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  Admin: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-  Member: "bg-zinc-500/10 text-zinc-600 border-zinc-500/20",
-};
-
 export default function WorkspaceMembersPage() {
   const params = useParams();
   const workspaceId = params.id as string;
@@ -85,10 +85,25 @@ export default function WorkspaceMembersPage() {
   const { data: membersResult, isLoading: membersLoading } = useWorkspaceMembers(workspaceId);
   const { data: invitations, isLoading: invitationsLoading } = useWorkspaceInvitations(workspaceId);
 
+  const queryClient = useQueryClient();
+
+  // Real-time: auto-refresh members list when changes are broadcast
+  useWebSocket<{ entityType: string; action: string; entityId: string }>({
+    topic: `/topic/workspaces/${workspaceId}/members`,
+    onMessage: () => {
+      queryClient.invalidateQueries({ queryKey: ["workspace-members", workspaceId] });
+      queryClient.invalidateQueries({ queryKey: ["workspace-invitations", workspaceId] });
+    },
+  });
+
+  // Redirect if current user is removed from workspace
+  useWorkspaceAccessGuard(workspaceId);
+
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("Member");
   const [removeTarget, setRemoveTarget] = useState<WorkspaceMember | null>(null);
+  const [assignTarget, setAssignTarget] = useState<WorkspaceMember | null>(null);
 
   const sendInvitation = useSendWorkspaceInvitation();
   const cancelInvitation = useCancelWorkspaceInvitation();
@@ -127,8 +142,9 @@ export default function WorkspaceMembersPage() {
         invitationId: inv.invitationId,
       });
       toast.success("Invitation cancelled");
-    } catch {
-      toast.error("Failed to cancel invitation");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to cancel invitation";
+      toast.error(msg);
     }
   };
 
@@ -305,7 +321,7 @@ export default function WorkspaceMembersPage() {
                     {/* Role badge */}
                     <Badge
                       variant="outline"
-                      className={`gap-1 text-xs ${ROLE_COLOR[member.role] ?? ""}`}
+                      className={`gap-1 text-xs ${WORKSPACE_ROLE_CONFIG[member.role]?.badgeClass ?? ""}`}
                     >
                       <RoleIcon className="h-3 w-3" />
                       {member.role}
@@ -332,6 +348,12 @@ export default function WorkspaceMembersPage() {
                             {member.role === "Admin"
                               ? "Demote to Member"
                               : "Promote to Admin"}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => setAssignTarget(member)}
+                          >
+                            <FolderOpen className="h-4 w-4 mr-2" />
+                            Assign Projects
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-destructive"
@@ -429,6 +451,16 @@ export default function WorkspaceMembersPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Assign project access dialog */}
+      {assignTarget && (
+        <AssignProjectAccessDialog
+          open={!!assignTarget}
+          onOpenChange={() => setAssignTarget(null)}
+          workspaceId={workspaceId}
+          member={assignTarget}
+        />
+      )}
     </div>
   );
 }
