@@ -145,8 +145,11 @@ export default function StoriesPage() {
       });
       toast.success("Story created successfully");
       setCreateModalOpen(false);
-    } catch {
-      toast.error("Failed to create story");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to create story. Please try again.";
+      toast.error(msg);
     }
   };
 
@@ -168,8 +171,11 @@ export default function StoriesPage() {
       });
       setEditingStory(null);
       toast.success("Story updated successfully");
-    } catch {
-      toast.error("Failed to update story");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to update story. Please try again.";
+      toast.error(msg);
     }
   };
 
@@ -179,8 +185,11 @@ export default function StoriesPage() {
       await deleteStory.mutateAsync(deleteConfirmStory.userStoryId);
       setDeleteConfirmStory(null);
       toast.success("Story deleted successfully");
-    } catch {
-      toast.error("Failed to delete story");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to delete story. Please try again.";
+      toast.error(msg);
     }
   };
 

@@ -79,8 +79,11 @@ export function SuitePickerDialog({
       setSelectedSuiteId(created.testSuiteId);
       setNewSuiteName("");
       toast.success("Suite created");
-    } catch {
-      toast.error("Failed to create suite");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to create suite. Please try again.";
+      toast.error(msg);
     }
   };
 
@@ -100,8 +103,11 @@ export function SuitePickerDialog({
       );
       onOpenChange(false);
       onSuccess?.();
-    } catch {
-      toast.error("Some test cases failed to add");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Some test cases failed to add. Please try again.";
+      toast.error(msg);
     } finally {
       setIsAdding(false);
     }

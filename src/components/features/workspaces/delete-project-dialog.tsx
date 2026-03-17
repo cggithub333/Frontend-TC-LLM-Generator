@@ -44,7 +44,10 @@ export function DeleteProjectDialog({
       onSuccess?.();
       toast.success("Project deleted");
     } catch (error) {
-      toast.error("Failed to delete project");
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to delete project. Please try again.";
+      toast.error(msg);
     }
   }, [project, deleteProject, onOpenChange, onSuccess]);
 

@@ -79,8 +79,11 @@ function CreateSuiteInline({
       toast.success("Suite created");
       setName("");
       onCreated();
-    } catch {
-      toast.error("Failed to create suite");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to create suite. Please try again.";
+      toast.error(msg);
     }
   };
 
@@ -231,8 +234,11 @@ function AddTestCasesDrawer({
       toast.success(`Added ${selected.size} test case(s) to suite`);
       setSelected(new Set());
       onClose();
-    } catch {
-      toast.error("Some test cases failed to add");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Some test cases failed to add. Please try again.";
+      toast.error(msg);
     } finally {
       setIsAdding(false);
     }
@@ -491,8 +497,11 @@ export default function ProjectTestSuitesPage() {
         testCaseId,
       });
       toast.success("Removed from suite");
-    } catch {
-      toast.error("Failed to remove");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to remove. Please try again.";
+      toast.error(msg);
     }
   };
 
@@ -513,8 +522,11 @@ export default function ProjectTestSuitesPage() {
             : null
         );
       }
-    } catch {
-      toast.error("Failed to delete suite");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to delete suite. Please try again.";
+      toast.error(msg);
     } finally {
       setDeletingSuiteId(null);
     }
@@ -537,8 +549,11 @@ export default function ProjectTestSuitesPage() {
         name: renameValue.trim(),
       });
       toast.success("Suite renamed");
-    } catch {
-      toast.error("Failed to rename suite");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to rename suite. Please try again.";
+      toast.error(msg);
     } finally {
       setRenamingSuiteId(null);
     }

@@ -118,8 +118,11 @@ export function EditTestPlanDialog({
         onOpenChange(false);
         onSuccess?.();
         toast.success("Test plan updated successfully");
-      } catch {
-        toast.error("Failed to update test plan");
+      } catch (error) {
+        const msg = error instanceof Error
+          ? error.message
+          : "Failed to update test plan. Please try again.";
+        toast.error(msg);
       }
     },
     [form, plan.testPlanId, updateTestPlan, onOpenChange, onSuccess]

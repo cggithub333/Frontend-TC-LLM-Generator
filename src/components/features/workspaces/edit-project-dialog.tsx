@@ -121,7 +121,10 @@ export function EditProjectDialog({
         onSuccess?.();
         toast.success("Project updated successfully");
       } catch (error) {
-        toast.error("Failed to update project");
+        const msg = error instanceof Error
+          ? error.message
+          : "Failed to update project. Please try again.";
+        toast.error(msg);
       }
     },
     [formData, project, updateProject, onOpenChange, onSuccess],

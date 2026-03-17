@@ -334,7 +334,10 @@ export default function ProjectStoriesPage() {
       setSearchQuery("");
       toast.success("Story created successfully");
     } catch (err) {
-      toast.error("Failed to create story");
+      const msg = err instanceof Error
+        ? err.message
+        : "Failed to create story. Please try again.";
+      toast.error(msg);
     }
   };
 
@@ -370,7 +373,10 @@ export default function ProjectStoriesPage() {
       setEditingStory(null);
       toast.success("Story updated successfully");
     } catch (err) {
-      toast.error("Failed to update story");
+      const msg = err instanceof Error
+        ? err.message
+        : "Failed to update story. Please try again.";
+      toast.error(msg);
     }
   };
 

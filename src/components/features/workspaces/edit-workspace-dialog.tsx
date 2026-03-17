@@ -82,7 +82,10 @@ export function EditWorkspaceDialog({
         onSuccess?.();
         toast.success("Workspace updated successfully");
       } catch (error) {
-        toast.error("Failed to update workspace");
+        const msg = error instanceof Error
+          ? error.message
+          : "Failed to update workspace. Please try again.";
+        toast.error(msg);
       }
     },
     [name, description, workspace, updateWorkspace, onOpenChange, onSuccess],

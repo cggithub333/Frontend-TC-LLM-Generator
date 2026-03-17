@@ -44,7 +44,10 @@ export function DeleteWorkspaceDialog({
       onSuccess?.();
       toast.success("Workspace deleted");
     } catch (error) {
-      toast.error("Failed to delete workspace");
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to delete workspace. Please try again.";
+      toast.error(msg);
     }
   }, [workspace, deleteWorkspace, onOpenChange, onSuccess]);
 

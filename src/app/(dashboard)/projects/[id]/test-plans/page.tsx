@@ -357,8 +357,11 @@ function ImportSuitesDrawer({
       toast.success(`Imported ${selected.size} suite(s)`);
       setSelected(new Set());
       onClose();
-    } catch {
-      toast.error("Failed to import suites");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to import suites. Please try again.";
+      toast.error(msg);
     }
   };
 
@@ -506,8 +509,11 @@ function LinkStoriesDrawer({
       toast.success(`Linked ${selected.size} story(ies)`);
       setSelected(new Set());
       onClose();
-    } catch {
-      toast.error("Failed to link stories");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to link stories. Please try again.";
+      toast.error(msg);
     }
   };
 
@@ -649,8 +655,11 @@ function PlanDetailDrawer({
       await updatePlan.mutateAsync({ id: plan.testPlanId, name: nameValue.trim() });
       toast.success("Plan name updated");
       onPlanUpdated?.();
-    } catch {
-      toast.error("Failed to update name");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to update name. Please try again.";
+      toast.error(msg);
     }
     setEditingName(false);
   };
@@ -669,8 +678,11 @@ function PlanDetailDrawer({
       await updatePlan.mutateAsync({ id: plan.testPlanId, description: descValue.trim() });
       toast.success("Description updated");
       onPlanUpdated?.();
-    } catch {
-      toast.error("Failed to update description");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to update description. Please try again.";
+      toast.error(msg);
     }
     setEditingDesc(false);
   };
@@ -693,8 +705,11 @@ function PlanDetailDrawer({
       setDeleteConfirmOpen(false);
       onPlanDeleted?.();
       onClose();
-    } catch {
-      toast.error("Failed to delete plan");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to delete plan. Please try again.";
+      toast.error(msg);
     }
   };
 
@@ -905,8 +920,11 @@ function PlanDetailDrawer({
                           await updatePlan.mutateAsync({ id: plan.testPlanId, storyIds: newStoryIds });
                           toast.success("Story unlinked");
                           onPlanUpdated?.();
-                        } catch {
-                          toast.error("Failed to unlink story");
+                        } catch (error) {
+                          const msg = error instanceof Error
+                            ? error.message
+                            : "Failed to unlink story. Please try again.";
+                          toast.error(msg);
                         }
                       }}
                       title="Unlink story"
@@ -1199,8 +1217,11 @@ export default function ProjectTestPlansPage() {
     try {
       await detachSuite.mutateAsync({ planId: selectedPlanId, testSuiteId });
       toast.success("Suite removed from plan");
-    } catch {
-      toast.error("Failed to remove suite");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to remove suite. Please try again.";
+      toast.error(msg);
     }
   };
 

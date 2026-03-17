@@ -142,8 +142,11 @@ export default function ProjectSettingsPage() {
       // Green flash confirmation
       setShowSaveFlash(true);
       setTimeout(() => setShowSaveFlash(false), 1500);
-    } catch {
-      toast.error("Failed to update project");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to update project. Please try again.";
+      toast.error(msg);
     }
   };
 
@@ -155,8 +158,11 @@ export default function ProjectSettingsPage() {
       });
       toast.success("Project archived");
       router.push("/workspaces");
-    } catch {
-      toast.error("Failed to archive project");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to archive project. Please try again.";
+      toast.error(msg);
     }
   };
 
@@ -166,8 +172,11 @@ export default function ProjectSettingsPage() {
       toast.success("Project deleted");
       setDeleteModalOpen(false);
       router.push("/workspaces");
-    } catch {
-      toast.error("Failed to delete project");
+    } catch (error) {
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to delete project. Please try again.";
+      toast.error(msg);
     }
   };
 

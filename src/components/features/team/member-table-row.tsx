@@ -38,7 +38,10 @@ export function MemberTableRow({ member, onMenuClick }: MemberTableRowProps) {
         });
         toast.success(`Role updated to ${newRole}`);
       } catch (error) {
-        toast.error("Failed to update member role");
+        const msg = error instanceof Error
+          ? error.message
+          : "Failed to update member role. Please try again.";
+        toast.error(msg);
       }
     },
     [member.projectId, member.projectMemberId, updateMember]

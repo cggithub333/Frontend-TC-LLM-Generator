@@ -70,7 +70,10 @@ export function CreateWorkspaceDialog({
         setTouched({});
         toast.success("Workspace created successfully");
       } catch (error) {
-        toast.error("Failed to create workspace");
+        const msg = error instanceof Error
+          ? error.message
+          : "Failed to create workspace. Please try again.";
+        toast.error(msg);
       }
     },
     [name, description, createWorkspace, onOpenChange, onSuccess]

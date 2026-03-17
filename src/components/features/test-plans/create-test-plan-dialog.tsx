@@ -143,7 +143,10 @@ export function CreateTestPlanDialog({
         onSuccess?.();
         toast.success("Test plan created successfully");
       } catch (err) {
-        toast.error("Failed to create test plan");
+        const msg = err instanceof Error
+          ? err.message
+          : "Failed to create test plan. Please try again.";
+        toast.error(msg);
       }
     },
     [form, projectId, createTestPlan, onOpenChange, onSuccess]
