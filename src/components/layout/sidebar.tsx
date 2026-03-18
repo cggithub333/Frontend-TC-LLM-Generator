@@ -21,6 +21,8 @@ import {
   Home,
   MessageSquare,
   HelpCircle,
+  BookOpen,
+  LayoutTemplate,
 } from "lucide-react";
 import { useSidebar } from "@/components/layout/sidebar-context";
 import { useWorkspaces } from "@/hooks/use-workspaces";
@@ -59,6 +61,8 @@ const getProjectNavGroups = (projectId: string, canManageTeam: boolean) => [
       { name: "Stories", href: `/projects/${projectId}/stories`, icon: FileText },
       { name: "Test Plans", href: `/projects/${projectId}/test-plans`, icon: ClipboardList },
       { name: "Test Suites", href: `/projects/${projectId}/suites`, icon: Folder },
+      { name: "Business Rules", href: `/projects/${projectId}/business-rules`, icon: BookOpen },
+      { name: "Templates", href: `/projects/${projectId}/templates`, icon: LayoutTemplate },
       ...(canManageTeam
         ? [{ name: "Team Management", href: `/projects/${projectId}/team`, icon: Users }]
         : []),

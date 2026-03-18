@@ -21,11 +21,25 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // TODO: Call POST /api/v1/auth/forgot-password when BE implements it
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
-    setIsLoading(false);
-    setIsSubmitted(true);
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Something went wrong");
+      }
+
+      setIsSubmitted(true);
+    } catch {
+      // Still show success — security: don't reveal if email exists
+      setIsSubmitted(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
