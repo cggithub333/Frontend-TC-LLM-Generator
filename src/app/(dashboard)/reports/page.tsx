@@ -20,16 +20,11 @@ const STATUS_COLORS: Record<string, string> = {
   DRAFT: "#94A3B8",
   READY: "#3B82F6",
   IN_PROGRESS: "#F59E0B",
-  PASS: "#22C55E",
-  PASSED: "#22C55E",
-  FAIL: "#EF4444",
-  FAILED: "#EF4444",
   DONE: "#22C55E",
-  BLOCKED: "#EF4444",
-  SKIP: "#A78BFA",
-  SKIPPED: "#A78BFA",
   ARCHIVED: "#71717A",
   UNKNOWN: "#D1D5DB",
+  "AI Generated": "#A78BFA",
+  Manual: "#3B82F6",
 };
 
 function BarItem({ label, value, total, color }: { label: string; value: number; total: number; color: string }) {
@@ -47,7 +42,8 @@ function BarItem({ label, value, total, color }: { label: string; value: number;
   );
 }
 
-function DonutChart({ data }: { data: Record<string, number> }) {
+function DonutChart({ data, colors }: { data: Record<string, number>; colors?: Record<string, string> }) {
+  const colorMap = colors || STATUS_COLORS;
   const total = Object.values(data).reduce((a, b) => a + b, 0);
   if (total === 0) return <p className="text-sm text-muted-foreground text-center py-8">No data available</p>;
 
@@ -55,7 +51,7 @@ function DonutChart({ data }: { data: Record<string, number> }) {
   let cumulativePercent = 0;
   const segments = entries.map(([key, value]) => {
     const percent = (value / total) * 100;
-    const segment = { key, value, percent, offset: cumulativePercent, color: STATUS_COLORS[key] || "#D1D5DB" };
+    const segment = { key, value, percent, offset: cumulativePercent, color: colorMap[key] || "#D1D5DB" };
     cumulativePercent += percent;
     return segment;
   });
@@ -144,26 +140,61 @@ export default function ReportsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[
-          { label: "Total Test Cases", icon: FileText, value: testCasesData?.page?.totalElements, loading: loadingCases, color: "primary" },
-          { label: "Total Test Plans", icon: CheckCircle2, value: testPlansData?.page?.totalElements, loading: loadingPlans, color: "primary" },
-          { label: "User Stories", icon: Sparkles, value: storiesData?.page?.totalElements, loading: loadingStories, color: "purple" },
-          { label: "Test Suites", icon: Layers, value: testSuitesData?.page?.totalElements, loading: loadingSuites, color: "rose" },
-        ].map((stat, i) => (
-          <div key={i} className="bg-card border border-border p-6 rounded-2xl">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-              <div className={`w-10 h-10 bg-${stat.color === "primary" ? "primary" : stat.color}-100 dark:bg-${stat.color === "primary" ? "primary" : stat.color}-900/30 rounded-lg flex items-center justify-center text-${stat.color === "primary" ? "primary" : stat.color}-600 dark:text-${stat.color === "primary" ? "primary" : stat.color}-400`}>
-                <stat.icon className="h-5 w-5" />
-              </div>
+        <div className="bg-card border border-border p-6 rounded-2xl">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm font-medium text-muted-foreground">Total Test Cases</p>
+            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+              <FileText className="h-5 w-5" />
             </div>
-            {stat.loading ? (
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            ) : (
-              <p className="text-3xl font-bold">{(stat.value ?? 0).toLocaleString()}</p>
-            )}
           </div>
-        ))}
+          {loadingCases ? (
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          ) : (
+            <p className="text-3xl font-bold">{(testCasesData?.page?.totalElements ?? 0).toLocaleString()}</p>
+          )}
+        </div>
+
+        <div className="bg-card border border-border p-6 rounded-2xl">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm font-medium text-muted-foreground">Total Test Plans</p>
+            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+              <CheckCircle2 className="h-5 w-5" />
+            </div>
+          </div>
+          {loadingPlans ? (
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          ) : (
+            <p className="text-3xl font-bold">{(testPlansData?.page?.totalElements ?? 0).toLocaleString()}</p>
+          )}
+        </div>
+
+        <div className="bg-card border border-border p-6 rounded-2xl">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm font-medium text-muted-foreground">User Stories</p>
+            <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center text-purple-600 dark:text-purple-400">
+              <Sparkles className="h-5 w-5" />
+            </div>
+          </div>
+          {loadingStories ? (
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          ) : (
+            <p className="text-3xl font-bold">{(storiesData?.page?.totalElements ?? 0).toLocaleString()}</p>
+          )}
+        </div>
+
+        <div className="bg-card border border-border p-6 rounded-2xl">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm font-medium text-muted-foreground">Test Suites</p>
+            <div className="w-10 h-10 bg-rose-100 dark:bg-rose-900/30 rounded-lg flex items-center justify-center text-rose-600 dark:text-rose-400">
+              <Layers className="h-5 w-5" />
+            </div>
+          </div>
+          {loadingSuites ? (
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          ) : (
+            <p className="text-3xl font-bold">{(testSuitesData?.page?.totalElements ?? 0).toLocaleString()}</p>
+          )}
+        </div>
       </div>
 
       {/* Charts */}
@@ -173,12 +204,12 @@ export default function ReportsPage() {
         </div>
       ) : report ? (
         <>
-          {/* Row 1: Status Distribution + Coverage */}
+          {/* Row 1: AI vs Manual + Coverage */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-1">Test Case Status Distribution</h3>
-              <p className="text-sm text-muted-foreground mb-5">Distribution of test case statuses</p>
-              <DonutChart data={report.testCaseStatusDistribution} />
+              <h3 className="text-lg font-bold mb-1">AI vs Manual Test Generation</h3>
+              <p className="text-sm text-muted-foreground mb-5">Breakdown of how test cases were created</p>
+              <DonutChart data={report.aiVsManualDistribution} />
             </div>
 
             <div className="bg-card border border-border rounded-2xl p-6">
@@ -192,7 +223,7 @@ export default function ReportsPage() {
             </div>
           </div>
 
-          {/* Row 2: Story Status + Priority */}
+          {/* Row 2: Story Status + Test Case Types */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-card border border-border rounded-2xl p-6">
               <h3 className="text-lg font-bold mb-1">Story Status Breakdown</h3>
@@ -211,26 +242,9 @@ export default function ReportsPage() {
             </div>
 
             <div className="bg-card border border-border rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-1">AI vs Manual Generation</h3>
-              <p className="text-sm text-muted-foreground mb-5">Test case creation method comparison</p>
+              <h3 className="text-lg font-bold mb-1">Test Case Types</h3>
+              <p className="text-sm text-muted-foreground mb-5">Distribution by test case type</p>
               <DonutChart data={report.testCaseTypeDistribution} />
-            </div>
-          </div>
-
-          {/* Row 3: Priority */}
-          <div className="bg-card border border-border rounded-2xl p-6">
-            <h3 className="text-lg font-bold mb-1">Test Case Priority Breakdown</h3>
-            <p className="text-sm text-muted-foreground mb-5">Distribution by priority level</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
-              {Object.entries(report.testCasePriorityDistribution).map(([priority, count]) => (
-                <BarItem
-                  key={priority}
-                  label={priority}
-                  value={count}
-                  total={Object.values(report.testCasePriorityDistribution).reduce((a, b) => a + b, 0)}
-                  color={priority === "HIGH" || priority === "CRITICAL" ? "#EF4444" : priority === "MEDIUM" ? "#F59E0B" : "#22C55E"}
-                />
-              ))}
             </div>
           </div>
         </>

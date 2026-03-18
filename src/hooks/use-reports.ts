@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "@/lib/axios";
 
 export interface ReportData {
-  testCaseStatusDistribution: Record<string, number>;
+  testCaseTypeDistribution: Record<string, number>;
+  aiVsManualDistribution: Record<string, number>;
   storyStatusDistribution: Record<string, number>;
   requirementCoverage: {
     totalStories: number;
@@ -10,8 +11,6 @@ export interface ReportData {
     uncoveredStories: number;
     coveragePercent: number;
   };
-  testCaseTypeDistribution: Record<string, number>;
-  testCasePriorityDistribution: Record<string, number>;
 }
 
 export function useReports() {

@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { useStory } from "@/hooks/use-stories";
 import { useUpdateAcceptanceCriteria } from "@/hooks/use-acceptance-criteria";
 import { useTestCasesByAcceptanceCriteria, useTestCasesByUserStory } from "@/hooks/use-test-cases";
+import { useBusinessRulesByStory } from "@/hooks/use-business-rules";
 import { SuitePickerDialog } from "@/components/features/test-suites/suite-picker-dialog";
 import {
   Sparkles,
@@ -23,6 +24,7 @@ import {
   ChevronUp,
   ClipboardList,
   FolderPlus,
+  BookOpen,
 } from "lucide-react";
 import type { UserStory, StoryStatus, AcceptanceCriteria } from "@/types/story.types";
 
@@ -253,6 +255,13 @@ export function StoryDetailPanel({
     [storyTCData]
   );
 
+  /* ---------- Business rules ---------- */
+  const { data: businessRules } = useBusinessRulesByStory(
+    story?.projectId ?? "",
+    story?.userStoryId ?? ""
+  );
+  const rules = businessRules ?? [];
+
   /* ---------- Render ---------- */
   return (
     <Sheet open={isOpen} onOpenChange={(val) => !val && onClose()}>
@@ -404,6 +413,55 @@ export function StoryDetailPanel({
                 </div>
               )}
             </section>
+
+            {/* ═══════ BUSINESS RULES SECTION ═══════ */}
+            {rules.length > 0 && (
+              <section className="px-6 py-5 border-b">
+                <div className="flex items-center gap-2 mb-3">
+                  <BookOpen className="h-3.5 w-3.5 text-zinc-400" />
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                    Business Rules
+                  </h3>
+                  <Badge variant="secondary" className="text-[10px] h-4 px-1.5">
+                    {rules.length}
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  {rules.map((rule) => {
+                    const priorityMap: Record<number, { label: string; color: string }> = {
+                      1: { label: "Critical", color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
+                      2: { label: "High", color: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" },
+                      3: { label: "Medium", color: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" },
+                      4: { label: "Low", color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" },
+                    };
+                    const p = priorityMap[rule.priority] ?? { label: `P${rule.priority}`, color: "bg-muted text-muted-foreground" };
+                    return (
+                      <div
+                        key={rule.businessRuleId}
+                        className="p-3 rounded-lg border bg-muted/30 hover:border-primary/20 transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium flex-1">{rule.title}</span>
+                          <Badge variant="outline" className={cn("text-[10px] shrink-0", p.color)}>
+                            {p.label}
+                          </Badge>
+                        </div>
+                        {rule.description && (
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                            {rule.description}
+                          </p>
+                        )}
+                        {rule.source && (
+                          <span className="text-[10px] text-zinc-400 mt-1 block">
+                            Source: {rule.source}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
 
             {/* ═══════ ACTIONS SECTION ═══════ */}
             <section className="px-6 py-5 space-y-4">
