@@ -31,6 +31,8 @@ import {
 } from "lucide-react";
 import { useProjects } from "@/hooks/use-projects";
 import { useTemplates } from "@/hooks/use-templates";
+import { useGenerateAcceptanceCriteria } from "@/hooks/use-ai-generation";
+import { toast } from "sonner";
 
 // ─── Types ─────────────────────────────────────────────────
 interface CreateStoryModalProps {
@@ -101,6 +103,7 @@ export function CreateStoryModal({
   const projects = projectsData?.items ?? [];
 
   const { data: templates } = useTemplates(projectId);
+  const generateAcMutation = useGenerateAcceptanceCriteria();
 
   const isEditMode = !!editStory;
 
@@ -396,12 +399,46 @@ export function CreateStoryModal({
                   type="button"
                   variant="outline"
                   className="w-full mt-3 gap-2 bg-indigo-50 dark:bg-indigo-900/20 border-indigo-100 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-sm"
+                  disabled={generateAcMutation.isPending || (!formData.title && !formData.iWantTo)}
+                  onClick={() => {
+                    generateAcMutation.mutate(
+                      {
+                        title: formData.title,
+                        asA: formData.asA,
+                        iWantTo: formData.iWantTo,
+                        soThat: formData.soThat,
+                        description: "",
+                      },
+                      {
+                        onSuccess: (criteria) => {
+                          const newCriteria = criteria.map((c) => ({
+                            id: Math.random().toString(36).substring(2, 9),
+                            description: c,
+                          }));
+                          setFormData((prev) => ({
+                            ...prev,
+                            acceptanceCriteria: newCriteria,
+                          }));
+                          toast.success(`AI generated ${criteria.length} acceptance criteria`);
+                        },
+                        onError: (error) => {
+                          toast.error(error.message || "Failed to generate criteria");
+                        },
+                      }
+                    );
+                  }}
                 >
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Re-generate with AI
+                  {generateAcMutation.isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-3.5 w-3.5" />
+                  )}
+                  {generateAcMutation.isPending ? "Generating..." : "Re-generate with AI"}
                 </Button>
                 <p className="text-center text-[10px] text-muted-foreground mt-1.5">
-                  AI will suggest criteria based on the story description above.
+                  {generateAcMutation.isPending
+                    ? "AI is analyzing your story... This may take 30-60s on first use."
+                    : "AI will suggest criteria based on the story description above."}
                 </p>
               </div>
             </div>

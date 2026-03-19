@@ -52,6 +52,8 @@ import {
 // Link removed — story titles now open side panel via onClick
 import { LoadingSkeleton } from "@/components/features/workspaces/loading-skeleton";
 import { CreateManualTestCaseDialog } from "@/components/features/test-cases/create-manual-test-case-dialog";
+import { GenerationModal } from "@/components/features/ai/generation-modal";
+import { RefineStoryDialog } from "@/components/features/ai/refine-story-dialog";
 
 import { useWebSocket } from "@/hooks/use-websocket";
 import { useQueryClient } from "@tanstack/react-query";
@@ -298,6 +300,14 @@ export default function ProjectStoriesPage() {
 
   // Tip banner dismissal (Phase 2 onboarding)
   const [tipDismissed, setTipDismissed] = useState(false);
+
+  // AI Generation Modal State
+  const [isGenerationModalOpen, setIsGenerationModalOpen] = useState(false);
+  const [aiGenerateStory, setAiGenerateStory] = useState<UserStory | null>(null);
+
+  // AI Refine Story Dialog State
+  const [isRefineDialogOpen, setIsRefineDialogOpen] = useState(false);
+  const [refineStory, setRefineStory] = useState<UserStory | null>(null);
 
   // Story Detail Panel state
   const [selectedStoryId, setSelectedStoryId] = useState<string | null>(null);
@@ -701,16 +711,33 @@ export default function ProjectStoriesPage() {
                       </div>
                     </div>
 
-                    {/* Generate Button - Disabled until AI is integrated */}
-                    <Button
-                      variant="outline"
-                      disabled
-                      className="w-full gap-2"
-                    >
-                      <Sparkles className="h-4 w-4" />
-                      Generate Tests
-                      <Badge variant="secondary" className="text-[9px] ml-1">Coming soon</Badge>
-                    </Button>
+                    {/* AI Generate & Refine Buttons */}
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        className="flex-1 gap-2"
+                        disabled={!story.acceptanceCriteria || story.acceptanceCriteria.length === 0}
+                        onClick={() => {
+                          setAiGenerateStory(story);
+                          setIsGenerationModalOpen(true);
+                        }}
+                      >
+                        <Sparkles className="h-4 w-4" />
+                        Generate Tests
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={() => {
+                          setRefineStory(story);
+                          setIsRefineDialogOpen(true);
+                        }}
+                      >
+                        <Sparkles className="h-3.5 w-3.5" />
+                        Refine
+                      </Button>
+                    </div>
 
                     {/* Story Actions */}
                     <div className="flex items-center justify-between pt-2 border-t border-border/50">
@@ -934,6 +961,51 @@ export default function ProjectStoriesPage() {
           setDeleteConfirmStory(story);
         }}
       />
+
+      {/* AI Generate Test Cases Modal */}
+      <GenerationModal
+        open={isGenerationModalOpen}
+        onOpenChange={(open) => {
+          setIsGenerationModalOpen(open);
+          if (!open) setAiGenerateStory(null);
+        }}
+        storyTitle={aiGenerateStory?.title}
+        userStoryId={aiGenerateStory?.userStoryId}
+      />
+
+      {/* AI Refine Story Dialog */}
+      {refineStory && (
+        <RefineStoryDialog
+          open={isRefineDialogOpen}
+          onOpenChange={(open) => {
+            setIsRefineDialogOpen(open);
+            if (!open) setRefineStory(null);
+          }}
+          userStoryId={refineStory.userStoryId}
+          originalStory={{
+            title: refineStory.title || "",
+            asA: refineStory.asA || "",
+            iWantTo: refineStory.iWantTo || "",
+            soThat: refineStory.soThat || "",
+            description: refineStory.description || "",
+          }}
+          onApply={async (refined) => {
+            try {
+              await updateStory.mutateAsync({
+                id: refineStory.userStoryId,
+                title: refined.title,
+                asA: refined.asA,
+                iWantTo: refined.iWantTo,
+                soThat: refined.soThat,
+                description: refined.description,
+              });
+              toast.success("Story updated with AI suggestions");
+            } catch {
+              toast.error("Failed to apply AI suggestions");
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
