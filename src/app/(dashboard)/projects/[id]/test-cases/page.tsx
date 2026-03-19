@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
-  Plus,
   Search,
   Loader2,
   ClipboardList,
@@ -15,6 +14,7 @@ import {
   PenLine,
   FileText,
   MoreHorizontal,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,11 +38,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useTestCasesByProject, useDeleteTestCase } from "@/hooks/use-test-cases";
-import { useStoriesByProject } from "@/hooks/use-stories";
 import { toast } from "sonner";
 import type { TestCase } from "@/types/test-case.types";
-import { CreateManualTestCaseDialog } from "@/components/features/test-cases/create-manual-test-case-dialog";
-import type { UserStory } from "@/types/story.types";
 
 /* ================================================================== */
 /*  Types                                                              */
@@ -55,7 +52,7 @@ interface GroupedTestCases {
 }
 
 /* ================================================================== */
-/*  Main Page                                                          */
+/*  Main Page — Read-only list (create happens in Stories)             */
 /* ================================================================== */
 
 export default function ProjectTestCasesPage() {
@@ -69,15 +66,8 @@ export default function ProjectTestCasesPage() {
   const [expandedTcId, setExpandedTcId] = useState<string | null>(null);
   const [deletingTcId, setDeletingTcId] = useState<string | null>(null);
 
-  // Create/Edit dialog state
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editTestCase, setEditTestCase] = useState<TestCase | null>(null);
-  const [selectedStory, setSelectedStory] = useState<UserStory | null>(null);
-
   // Data
   const { data: testCases, isLoading, refetch } = useTestCasesByProject(projectId);
-  const { data: storiesData } = useStoriesByProject(projectId, { size: 200 });
-  const stories: UserStory[] = storiesData?.items ?? [];
   const deleteMutation = useDeleteTestCase();
 
   // Filter by search
@@ -139,27 +129,6 @@ export default function ProjectTestCasesPage() {
     }
   };
 
-  const handleEdit = (tc: TestCase) => {
-    const story = stories.find((s) => s.userStoryId === tc.userStoryId);
-    if (story) {
-      setSelectedStory(story);
-      setEditTestCase(tc);
-      setDialogOpen(true);
-    } else {
-      toast.error("Cannot edit: story context not found");
-    }
-  };
-
-  const handleCreate = () => {
-    if (stories.length === 0) {
-      toast.error("Create a user story first before adding test cases");
-      return;
-    }
-    setEditTestCase(null);
-    setSelectedStory(stories[0]);
-    setDialogOpen(true);
-  };
-
   const totalCount = testCases?.length ?? 0;
   const aiCount = testCases?.filter((tc) => tc.generatedByAi).length ?? 0;
   const manualCount = totalCount - aiCount;
@@ -179,10 +148,19 @@ export default function ProjectTestCasesPage() {
             <span className="text-blue-500">{manualCount} Manual</span>
           </p>
         </div>
-        <Button onClick={handleCreate} className="gap-2 shadow-md shadow-primary/20">
-          <Plus className="h-4 w-4" />
-          Create Test Case
-        </Button>
+        {/* Info badge: creation happens in Stories */}
+        <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-3 py-2 rounded-lg border border-border">
+          <BookOpen className="h-4 w-4 text-primary shrink-0" />
+          <span>
+            To create test cases, go to{" "}
+            <button
+              onClick={() => router.push(`/projects/${projectId}/stories`)}
+              className="text-primary font-medium hover:underline"
+            >
+              Stories
+            </button>
+          </span>
+        </div>
       </div>
 
       {/* Search */}
@@ -218,12 +196,16 @@ export default function ProjectTestCasesPage() {
           <p className="text-sm mt-1 mb-6 max-w-sm text-center">
             {search
               ? "Try a different search term"
-              : "Create test cases from your user stories to start testing"}
+              : "Create test cases from your user stories in the Stories page"}
           </p>
           {!search && (
-            <Button onClick={handleCreate} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Create Test Case
+            <Button
+              variant="outline"
+              onClick={() => router.push(`/projects/${projectId}/stories`)}
+              className="gap-2"
+            >
+              <BookOpen className="h-4 w-4" />
+              Go to Stories
             </Button>
           )}
         </div>
@@ -326,21 +308,13 @@ export default function ProjectTestCasesPage() {
                                     className="gap-2 text-sm"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      router.push(`/test-cases/${tc.testCaseId}`);
+                                      setExpandedTcId(
+                                        expandedTcId === tc.testCaseId ? null : tc.testCaseId
+                                      );
                                     }}
                                   >
                                     <Eye className="h-3.5 w-3.5" />
-                                    View Detail
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    className="gap-2 text-sm"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleEdit(tc);
-                                    }}
-                                  >
-                                    <Pencil className="h-3.5 w-3.5" />
-                                    Edit
+                                    {expandedTcId === tc.testCaseId ? "Collapse" : "View Detail"}
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem
@@ -397,27 +371,39 @@ export default function ProjectTestCasesPage() {
                                   </div>
                                 </div>
                               )}
-                              <div className="flex gap-2 pt-1">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="gap-1.5 h-7 text-xs"
-                                  onClick={() =>
-                                    router.push(`/test-cases/${tc.testCaseId}`)
-                                  }
-                                >
-                                  <Eye className="h-3 w-3" />
-                                  Full Detail
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="gap-1.5 h-7 text-xs"
-                                  onClick={() => handleEdit(tc)}
-                                >
-                                  <Pencil className="h-3 w-3" />
-                                  Edit
-                                </Button>
+                              {/* Custom Fields from Template */}
+                              {(() => {
+                                try {
+                                  const cf = tc.customFieldsJson ? JSON.parse(tc.customFieldsJson) : null;
+                                  if (!cf?.fields || Object.keys(cf.fields).length === 0) return null;
+                                  return (
+                                    <div className="border-t pt-3 space-y-2">
+                                      <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                                        Custom Fields
+                                        {cf.templateName && (
+                                          <span className="normal-case font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded text-[10px]">
+                                            {cf.templateName}
+                                          </span>
+                                        )}
+                                      </p>
+                                      <div className="grid gap-2">
+                                        {Object.entries(cf.fields as Record<string, string>).map(([key, value]) => (
+                                          <div key={key} className="bg-muted/50 rounded-lg p-2.5 flex items-start gap-2">
+                                            <span className="text-xs font-medium text-muted-foreground min-w-[100px] shrink-0 pt-0.5">{key}:</span>
+                                            <span className="text-sm whitespace-pre-wrap break-words">{value || "—"}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  );
+                                } catch { return null; }
+                              })()}
+                              {/* Metadata */}
+                              <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
+                                <span>ID: <code className="bg-muted px-1.5 py-0.5 rounded font-mono text-[10px]">{tc.testCaseId.slice(0, 8)}…</code></span>
+                                <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                                  {tc.generatedByAi ? "AI Generated" : "Manual"}
+                                </Badge>
                               </div>
                             </div>
                           )}
@@ -431,20 +417,6 @@ export default function ProjectTestCasesPage() {
           })}
         </div>
       )}
-
-      {/* Create/Edit Dialog */}
-      <CreateManualTestCaseDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        userStory={selectedStory}
-        editTestCase={editTestCase}
-        onSuccess={() => {
-          refetch();
-          toast.success(
-            editTestCase ? "Test case updated" : "Test case created"
-          );
-        }}
-      />
 
       {/* Delete Confirmation */}
       <AlertDialog

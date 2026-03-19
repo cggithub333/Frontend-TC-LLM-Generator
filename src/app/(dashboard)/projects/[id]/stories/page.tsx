@@ -834,6 +834,7 @@ export default function ProjectStoriesPage() {
           if (!open) setEditingTestCase(null);
         }}
         userStory={testCaseDialogStory}
+        projectId={projectId}
         defaultAcId={testCaseDialogAcId}
         editTestCase={editingTestCase}
         onSuccess={() => {

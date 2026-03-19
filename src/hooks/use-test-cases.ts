@@ -118,8 +118,9 @@ export function useTestCase(id: string) {
   return useQuery({
     queryKey: ["testCases", id],
     queryFn: async () => {
-      const { data } = await axios.get<TestCase>(`/test-cases/${id}`);
-      return data;
+      const { data } = await axios.get<{ data?: TestCase } & TestCase>(`/test-cases/${id}`);
+      // Unwrap ApiResponse wrapper if present, otherwise use raw data (HATEOAS)
+      return (data as any)?.data ?? data;
     },
     enabled: !!id,
   });

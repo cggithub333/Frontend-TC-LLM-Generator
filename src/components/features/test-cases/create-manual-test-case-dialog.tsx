@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -20,15 +21,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { UserStory, AcceptanceCriteria } from "@/types/story.types";
+import { LayoutTemplate } from "lucide-react";
+import type { UserStory } from "@/types/story.types";
 import type { TestCase } from "@/types/test-case.types";
+import type { TestCaseTemplate, TemplateField } from "@/types/template.types";
 import { useCreateTestCase, useUpdateTestCase } from "@/hooks/use-test-cases";
+import { useTemplates } from "@/hooks/use-templates";
 import { toast } from "sonner";
 
 interface CreateManualTestCaseDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   userStory: UserStory | null;
+  projectId?: string;
   defaultAcId?: string | null;
   editTestCase?: TestCase | null;
   onSuccess?: (createdTestCase?: TestCase) => void;
@@ -38,6 +43,7 @@ export function CreateManualTestCaseDialog({
   open,
   onOpenChange,
   userStory,
+  projectId,
   defaultAcId,
   editTestCase,
   onSuccess,
@@ -47,12 +53,25 @@ export function CreateManualTestCaseDialog({
   const isPending = isCreating || isUpdating;
   const isEditMode = !!editTestCase;
 
+  // Fetch templates for the project
+  const { data: templates } = useTemplates(projectId ?? "");
+  const templatesWithFields = (templates ?? []).filter(
+    (t) => t.fields && t.fields.length > 0
+  );
+
   // Form State
   const [selectedAcId, setSelectedAcId] = useState<string>("");
   const [title, setTitle] = useState("");
   const [preconditions, setPreconditions] = useState("");
   const [steps, setSteps] = useState("");
   const [expectedResult, setExpectedResult] = useState("");
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
+  const [customFields, setCustomFields] = useState<Record<string, string>>({});
+
+  // Get selected template
+  const selectedTemplate = templatesWithFields.find(
+    (t) => t.testCaseTemplateId === selectedTemplateId
+  );
 
   useEffect(() => {
     if (open) {
@@ -64,6 +83,16 @@ export function CreateManualTestCaseDialog({
         if (editTestCase.acceptanceCriteriaId) {
           setSelectedAcId(editTestCase.acceptanceCriteriaId);
         }
+        // Restore custom fields from JSON
+        if (editTestCase.customFieldsJson) {
+          try {
+            const parsed = JSON.parse(editTestCase.customFieldsJson);
+            if (parsed.templateId) setSelectedTemplateId(parsed.templateId);
+            if (parsed.fields) setCustomFields(parsed.fields);
+          } catch {
+            setCustomFields({});
+          }
+        }
       } else {
         resetForm();
         if (defaultAcId) {
@@ -71,8 +100,14 @@ export function CreateManualTestCaseDialog({
         } else if (userStory?.acceptanceCriteria?.length) {
           setSelectedAcId(userStory.acceptanceCriteria[0].acceptanceCriteriaId);
         }
+        // Auto-select default template if one exists
+        const defaultTemplate = templatesWithFields.find((t) => t.isDefault);
+        if (defaultTemplate) {
+          setSelectedTemplateId(defaultTemplate.testCaseTemplateId);
+        }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, defaultAcId, userStory, editTestCase]);
 
   const resetForm = () => {
@@ -80,7 +115,23 @@ export function CreateManualTestCaseDialog({
     setPreconditions("");
     setSteps("");
     setExpectedResult("");
-    // keep selectedAcId
+    setSelectedTemplateId("");
+    setCustomFields({});
+  };
+
+  const handleTemplateChange = (templateId: string) => {
+    if (templateId === "__none__") {
+      setSelectedTemplateId("");
+      setCustomFields({});
+      return;
+    }
+    setSelectedTemplateId(templateId);
+    // Reset custom fields when switching template
+    setCustomFields({});
+  };
+
+  const updateCustomField = (fieldKey: string, value: string) => {
+    setCustomFields((prev) => ({ ...prev, [fieldKey]: value }));
   };
 
   const handleClose = () => {
@@ -88,8 +139,28 @@ export function CreateManualTestCaseDialog({
     resetForm();
   };
 
+  const buildCustomFieldsJson = (): string => {
+    if (!selectedTemplate) return "{}";
+    return JSON.stringify({
+      templateId: selectedTemplate.testCaseTemplateId,
+      templateName: selectedTemplate.name,
+      fields: customFields,
+    });
+  };
+
   const handleSave = async (closeAfterSave: boolean) => {
     if (!title.trim() || !selectedAcId) return;
+
+    // Validate required custom fields
+    if (selectedTemplate) {
+      const missingRequired = selectedTemplate.fields
+        .filter((f) => f.isRequired && !customFields[f.fieldKey]?.trim())
+        .map((f) => f.fieldLabel);
+      if (missingRequired.length > 0) {
+        toast.error(`Please fill required fields: ${missingRequired.join(", ")}`);
+        return;
+      }
+    }
 
     try {
       let result: TestCase | undefined;
@@ -100,6 +171,7 @@ export function CreateManualTestCaseDialog({
           preconditions,
           steps,
           expectedResult,
+          customFieldsJson: buildCustomFieldsJson(),
         });
       } else {
         result = await createTestCase({
@@ -109,7 +181,7 @@ export function CreateManualTestCaseDialog({
           preconditions,
           steps,
           expectedResult,
-          customFieldsJson: "{}",
+          customFieldsJson: buildCustomFieldsJson(),
           generatedByAi: false,
         });
       }
@@ -118,19 +190,86 @@ export function CreateManualTestCaseDialog({
         handleClose();
       } else {
         resetForm();
+        // Re-select default template
+        const defaultTemplate = templatesWithFields.find((t) => t.isDefault);
+        if (defaultTemplate) {
+          setSelectedTemplateId(defaultTemplate.testCaseTemplateId);
+        }
       }
 
       onSuccess?.(result);
-      // Only show generic toast if no onSuccess handler (caller provides richer toast)
       if (!onSuccess) {
         toast.success(isEditMode ? "Test case updated successfully" : "Test case created successfully");
       }
-    } catch (error) {
+    } catch {
       toast.error(isEditMode ? "Failed to update test case" : "Failed to create test case");
     }
   };
 
   if (!userStory) return null;
+
+  const renderCustomField = (field: TemplateField) => {
+    const value = customFields[field.fieldKey] ?? "";
+    const id = `custom-${field.fieldKey}`;
+
+    return (
+      <div key={field.fieldKey} className="space-y-1.5">
+        <Label htmlFor={id} className="text-sm flex items-center gap-1.5">
+          {field.fieldLabel}
+          {field.isRequired && <span className="text-destructive">*</span>}
+          <Badge variant="outline" className="text-[9px] px-1 py-0 font-normal text-muted-foreground">
+            {field.fieldType}
+          </Badge>
+        </Label>
+        {field.fieldType === "textarea" ? (
+          <Textarea
+            id={id}
+            placeholder={`Enter ${field.fieldLabel.toLowerCase()}...`}
+            value={value}
+            onChange={(e) => updateCustomField(field.fieldKey, e.target.value)}
+            className="resize-none"
+            rows={3}
+          />
+        ) : field.fieldType === "checkbox" ? (
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={value === "true"}
+              onChange={(e) =>
+                updateCustomField(field.fieldKey, e.target.checked ? "true" : "false")
+              }
+              className="rounded border-input"
+            />
+            <span className="text-sm text-muted-foreground">
+              {field.fieldLabel}
+            </span>
+          </label>
+        ) : field.fieldType === "number" ? (
+          <Input
+            id={id}
+            type="number"
+            placeholder={`Enter ${field.fieldLabel.toLowerCase()}...`}
+            value={value}
+            onChange={(e) => updateCustomField(field.fieldKey, e.target.value)}
+          />
+        ) : field.fieldType === "date" ? (
+          <Input
+            id={id}
+            type="date"
+            value={value}
+            onChange={(e) => updateCustomField(field.fieldKey, e.target.value)}
+          />
+        ) : (
+          <Input
+            id={id}
+            placeholder={`Enter ${field.fieldLabel.toLowerCase()}...`}
+            value={value}
+            onChange={(e) => updateCustomField(field.fieldKey, e.target.value)}
+          />
+        )}
+      </div>
+    );
+  };
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && handleClose()}>
@@ -143,6 +282,7 @@ export function CreateManualTestCaseDialog({
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto space-y-6 py-4">
+          {/* Acceptance Criteria */}
           <div className="space-y-2">
             <Label htmlFor="acceptanceCriteria">Acceptance Criteria *</Label>
             <Select value={selectedAcId} onValueChange={setSelectedAcId}>
@@ -165,6 +305,41 @@ export function CreateManualTestCaseDialog({
             </Select>
           </div>
 
+          {/* Template Selector */}
+          {templatesWithFields.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="template" className="flex items-center gap-2">
+                <LayoutTemplate className="h-4 w-4 text-primary" />
+                Template
+                <span className="text-xs text-muted-foreground font-normal">(optional)</span>
+              </Label>
+              <Select value={selectedTemplateId || "__none__"} onValueChange={handleTemplateChange}>
+                <SelectTrigger id="template" className="w-full">
+                  <SelectValue placeholder="No template" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">No template</SelectItem>
+                  {templatesWithFields.map((t) => (
+                    <SelectItem key={t.testCaseTemplateId} value={t.testCaseTemplateId}>
+                      <span className="flex items-center gap-2">
+                        {t.name}
+                        {t.isDefault && (
+                          <Badge variant="outline" className="text-[9px] px-1 py-0">
+                            Default
+                          </Badge>
+                        )}
+                        <span className="text-muted-foreground text-xs">
+                          ({t.fields.length} fields)
+                        </span>
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Standard fields */}
           <div className="space-y-2">
             <Label htmlFor="title">Test Case Title *</Label>
             <Input
@@ -210,6 +385,24 @@ export function CreateManualTestCaseDialog({
               rows={3}
             />
           </div>
+
+          {/* Custom Fields from Template */}
+          {selectedTemplate && selectedTemplate.fields.length > 0 && (
+            <div className="space-y-4 border-t pt-4">
+              <div className="flex items-center gap-2">
+                <LayoutTemplate className="h-4 w-4 text-primary" />
+                <span className="text-sm font-bold">
+                  Custom Fields
+                </span>
+                <Badge variant="secondary" className="text-[10px]">
+                  {selectedTemplate.name}
+                </Badge>
+              </div>
+              {selectedTemplate.fields
+                .sort((a, b) => a.displayOrder - b.displayOrder)
+                .map(renderCustomField)}
+            </div>
+          )}
         </div>
 
         <DialogFooter className="gap-2 sm:gap-0 border-t pt-4 shrink-0">
@@ -223,7 +416,7 @@ export function CreateManualTestCaseDialog({
                 onClick={() => handleSave(false)}
                 disabled={!title.trim() || !selectedAcId || isPending}
               >
-                Save & Add Another
+                Save &amp; Add Another
               </Button>
             )}
             <Button
