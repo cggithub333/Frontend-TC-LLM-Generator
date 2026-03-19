@@ -4,13 +4,13 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Bell,
   User,
   SlidersHorizontal,
   LogOut,
   Loader2,
   ChevronDown,
 } from "lucide-react";
+import { NotificationCenter } from "@/components/layout/notification-center";
 import { cn } from "@/lib/utils";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 import { useLogout, useCurrentUser } from "@/hooks/use-auth";
@@ -62,13 +62,7 @@ export function GlobalHeader() {
         <ModeToggle />
 
         {/* Notifications */}
-        <button
-          className="relative inline-flex items-center justify-center h-9 w-9 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-          aria-label="Notifications"
-        >
-          <Bell className="h-[18px] w-[18px]" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full ring-2 ring-card" />
-        </button>
+        <NotificationCenter />
 
         {/* Divider */}
         <div className="h-6 w-px bg-border mx-2" />

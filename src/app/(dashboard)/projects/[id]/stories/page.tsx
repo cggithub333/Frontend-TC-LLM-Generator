@@ -12,6 +12,7 @@ import {
   ALLOWED_STORY_TRANSITIONS,
 } from "@/hooks/use-stories";
 import { useUpdateAcceptanceCriteria } from "@/hooks/use-acceptance-criteria";
+import { useCreateBusinessRule } from "@/hooks/use-business-rules";
 import { CreateStoryModal } from "@/components/features/stories/create-story-modal";
 import type { StoryFormData } from "@/components/features/stories/create-story-modal";
 import { StoryDetailPanel } from "@/components/features/stories/story-detail-panel";
@@ -271,6 +272,7 @@ export default function ProjectStoriesPage() {
   const updateStory = useUpdateStory();
   const deleteStory = useDeleteStory();
   const updateStoryStatus = useUpdateStoryStatus();
+  const createBusinessRule = useCreateBusinessRule(projectId);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedStories, setExpandedStories] = useState<string[]>([]);
@@ -316,7 +318,7 @@ export default function ProjectStoriesPage() {
 
   const handleCreateStory = async (formData: StoryFormData) => {
     try {
-      await createStory.mutateAsync({
+      const newStory = await createStory.mutateAsync({
         projectId: formData.projectId || projectId,
         title: formData.title,
         asA: formData.asA,
@@ -330,6 +332,26 @@ export default function ProjectStoriesPage() {
             orderNo: index + 1,
           })),
       });
+
+      // Batch-create pending business rules with the new story ID
+      if (formData.pendingBusinessRules && formData.pendingBusinessRules.length > 0 && newStory?.userStoryId) {
+        const rulePromises = formData.pendingBusinessRules.map((rule) =>
+          createBusinessRule.mutateAsync({
+            title: rule.title,
+            description: rule.description || undefined,
+            priority: rule.priority,
+            source: rule.source || undefined,
+            userStoryId: newStory.userStoryId,
+          })
+        );
+        try {
+          await Promise.all(rulePromises);
+          toast.success(`${formData.pendingBusinessRules.length} business rule(s) created`);
+        } catch {
+          toast.error("Story created but some business rules failed to save");
+        }
+      }
+
       setCreateModalOpen(false);
       setSearchQuery("");
       toast.success("Story created successfully");
