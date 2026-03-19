@@ -12,7 +12,7 @@ import { useProjectMembers } from "@/hooks/use-project-members";
 import { useProjects } from "@/hooks/use-projects";
 import { filterMembersByQuery } from "@/lib/utils/member.utils";
 import { DEFAULT_MEMBERS_PER_PAGE } from "@/lib/constants/member.constants";
-import { Search, UserPlus } from "lucide-react";
+import { Search, UserPlus, Shield, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import type { ProjectTeamStats } from "@/types/team.types";
@@ -155,15 +155,31 @@ export default function TeamManagementPage() {
   }
 
   if (error) {
+    // Check if this is a permission error (403 or role-restricted)
+    const statusCode = (error as any)?.response?.status;
+    const isPermissionError = statusCode === 403 || statusCode === 401;
+
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
-        <div className="text-center">
-          <p className="text-destructive mb-4 font-medium">
-            Failed to load team members
+        <div className="text-center max-w-md">
+          <div className="mx-auto w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center mb-4">
+            <Shield className="h-8 w-8 text-amber-600 dark:text-amber-400" />
+          </div>
+          <h2 className="text-xl font-bold mb-2">
+            {isPermissionError ? "Access Restricted" : "Failed to load team members"}
+          </h2>
+          <p className="text-sm text-muted-foreground mb-6">
+            {isPermissionError
+              ? "Only project Leads and workspace Admins/Owners can manage team members. Contact your project lead for access."
+              : (error instanceof Error ? error.message : "An unexpected error occurred. Please try again.")}
           </p>
-          <p className="text-sm text-muted-foreground">
-            {error instanceof Error ? error.message : "An error occurred"}
-          </p>
+          <Link
+            href={`/projects/${projectId}`}
+            className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Project Overview
+          </Link>
         </div>
       </div>
     );

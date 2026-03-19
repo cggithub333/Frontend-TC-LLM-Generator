@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +12,18 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
-import { useTestCase } from "@/hooks/use-test-cases";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useTestCase, useDeleteTestCase } from "@/hooks/use-test-cases";
+import { toast } from "sonner";
 
 export default function TestCaseDetailPage() {
   const params = useParams();
@@ -19,6 +31,20 @@ export default function TestCaseDetailPage() {
   const testCaseId = params.id as string;
 
   const { data: testCase, isLoading, error } = useTestCase(testCaseId);
+  const deleteMutation = useDeleteTestCase();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      await deleteMutation.mutateAsync(testCaseId);
+      toast.success("Test case deleted");
+      router.back();
+    } catch {
+      toast.error("Failed to delete test case");
+    } finally {
+      setShowDeleteDialog(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -79,14 +105,27 @@ export default function TestCaseDetailPage() {
           <h1 className="text-3xl font-bold tracking-tight mb-2">
             {testCase.title}
           </h1>
-          {testCase.userStoryId && (
+          {testCase.userStoryTitle && (
             <p className="text-sm text-muted-foreground">
               Linked to User Story:{" "}
               <span className="text-primary font-semibold">
-                {testCase.userStoryId}
+                {testCase.userStoryTitle}
               </span>
             </p>
           )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="destructive"
+            size="sm"
+            className="gap-1.5"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Delete
+          </Button>
         </div>
       </div>
 
@@ -163,6 +202,28 @@ export default function TestCaseDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Test Case</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. The test case &quot;{testCase.title}&quot;
+              will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

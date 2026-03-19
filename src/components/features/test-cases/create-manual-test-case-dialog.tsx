@@ -146,16 +146,19 @@ export function CreateManualTestCaseDialog({
           <div className="space-y-2">
             <Label htmlFor="acceptanceCriteria">Acceptance Criteria *</Label>
             <Select value={selectedAcId} onValueChange={setSelectedAcId}>
-              <SelectTrigger id="acceptanceCriteria">
+              <SelectTrigger id="acceptanceCriteria" className="w-full truncate">
                 <SelectValue placeholder="Select Acceptance Criteria" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-w-[calc(100vw-4rem)]">
                 {userStory.acceptanceCriteria?.map((ac) => (
                   <SelectItem
                     key={ac.acceptanceCriteriaId}
                     value={ac.acceptanceCriteriaId}
+                    className="max-w-full"
                   >
-                    {ac.content}
+                    <span className="line-clamp-2 break-words whitespace-normal">
+                      {ac.content}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>

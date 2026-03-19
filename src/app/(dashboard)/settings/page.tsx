@@ -270,38 +270,310 @@ export default function SettingsPage() {
               )}
 
               {activeTab === "users" && (
-                <div className="bg-card rounded-xl shadow-sm border p-6">
-                  <h3 className="text-lg font-semibold mb-4">User Management</h3>
-                  <p className="text-muted-foreground">
-                    User management features coming soon...
-                  </p>
+                <div className="space-y-6">
+                  {/* Members Table */}
+                  <div className="bg-card rounded-xl shadow-sm border overflow-hidden">
+                    <div className="p-6 border-b flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold">Team Members</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Manage who has access to this workspace.
+                        </p>
+                      </div>
+                      <Button className="gap-2" size="sm">
+                        <Users className="h-4 w-4" />
+                        Invite Member
+                      </Button>
+                    </div>
+                    <div className="divide-y">
+                      {[
+                        { name: "Hoa Ba Van", email: "hoangbavan4478@gmail.com", role: "Owner", status: "Active", lastActive: "Today" },
+                        { name: "Van", email: "vchun0201@gmail.com", role: "Member", status: "Active", lastActive: "Today" },
+                      ].map((member) => (
+                        <div key={member.email} className="flex items-center gap-4 px-6 py-4 hover:bg-muted/30 transition-colors">
+                          <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                            {member.name.charAt(0)}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium">{member.name}</p>
+                            <p className="text-xs text-muted-foreground">{member.email}</p>
+                          </div>
+                          <Select defaultValue={member.role.toLowerCase()}>
+                            <SelectTrigger className="w-28 h-8 text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="owner">Owner</SelectItem>
+                              <SelectItem value="admin">Admin</SelectItem>
+                              <SelectItem value="member">Member</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <span className="text-xs text-muted-foreground w-16 text-right">{member.lastActive}</span>
+                          <div className="w-2 h-2 rounded-full bg-green-500 shrink-0" title="Active" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Pending Invitations */}
+                  <div className="bg-card rounded-xl shadow-sm border overflow-hidden">
+                    <div className="p-6 border-b">
+                      <h3 className="text-lg font-semibold">Pending Invitations</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Invitations waiting for acceptance.
+                      </p>
+                    </div>
+                    <div className="p-8 text-center">
+                      <p className="text-sm text-muted-foreground">No pending invitations</p>
+                    </div>
+                  </div>
                 </div>
               )}
 
               {activeTab === "ai" && (
-                <div className="bg-card rounded-xl shadow-sm border p-6">
-                  <h3 className="text-lg font-semibold mb-4">AI Configurations</h3>
-                  <p className="text-muted-foreground">
-                    AI configuration features coming soon...
-                  </p>
+                <div className="space-y-6">
+                  {/* LLM Provider */}
+                  <div className="bg-card rounded-xl shadow-sm border overflow-hidden">
+                    <div className="p-6 border-b">
+                      <h3 className="text-lg font-semibold">LLM Provider</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Configure the AI model used for test case generation.
+                      </p>
+                    </div>
+                    <div className="p-6 space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid gap-2">
+                          <Label>Model Provider</Label>
+                          <Select defaultValue="gemini">
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="gemini">Google Gemini Pro</SelectItem>
+                              <SelectItem value="gpt4">OpenAI GPT-4</SelectItem>
+                              <SelectItem value="claude">Anthropic Claude 3.5</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid gap-2">
+                          <Label>API Key</Label>
+                          <Input type="password" placeholder="••••••••••••••••" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid gap-2">
+                          <Label>Temperature <span className="text-muted-foreground font-normal">(0.0 - 1.0)</span></Label>
+                          <Input type="number" defaultValue="0.7" min="0" max="1" step="0.1" />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label>Max Tokens</Label>
+                          <Input type="number" defaultValue="4096" />
+                        </div>
+                      </div>
+                      <Button variant="outline" className="gap-2" size="sm">
+                        <Bot className="h-4 w-4" />
+                        Test Connection
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Default Prompt Template */}
+                  <div className="bg-card rounded-xl shadow-sm border overflow-hidden">
+                    <div className="p-6 border-b">
+                      <h3 className="text-lg font-semibold">Default Prompt Template</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Customize the prompt used to generate test cases from user stories.
+                      </p>
+                    </div>
+                    <div className="p-6">
+                      <textarea
+                        className="w-full h-40 rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        defaultValue={`Given the following user story:\n\nTitle: {{story.title}}\nAs a: {{story.asA}}\nI want to: {{story.iWantTo}}\nSo that: {{story.soThat}}\n\nAcceptance Criteria:\n{{#each acceptanceCriteria}}\n- {{this.content}}\n{{/each}}\n\nGenerate comprehensive test cases covering positive, negative, and edge cases.`}
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
 
               {activeTab === "billing" && (
-                <div className="bg-card rounded-xl shadow-sm border p-6">
-                  <h3 className="text-lg font-semibold mb-4">Billing</h3>
-                  <p className="text-muted-foreground">
-                    Billing features coming soon...
-                  </p>
+                <div className="space-y-6">
+                  {/* Current Plan */}
+                  <div className="bg-card rounded-xl shadow-sm border overflow-hidden">
+                    <div className="p-6 border-b">
+                      <h3 className="text-lg font-semibold">Current Plan</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Manage your subscription and billing preferences.
+                      </p>
+                    </div>
+                    <div className="p-6">
+                      <div className="flex items-center gap-6">
+                        <div className="flex-1 p-5 rounded-xl bg-primary/5 border-2 border-primary">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-lg font-bold">Free Plan</span>
+                            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">Current</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">Up to 3 projects • 100 test cases/mo • 2 team members</p>
+                        </div>
+                        <div className="flex-1 p-5 rounded-xl border border-border hover:border-primary/50 transition-colors cursor-pointer">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-lg font-bold">Pro Plan</span>
+                            <span className="text-sm text-muted-foreground">$29/mo</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">Unlimited projects • 5,000 test cases/mo • 20 members</p>
+                          <Button size="sm" className="mt-3 gap-1.5">
+                            <CreditCard className="h-3.5 w-3.5" />
+                            Upgrade
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Usage */}
+                  <div className="bg-card rounded-xl shadow-sm border overflow-hidden">
+                    <div className="p-6 border-b">
+                      <h3 className="text-lg font-semibold">Usage This Month</h3>
+                    </div>
+                    <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-2">Test Cases Generated</p>
+                        <div className="flex items-end gap-2">
+                          <span className="text-2xl font-bold">13</span>
+                          <span className="text-sm text-muted-foreground mb-0.5">/ 100</span>
+                        </div>
+                        <div className="mt-2 h-2 rounded-full bg-muted overflow-hidden">
+                          <div className="h-full rounded-full bg-primary" style={{ width: "13%" }} />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-2">API Calls</p>
+                        <div className="flex items-end gap-2">
+                          <span className="text-2xl font-bold">47</span>
+                          <span className="text-sm text-muted-foreground mb-0.5">/ 1,000</span>
+                        </div>
+                        <div className="mt-2 h-2 rounded-full bg-muted overflow-hidden">
+                          <div className="h-full rounded-full bg-blue-500" style={{ width: "4.7%" }} />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-2">Team Members</p>
+                        <div className="flex items-end gap-2">
+                          <span className="text-2xl font-bold">2</span>
+                          <span className="text-sm text-muted-foreground mb-0.5">/ 2</span>
+                        </div>
+                        <div className="mt-2 h-2 rounded-full bg-muted overflow-hidden">
+                          <div className="h-full rounded-full bg-amber-500" style={{ width: "100%" }} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Billing History */}
+                  <div className="bg-card rounded-xl shadow-sm border overflow-hidden">
+                    <div className="p-6 border-b">
+                      <h3 className="text-lg font-semibold">Billing History</h3>
+                    </div>
+                    <div className="p-8 text-center">
+                      <p className="text-sm text-muted-foreground">No billing history — you&apos;re on the Free plan.</p>
+                    </div>
+                  </div>
                 </div>
               )}
 
               {activeTab === "security" && (
-                <div className="bg-card rounded-xl shadow-sm border p-6">
-                  <h3 className="text-lg font-semibold mb-4">Security</h3>
-                  <p className="text-muted-foreground">
-                    Security features coming soon...
-                  </p>
+                <div className="space-y-6">
+                  {/* Authentication */}
+                  <div className="bg-card rounded-xl shadow-sm border overflow-hidden">
+                    <div className="p-6 border-b">
+                      <h3 className="text-lg font-semibold">Authentication</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Strengthen workspace security with multi-factor authentication.
+                      </p>
+                    </div>
+                    <div className="p-6 space-y-5">
+                      <div className="flex items-start justify-between">
+                        <div className="flex flex-col gap-1">
+                          <p className="text-sm font-medium">Two-Factor Authentication (2FA)</p>
+                          <p className="text-sm text-muted-foreground">
+                            Require all workspace members to use 2FA.
+                          </p>
+                        </div>
+                        <Switch />
+                      </div>
+                      <hr className="border-border" />
+                      <div className="flex items-start justify-between">
+                        <div className="flex flex-col gap-1">
+                          <p className="text-sm font-medium">Single Sign-On (SSO)</p>
+                          <p className="text-sm text-muted-foreground">
+                            Enable SAML-based enterprise SSO.
+                          </p>
+                        </div>
+                        <Switch />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Session Management */}
+                  <div className="bg-card rounded-xl shadow-sm border overflow-hidden">
+                    <div className="p-6 border-b">
+                      <h3 className="text-lg font-semibold">Session Management</h3>
+                    </div>
+                    <div className="p-6 space-y-6">
+                      <div className="grid gap-2 max-w-sm">
+                        <Label>Session Timeout</Label>
+                        <Select defaultValue="8h">
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1h">1 hour</SelectItem>
+                            <SelectItem value="4h">4 hours</SelectItem>
+                            <SelectItem value="8h">8 hours</SelectItem>
+                            <SelectItem value="24h">24 hours</SelectItem>
+                            <SelectItem value="7d">7 days</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Password Policy */}
+                  <div className="bg-card rounded-xl shadow-sm border overflow-hidden">
+                    <div className="p-6 border-b">
+                      <h3 className="text-lg font-semibold">Password Policy</h3>
+                    </div>
+                    <div className="p-6 space-y-5">
+                      <div className="flex items-start justify-between">
+                        <div className="flex flex-col gap-1">
+                          <p className="text-sm font-medium">Minimum 8 Characters</p>
+                          <p className="text-sm text-muted-foreground">
+                            Enforce a minimum password length.
+                          </p>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                      <hr className="border-border" />
+                      <div className="flex items-start justify-between">
+                        <div className="flex flex-col gap-1">
+                          <p className="text-sm font-medium">Require Special Characters</p>
+                          <p className="text-sm text-muted-foreground">
+                            At least one special character (!@#$%).
+                          </p>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                      <hr className="border-border" />
+                      <div className="flex items-start justify-between">
+                        <div className="flex flex-col gap-1">
+                          <p className="text-sm font-medium">Password Expiry</p>
+                          <p className="text-sm text-muted-foreground">
+                            Force password change every 90 days.
+                          </p>
+                        </div>
+                        <Switch />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

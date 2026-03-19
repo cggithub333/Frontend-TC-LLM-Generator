@@ -59,6 +59,7 @@ const getProjectNavGroups = (projectId: string, canManageTeam: boolean) => [
     items: [
       { name: "Overview", href: `/projects/${projectId}`, icon: Layers },
       { name: "Stories", href: `/projects/${projectId}/stories`, icon: FileText },
+      { name: "Test Cases", href: `/projects/${projectId}/test-cases`, icon: ClipboardList },
       { name: "Test Plans", href: `/projects/${projectId}/test-plans`, icon: ClipboardList },
       { name: "Test Suites", href: `/projects/${projectId}/suites`, icon: Folder },
       { name: "Business Rules", href: `/projects/${projectId}/business-rules`, icon: BookOpen },
