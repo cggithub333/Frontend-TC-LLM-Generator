@@ -13,12 +13,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
   Search,
   ChevronDown,
@@ -43,8 +38,6 @@ import {
   useCreateStory,
   useUpdateStory,
   useDeleteStory,
-  useUpdateStoryStatus,
-  ALLOWED_STORY_TRANSITIONS,
 } from "@/hooks/use-stories";
 import { useUpdateAcceptanceCriteria } from "@/hooks/use-acceptance-criteria";
 import type { UserStory, AcceptanceCriteria } from "@/types/story.types";
@@ -55,7 +48,6 @@ const statusColors: Record<string, string> = {
   READY: "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800",
   IN_PROGRESS: "bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800",
   DONE: "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
-  ARCHIVED: "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700",
 };
 
 /** Format a date as relative time (simple) */
@@ -87,7 +79,6 @@ export default function StoriesPage() {
   const createStory = useCreateStory();
   const updateStory = useUpdateStory();
   const deleteStory = useDeleteStory();
-  const updateStoryStatus = useUpdateStoryStatus();
   const updateAC = useUpdateAcceptanceCriteria();
 
   const stories = storiesData?.items ?? [];
@@ -234,7 +225,6 @@ export default function StoriesPage() {
             { value: "READY", label: "Ready", count: stories.filter(s => s.status === "READY").length },
             { value: "IN_PROGRESS", label: "In Progress", count: stories.filter(s => s.status === "IN_PROGRESS").length },
             { value: "DONE", label: "Done", count: stories.filter(s => s.status === "DONE").length },
-            { value: "ARCHIVED", label: "Archived", count: stories.filter(s => s.status === "ARCHIVED").length },
           ].filter(tab => tab.value === "ALL" || tab.count > 0).map((tab) => (
             <button
               key={tab.value}
@@ -330,38 +320,11 @@ export default function StoriesPage() {
                         {story.title}
                       </button>
                       {story.status && (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button
-                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border cursor-pointer transition-colors hover:opacity-80 ${statusColors[story.status] ?? statusColors.DRAFT}`}
-                            >
-                              {story.status.replace("_", " ")}
-                              <ChevronDown className="h-3 w-3" />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start">
-                            {(ALLOWED_STORY_TRANSITIONS[story.status] || []).map((nextStatus) => (
-                              <DropdownMenuItem
-                                key={nextStatus}
-                                onClick={() => {
-                                  updateStoryStatus.mutate(
-                                    { id: story.userStoryId, status: nextStatus },
-                                    {
-                                      onSuccess: () => toast.success(`Status changed to ${nextStatus.replace("_", " ")}`),
-                                      onError: (err: any) => {
-                                        const msg = err?.response?.data?.message || err?.message || "Failed to update status";
-                                        toast.error(msg);
-                                      },
-                                    }
-                                  );
-                                }}
-                                className="text-xs font-medium"
-                              >
-                                → {nextStatus.replace("_", " ")}
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border select-none ${statusColors[story.status] ?? statusColors.DRAFT}`}
+                        >
+                          {story.status.replace("_", " ")}
+                        </span>
                       )}
                       <span className="text-xs text-muted-foreground ml-auto shrink-0">
                         {story.createdAt && formatRelativeTime(story.createdAt)}

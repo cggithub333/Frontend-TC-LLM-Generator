@@ -8,8 +8,6 @@ import {
   useCreateStory,
   useUpdateStory,
   useDeleteStory,
-  useUpdateStoryStatus,
-  ALLOWED_STORY_TRANSITIONS,
 } from "@/hooks/use-stories";
 import { useUpdateAcceptanceCriteria } from "@/hooks/use-acceptance-criteria";
 import { useCreateBusinessRule } from "@/hooks/use-business-rules";
@@ -27,12 +25,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
   Search,
   ChevronDown,
@@ -273,7 +266,7 @@ export default function ProjectStoriesPage() {
   const createStory = useCreateStory();
   const updateStory = useUpdateStory();
   const deleteStory = useDeleteStory();
-  const updateStoryStatus = useUpdateStoryStatus();
+
   const createBusinessRule = useCreateBusinessRule(projectId);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -564,49 +557,22 @@ export default function ProjectStoriesPage() {
                       {story.title}
                     </button>
                     {story.status && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <button
-                            className={cn(
-                              "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border cursor-pointer transition-colors hover:opacity-80",
-                              story.status === "DRAFT"
-                                ? "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600"
-                                : story.status === "READY"
-                                  ? "bg-primary/10 dark:bg-primary/20 text-primary border-primary/20 dark:border-primary/30"
-                                  : story.status === "IN_PROGRESS"
-                                    ? "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800"
-                                    : story.status === "DONE"
-                                      ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
-                                      : "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800"
-                            )}
-                          >
-                            {story.status.replace("_", " ")}
-                            <ChevronDown className="h-3 w-3" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" onClick={(e) => e.stopPropagation()}>
-                          {(ALLOWED_STORY_TRANSITIONS[story.status] || []).map((nextStatus) => (
-                            <DropdownMenuItem
-                              key={nextStatus}
-                              onClick={() => {
-                                updateStoryStatus.mutate(
-                                  { id: story.userStoryId, status: nextStatus },
-                                  {
-                                    onSuccess: () => toast.success(`Status changed to ${nextStatus.replace("_", " ")}`),
-                                    onError: (err: any) => {
-                                      const msg = err?.response?.data?.message || err?.message || "Failed to update status";
-                                      toast.error(msg);
-                                    },
-                                  }
-                                );
-                              }}
-                              className="text-xs font-medium"
-                            >
-                              → {nextStatus.replace("_", " ")}
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <span
+                        className={cn(
+                          "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border select-none",
+                          story.status === "DRAFT"
+                            ? "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600"
+                            : story.status === "READY"
+                              ? "bg-primary/10 dark:bg-primary/20 text-primary border-primary/20 dark:border-primary/30"
+                              : story.status === "IN_PROGRESS"
+                                ? "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800"
+                                : story.status === "DONE"
+                                  ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
+                                  : "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800"
+                        )}
+                      >
+                        {story.status.replace("_", " ")}
+                      </span>
                     )}
                   </div>
                   {!isExpanded && (

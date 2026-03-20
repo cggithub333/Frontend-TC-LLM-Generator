@@ -41,8 +41,6 @@ const STATUS_STYLES: Record<StoryStatus, string> = {
     "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800",
   DONE:
     "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
-  ARCHIVED:
-    "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-500 border-zinc-200 dark:border-zinc-700",
 };
 
 /* ------------------------------------------------------------------ */

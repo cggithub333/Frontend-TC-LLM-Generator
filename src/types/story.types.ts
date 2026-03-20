@@ -2,8 +2,7 @@ export type StoryStatus =
   | "DRAFT"
   | "READY"
   | "IN_PROGRESS"
-  | "DONE"
-  | "ARCHIVED";
+  | "DONE";
 
 export interface AcceptanceCriteria {
   acceptanceCriteriaId: string;

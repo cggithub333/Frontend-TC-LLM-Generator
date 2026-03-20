@@ -83,32 +83,4 @@ export function useDeleteStory() {
   });
 }
 
-export function useUpdateStoryStatus() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { data } = await axios.patch<UserStory>(
-        `/user-stories/${id}/status`,
-        { status }
-      );
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["stories"] });
-    },
-  });
-}
-
-/**
- * Allowed status transitions for UserStory.
- * Used by FE to only show valid next statuses in dropdown.
- */
-export const ALLOWED_STORY_TRANSITIONS: Record<string, string[]> = {
-  DRAFT: ["READY", "ARCHIVED"],
-  READY: ["DRAFT", "IN_PROGRESS", "ARCHIVED"],
-  IN_PROGRESS: ["READY", "DONE", "ARCHIVED"],
-  DONE: ["IN_PROGRESS", "ARCHIVED"],
-  ARCHIVED: ["DRAFT"],
-};
 
