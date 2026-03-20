@@ -116,3 +116,31 @@ export function useGenerateAcceptanceCriteria() {
     },
   });
 }
+
+/**
+ * Hook: Generate AC for an existing story by ID (preview only — does NOT save)
+ */
+export function useGenerateACForStory() {
+  return useMutation<string[], Error, string>({
+    mutationFn: async (userStoryId: string) => {
+      const res = await fetch(
+        `${API_BASE}/user-stories/${userStoryId}/generate-acceptance-criteria`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(
+          body?.message || `Failed to generate acceptance criteria (${res.status})`
+        );
+      }
+
+      const json = await res.json();
+      return json.data as string[];
+    },
+  });
+}
+

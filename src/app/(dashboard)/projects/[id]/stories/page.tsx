@@ -47,6 +47,7 @@ import { LoadingSkeleton } from "@/components/features/workspaces/loading-skelet
 import { CreateManualTestCaseDialog } from "@/components/features/test-cases/create-manual-test-case-dialog";
 import { GenerationModal } from "@/components/features/ai/generation-modal";
 import { RefineStoryDialog } from "@/components/features/ai/refine-story-dialog";
+import { GenerateACDialog } from "@/components/features/ai/generate-ac-dialog";
 
 import { useWebSocket } from "@/hooks/use-websocket";
 import { useQueryClient } from "@tanstack/react-query";
@@ -300,6 +301,9 @@ export default function ProjectStoriesPage() {
 
   // AI Refine Story Dialog State
   const [isRefineDialogOpen, setIsRefineDialogOpen] = useState(false);
+
+  // AI Generate AC Dialog State
+  const [isGenerateACDialogOpen, setIsGenerateACDialogOpen] = useState(false);
   const [refineStory, setRefineStory] = useState<UserStory | null>(null);
 
   // Story Detail Panel state
@@ -778,21 +782,27 @@ export default function ProjectStoriesPage() {
       </div>
 
       {/* Floating Action Bar */}
-      {selectedStories.length > 0 && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-6 py-3 rounded-full shadow-lg shadow-primary/30 flex items-center gap-4 z-40">
-          <span className="font-semibold">
-            {selectedStories.length} Stories Selected
-          </span>
-          <Button
-            size="sm"
-            variant="secondary"
-            className="gap-2 bg-white/20 hover:bg-white/30 text-white border-0"
-          >
-            <Sparkles className="h-4 w-4" />
-            Create New Test Plan
-          </Button>
-        </div>
-      )}
+      {selectedStories.length > 0 && (() => {
+        const selectedStoryObjects = stories.filter(s => selectedStories.includes(s.userStoryId));
+        const allHaveAC = selectedStoryObjects.every(s => s.acceptanceCriteria?.length > 0);
+        const buttonLabel = allHaveAC ? "Regenerate AC" : "Generate AC";
+        return (
+          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-6 py-3 rounded-full shadow-lg shadow-primary/30 flex items-center gap-4 z-40">
+            <span className="font-semibold">
+              {selectedStories.length} Stories Selected
+            </span>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="gap-2 bg-white/20 hover:bg-white/30 text-white border-0"
+              onClick={() => setIsGenerateACDialogOpen(true)}
+            >
+              <Sparkles className="h-4 w-4" />
+              {buttonLabel}
+            </Button>
+          </div>
+        );
+      })()}
 
 
 
@@ -966,6 +976,16 @@ export default function ProjectStoriesPage() {
           }}
         />
       )}
+
+      {/* AI Generate AC Dialog */}
+      <GenerateACDialog
+        open={isGenerateACDialogOpen}
+        onOpenChange={(open) => {
+          setIsGenerateACDialogOpen(open);
+          if (!open) setSelectedStories([]);
+        }}
+        stories={stories.filter(s => selectedStories.includes(s.userStoryId))}
+      />
     </div>
   );
 }
