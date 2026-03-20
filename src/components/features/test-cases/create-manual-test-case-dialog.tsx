@@ -286,23 +286,45 @@ export function CreateManualTestCaseDialog({
           <div className="space-y-2">
             <Label htmlFor="acceptanceCriteria">Acceptance Criteria *</Label>
             <Select value={selectedAcId} onValueChange={setSelectedAcId}>
-              <SelectTrigger id="acceptanceCriteria" className="w-full truncate">
-                <SelectValue placeholder="Select Acceptance Criteria" />
+              <SelectTrigger id="acceptanceCriteria" className="w-full">
+                <SelectValue placeholder="Select Acceptance Criteria">
+                  {selectedAcId && userStory.acceptanceCriteria ? (() => {
+                    const idx = userStory.acceptanceCriteria.findIndex(
+                      (ac) => ac.acceptanceCriteriaId === selectedAcId
+                    );
+                    return idx >= 0 ? `AC #${idx + 1}` : "Select Acceptance Criteria";
+                  })() : "Select Acceptance Criteria"}
+                </SelectValue>
               </SelectTrigger>
-              <SelectContent className="max-w-[calc(100vw-4rem)]">
-                {userStory.acceptanceCriteria?.map((ac) => (
+              <SelectContent className="max-w-[min(calc(100vw-4rem),36rem)]">
+                {userStory.acceptanceCriteria?.map((ac, idx) => (
                   <SelectItem
                     key={ac.acceptanceCriteriaId}
                     value={ac.acceptanceCriteriaId}
                     className="max-w-full"
                   >
-                    <span className="line-clamp-2 break-words whitespace-normal">
+                    <span className="break-words whitespace-normal">
+                      <span className="font-semibold text-primary">AC #{idx + 1}:</span>{" "}
                       {ac.content}
                     </span>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            {/* Full AC content preview */}
+            {selectedAcId && userStory.acceptanceCriteria && (() => {
+              const selectedAc = userStory.acceptanceCriteria.find(
+                (ac) => ac.acceptanceCriteriaId === selectedAcId
+              );
+              if (!selectedAc) return null;
+              const idx = userStory.acceptanceCriteria.indexOf(selectedAc);
+              return (
+                <div className="rounded-md border border-border bg-muted/30 px-3 py-2 text-sm text-muted-foreground leading-relaxed">
+                  <span className="font-semibold text-foreground">AC #{idx + 1}:</span>{" "}
+                  {selectedAc.content}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Template Selector */}
