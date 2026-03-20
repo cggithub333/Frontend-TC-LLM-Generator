@@ -382,31 +382,10 @@ export default function ProjectDetailPage() {
           ))}
         </div>
 
-        {/* ── Charts Row: Test Execution + Story Status ────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Test Execution Progress */}
-          <div className="bg-card rounded-xl border shadow-sm p-6">
-            <div className="mb-4">
-              <h2 className="text-base font-semibold">Test Execution</h2>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                Current test plan progress
-              </p>
-            </div>
-            {hasExecutionData ? (
-              <TestExecutionChart data={overview!.testExecutionStatus} />
-            ) : (
-              <div className="h-[200px] flex flex-col items-center justify-center text-muted-foreground">
-                <ClipboardList className="h-8 w-8 mb-3 opacity-40" />
-                <p className="text-sm font-medium">No execution data</p>
-                <p className="text-xs mt-1 opacity-70">
-                  Create a test plan and run tests
-                </p>
-              </div>
-            )}
-          </div>
-
+        {/* ── Charts Row: Story Status ────────────── */}
+        <div className="gap-6">
           {/* Story Status Distribution */}
-          <div className="lg:col-span-2 bg-card rounded-xl border shadow-sm p-6">
+          <div className="bg-card rounded-xl border shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-base font-semibold">Story Status</h2>
