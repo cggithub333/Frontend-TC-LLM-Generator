@@ -15,6 +15,7 @@ import {
   LogOut,
   Loader2,
   Shield,
+  Activity,
 } from "lucide-react";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 import { useSidebar } from "@/components/layout/sidebar-context";
@@ -22,9 +23,10 @@ import { useLogout, useCurrentUser } from "@/hooks/use-auth";
 import { broadcastLogout, onLogoutBroadcast } from "@/lib/auth-broadcast";
 
 const navigation = [
-  { name: "Overview", href: "/admin/overview", icon: LayoutDashboard },
-  { name: "Platform Users", href: "/admin/users", icon: Users },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
+  { name: "Overview",       href: "/admin/overview",    icon: LayoutDashboard },
+  { name: "Platform Users", href: "/admin/users",       icon: Users },
+  { name: "Monitoring",     href: "/admin/monitoring",  icon: Activity },
+  { name: "Settings",       href: "/admin/settings",    icon: Settings },
 ];
 
 export function AdminSidebar() {
