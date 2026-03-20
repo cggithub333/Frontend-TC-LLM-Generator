@@ -45,7 +45,6 @@ import type { UserStory, AcceptanceCriteria } from "@/types/story.types";
 /** Map story status to badge colors */
 const statusColors: Record<string, string> = {
   DRAFT: "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700",
-  READY: "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800",
   IN_PROGRESS: "bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800",
   DONE: "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
 };
@@ -222,7 +221,6 @@ export default function StoriesPage() {
           {[
             { value: "ALL", label: "All", count: stories.length },
             { value: "DRAFT", label: "Draft", count: stories.filter(s => s.status === "DRAFT").length },
-            { value: "READY", label: "Ready", count: stories.filter(s => s.status === "READY").length },
             { value: "IN_PROGRESS", label: "In Progress", count: stories.filter(s => s.status === "IN_PROGRESS").length },
             { value: "DONE", label: "Done", count: stories.filter(s => s.status === "DONE").length },
           ].filter(tab => tab.value === "ALL" || tab.count > 0).map((tab) => (

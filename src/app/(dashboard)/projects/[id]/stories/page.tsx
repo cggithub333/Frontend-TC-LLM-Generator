@@ -428,13 +428,9 @@ export default function ProjectStoriesPage() {
           ...oldData,
           items: oldData.items.map((story: UserStory) => {
             if (story.userStoryId !== storyId) return story;
-            // Auto-transition DRAFT → READY
-            if (
-              story.status === "DRAFT" &&
-              story.acceptanceCriteria &&
-              story.acceptanceCriteria.length > 0
-            ) {
-              return { ...story, status: "READY" as const };
+            // Auto-transition DRAFT → IN_PROGRESS when first TC is added
+            if (story.status === "DRAFT") {
+              return { ...story, status: "IN_PROGRESS" as const };
             }
             return story;
           }),
@@ -457,7 +453,7 @@ export default function ProjectStoriesPage() {
 
     // 4. Toast
     toast.success("Test case created successfully", {
-      description: "Story status auto-updated to READY.",
+      description: "Story status auto-updated.",
       duration: 5000,
     });
   };
@@ -562,13 +558,11 @@ export default function ProjectStoriesPage() {
                           "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border select-none",
                           story.status === "DRAFT"
                             ? "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600"
-                            : story.status === "READY"
-                              ? "bg-primary/10 dark:bg-primary/20 text-primary border-primary/20 dark:border-primary/30"
-                              : story.status === "IN_PROGRESS"
-                                ? "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800"
-                                : story.status === "DONE"
-                                  ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
-                                  : "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800"
+                            : story.status === "IN_PROGRESS"
+                              ? "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800"
+                              : story.status === "DONE"
+                                ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
+                                : "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800"
                         )}
                       >
                         {story.status.replace("_", " ")}

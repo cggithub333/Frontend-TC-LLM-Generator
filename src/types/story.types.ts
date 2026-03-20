@@ -1,6 +1,5 @@
 export type StoryStatus =
   | "DRAFT"
-  | "READY"
   | "IN_PROGRESS"
   | "DONE";
 

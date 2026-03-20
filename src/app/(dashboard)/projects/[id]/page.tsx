@@ -58,7 +58,6 @@ const EXECUTION_COLORS: Record<string, string> = {
 
 const STORY_COLORS: Record<string, string> = {
   DRAFT: "#94a3b8",
-  READY: "#f59e0b",
   IN_PROGRESS: "#3b82f6",
   DONE: "#10b981",
   ARCHIVED: "#6b7280",

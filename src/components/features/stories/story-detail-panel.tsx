@@ -35,8 +35,6 @@ import type { UserStory, StoryStatus, AcceptanceCriteria } from "@/types/story.t
 const STATUS_STYLES: Record<StoryStatus, string> = {
   DRAFT:
     "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700",
-  READY:
-    "bg-primary/10 dark:bg-primary/20 text-primary border-primary/20 dark:border-primary/30",
   IN_PROGRESS:
     "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800",
   DONE:

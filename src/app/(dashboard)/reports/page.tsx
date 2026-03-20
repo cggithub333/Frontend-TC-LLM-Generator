@@ -18,7 +18,6 @@ import { useReports } from "@/hooks/use-reports";
 
 const STATUS_COLORS: Record<string, string> = {
   DRAFT: "#94A3B8",
-  READY: "#3B82F6",
   IN_PROGRESS: "#F59E0B",
   DONE: "#22C55E",
   ARCHIVED: "#71717A",
