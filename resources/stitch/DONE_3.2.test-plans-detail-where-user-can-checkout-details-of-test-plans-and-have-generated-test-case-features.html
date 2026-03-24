@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QA Artifacts - Test Planning</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2563eb",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                        "card-light": "#ffffff",
+                        "card-dark": "#1e293b",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.75rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-card-light dark:bg-card-dark flex-col hidden lg:flex">
+<div class="p-6">
+<div class="flex items-center gap-2 mb-8">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-icons-round text-lg">auto_awesome</span>
+</div>
+<span class="text-xl font-bold tracking-tight">QA Artifacts</span>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-icons-round">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-icons-round">description</span>
+<span class="font-medium">User Stories</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-icons-round">rule</span>
+<span class="font-medium">Test Cases</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded-lg transition-colors" href="#">
+<span class="material-icons-round">assignment</span>
+<span class="font-medium">Test Plans</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-icons-round">bar_chart</span>
+<span class="font-medium">Reports</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-6 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+<span class="material-icons-round text-slate-500">person</span>
+</div>
+<div>
+<p class="text-sm font-semibold">Alex Rivera</p>
+<p class="text-xs text-slate-500">Lead QA Engineer</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-screen overflow-hidden">
+<div class="bg-card-light dark:bg-card-dark shrink-0 border-b border-slate-200 dark:border-slate-800">
+<header class="h-20 flex items-center justify-between px-8">
+<div class="flex items-center gap-4 flex-1 max-w-2xl">
+<h1 class="text-2xl font-bold">Test Planning</h1>
+<div class="relative flex-1 ml-4">
+<span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-transparent focus:border-primary focus:ring-0 rounded-xl text-sm transition-all" placeholder="Search plans by name or type..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="bg-primary text-white p-2 px-4 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition-colors">
+<span class="material-icons-round">add</span>
+<span class="font-semibold text-sm">New Plan</span>
+</button>
+</div>
+</header>
+<nav class="px-8 flex gap-8">
+<a class="pb-4 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors" href="#">
+                    User Story
+                </a>
+<a class="pb-4 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors" href="#">
+                    Test Case
+                </a>
+<a class="pb-4 text-sm font-semibold text-primary border-b-2 border-primary relative" href="#">
+                    Test Plan
+                </a>
+</nav>
+</div>
+<div class="flex-1 overflow-y-auto p-8">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+<div class="flex p-1 bg-slate-200 dark:bg-slate-800 rounded-xl w-fit">
+<button class="px-6 py-2 bg-white dark:bg-slate-700 shadow-sm rounded-lg text-sm font-semibold">Active</button>
+<button class="px-6 py-2 text-slate-500 dark:text-slate-400 text-sm font-semibold">Completed</button>
+<button class="px-6 py-2 text-slate-500 dark:text-slate-400 text-sm font-semibold">Draft</button>
+</div>
+<div class="flex gap-2 overflow-x-auto scrollbar-hide">
+<button class="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-full text-xs font-bold whitespace-nowrap">ALL TYPES</button>
+<button class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs font-bold text-slate-600 dark:text-slate-400 whitespace-nowrap">SPRINT</button>
+<button class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs font-bold text-slate-600 dark:text-slate-400 whitespace-nowrap">RELEASE</button>
+<button class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs font-bold text-slate-600 dark:text-slate-400 whitespace-nowrap">REGRESSION</button>
+</div>
+</div>
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-lg font-bold">Active Plans</h2>
+<span class="text-xs font-bold text-slate-400 tracking-widest uppercase">3 Total</span>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+<div class="xl:col-span-2 bg-card-light dark:bg-card-dark border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+<div class="p-6 border-b border-slate-100 dark:border-slate-800">
+<div class="flex items-start justify-between mb-4">
+<div>
+<span class="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold rounded uppercase tracking-wider">Sprint Plan</span>
+<h3 class="text-xl font-bold mt-2">Sprint 24 - Checkout Flow</h3>
+<div class="flex items-center gap-4 mt-2 text-slate-500 text-sm">
+<span class="flex items-center gap-1"><span class="material-icons-round text-base">calendar_today</span> Oct 12 - Oct 26</span>
+<span class="flex items-center gap-1"><span class="material-icons-round text-base">description</span> 48 Test Cases</span>
+</div>
+</div>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-icons-round">more_vert</span>
+</button>
+</div>
+<div class="mt-6">
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-semibold">Execution Progress</span>
+<span class="text-sm font-bold text-primary">65%</span>
+</div>
+<div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 65%"></div>
+</div>
+</div>
+</div>
+<div class="p-6">
+<div class="bg-purple-50 dark:bg-purple-900/10 border border-purple-100 dark:border-purple-900/30 rounded-xl p-4 mb-6 flex gap-4">
+<div class="w-10 h-10 shrink-0 bg-purple-600 rounded-lg flex items-center justify-center text-white">
+<span class="material-icons-round text-xl">psychology</span>
+</div>
+<div>
+<p class="text-purple-700 dark:text-purple-300 font-bold text-sm">AI Suggestion</p>
+<p class="text-sm text-purple-600 dark:text-purple-400 mt-1">Found 3 missing edge cases for User Story #102: "Guest Checkout". <a class="underline font-semibold" href="#">Click to generate.</a></p>
+</div>
+</div>
+<div class="space-y-6">
+<p class="text-sm font-bold">Story Distribution</p>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-xs font-semibold mb-1">
+<span>#102 Guest Checkout</span>
+<span>12 cases</span>
+</div>
+<div class="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full">
+<div class="h-full bg-blue-400" style="width: 100%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-semibold mb-1">
+<span>#105 PayPal Integration</span>
+<span>24 cases</span>
+</div>
+<div class="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full">
+<div class="h-full bg-indigo-500" style="width: 50%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-semibold mb-1">
+<span>#108 Coupon Validation</span>
+<span>12 cases</span>
+</div>
+<div class="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full">
+<div class="h-full bg-cyan-400" style="width: 40%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<a class="block p-4 text-center text-primary text-sm font-bold border-t border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" href="#">
+                        View Full Report →
+                    </a>
+</div>
+<div class="space-y-6">
+<div class="bg-card-light dark:bg-card-dark border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm hover:border-primary/30 transition-all cursor-pointer group">
+<div class="flex gap-4 items-start">
+<div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center text-orange-600">
+<span class="material-icons-round">history</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold">Regression - Core API</h4>
+<span class="px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 text-[10px] font-bold rounded uppercase tracking-wider">Ongoing</span>
+</div>
+<p class="text-xs text-slate-500 mt-1">Progress: 12/110 passed</p>
+</div>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm hover:border-primary/30 transition-all cursor-pointer group">
+<div class="flex gap-4 items-start">
+<div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center text-emerald-600">
+<span class="material-icons-round">rocket_launch</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold">v2.4 Release Candidate</h4>
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-bold rounded uppercase tracking-wider">Pending</span>
+</div>
+<p class="text-xs text-slate-500 mt-1">Starts in 2 days</p>
+</div>
+</div>
+</div>
+<div class="bg-primary p-6 rounded-2xl text-white shadow-lg shadow-primary/20">
+<p class="text-primary-100 text-xs font-bold uppercase tracking-widest mb-4 opacity-80">Quick Stats</p>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="text-2xl font-bold">142</p>
+<p class="text-[10px] opacity-70">Total Runs</p>
+</div>
+<div>
+<p class="text-2xl font-bold">98.2%</p>
+<p class="text-[10px] opacity-70">Pass Rate</p>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
+<span class="text-xs font-medium">Team Efficiency</span>
+<span class="text-xs font-bold px-2 py-1 bg-white/20 rounded-full">+12%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<button class="fixed bottom-8 right-8 bg-primary text-white pl-5 pr-7 py-4 rounded-full shadow-2xl shadow-primary/40 flex items-center gap-3 hover:scale-105 active:scale-95 transition-all z-50">
+<span class="material-icons-round animate-pulse">bolt</span>
+<span class="font-bold tracking-tight">Generate with AI</span>
+</button>
+<nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark border-t border-slate-200 dark:border-slate-800 flex justify-around py-3 px-2 z-40">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-icons-round">dashboard</span>
+<span class="text-[10px] font-medium">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-icons-round">assignment</span>
+<span class="text-[10px] font-medium">Plans</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-icons-round">rule</span>
+<span class="text-[10px] font-medium">Cases</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-icons-round">bar_chart</span>
+<span class="text-[10px] font-medium">Reports</span>
+</a>
+</nav>
+<script>
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            // document.documentElement.classList.add('dark');
+        }
+    </script>
+
+</body></html>
+

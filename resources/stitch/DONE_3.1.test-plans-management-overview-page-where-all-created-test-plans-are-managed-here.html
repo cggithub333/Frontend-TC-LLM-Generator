@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QA Artifacts - Test Plans Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2563eb",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "12px",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-200">
+<div class="flex h-screen overflow-hidden">
+<aside class="w-20 lg:w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center lg:items-stretch transition-all">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">verified</span>
+</div>
+<span class="font-bold text-xl hidden lg:block tracking-tight">QA Artifacts</span>
+</div>
+<nav class="flex-1 mt-6 px-3 space-y-2">
+<a class="flex items-center gap-4 p-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium hidden lg:block">Projects</span>
+</a>
+<a class="flex items-center gap-4 p-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">list_alt</span>
+<span class="font-medium hidden lg:block">Stories</span>
+</a>
+<a class="flex items-center gap-4 p-3 rounded-xl bg-primary/10 text-primary transition-all" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-medium hidden lg:block">Test Plans</span>
+</a>
+<a class="flex items-center gap-4 p-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">play_circle</span>
+<span class="font-medium hidden lg:block">Runs</span>
+</a>
+<a class="flex items-center gap-4 p-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">assessment</span>
+<span class="font-medium hidden lg:block">Reports</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<button class="w-full flex items-center gap-4 p-3 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined">dark_mode</span>
+<span class="font-medium hidden lg:block">Dark Mode</span>
+</button>
+</div>
+</aside>
+<main class="flex-1 flex flex-col overflow-hidden relative">
+<header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 pt-6 pb-0">
+<div class="flex flex-col gap-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<nav class="flex items-center text-sm text-slate-500 dark:text-slate-400 mb-1">
+<span>Workspaces</span>
+<span class="material-symbols-outlined text-base mx-1">chevron_right</span>
+<span>Mobile Redesign V2</span>
+</nav>
+<h1 class="text-2xl font-bold">Test Plans</h1>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400">notifications</span>
+</button>
+<button class="bg-primary hover:bg-blue-600 text-white pl-3 pr-4 py-2 rounded-lg font-medium flex items-center gap-2 shadow-md shadow-primary/20 transition-all">
+<span class="material-symbols-outlined">add</span>
+                            Create Plan
+                        </button>
+</div>
+</div>
+<div class="flex items-center gap-8 border-b border-slate-200 dark:border-slate-800">
+<button class="pb-3 border-b-2 border-primary text-primary font-semibold px-1">Test Plans</button>
+<button class="pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 font-medium px-1 transition-colors">User Stories</button>
+<button class="pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 font-medium px-1 transition-colors">Test Cases</button>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-6 custom-scrollbar pb-12 bg-background-light dark:bg-background-dark">
+<div class="max-w-7xl mx-auto space-y-6">
+<div class="flex items-center gap-3">
+<div class="relative flex-1 max-w-lg">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-11 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400" placeholder="Search test plans..." type="text"/>
+</div>
+<button class="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-all font-medium text-sm">
+<span class="material-symbols-outlined text-lg">filter_list</span>
+                        Filter
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-all font-medium text-sm">
+<span class="material-symbols-outlined text-lg">sort</span>
+                        Sort
+                    </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-900/50 transition-all group cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 mb-2 border border-blue-100 dark:border-blue-800">
+                                    IN PROGRESS
+                                </span>
+<h3 class="font-bold text-lg text-slate-900 dark:text-slate-100 leading-tight">Sprint 24 - Biometric Auth</h3>
+</div>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="mb-6 space-y-3">
+<div class="flex justify-between text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+<span>Progress</span>
+<span class="text-slate-900 dark:text-slate-100">65%</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+<div class="bg-primary h-2 rounded-full relative overflow-hidden" style="width: 65%">
+<div class="absolute inset-0 bg-white/20"></div>
+</div>
+</div>
+<div class="flex gap-4 pt-1 text-sm text-slate-500 dark:text-slate-400">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">science</span>
+<span>24 Tests</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span>Oct 24</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4 mt-auto">
+<div class="flex -space-x-2">
+<img alt="SC" class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1PY9j0MLiP8sMZLGcbX1ScHZUJu7zcR9tf4DuRb9VVgWVH_ea-0H5RZBhjNDi4KXd3cdrxIce4pphOSEQ5IAl-6z9fBNNr2xud2MqPzvsjMgHWr6i1DVixFgTTRYEqIH8xj0fOuC5aIhngtDVelp-YU_qpV6okGXUpE5IHkZfdyj4nkEx4WA61OwirDfNqNAWRUGNIc8b5pbKz2oEdR7g487DG7IsuyZhbWWPLyfD1CC7LubTUxXzSpk5Kq1ozWsplmUIj6-zOmIo"/>
+<img alt="MR" class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSUMSTKYmh8tu4tYnrcXMMkOYnUSMk0c0SIj7BjJF9YatXYekBvK3IPNdPipisRh6gSDErO2L7jLjm1Mf9ZY7ZhwNz0ghHvRV5Y4kMEvuaKmOSLnLJtx_MX_35gbcQrg00H9dYU53xRmfG0jXjjqc1NhDl7CIPQhLvTBLoIlTpaz1W2mWjZY76r8D_0K6h_v4ODS7FkUlfIYB8syYxdlttL5fOmrKOzpIphzmIIXsRB1Aflqj1VQ8tNu3LsoHGT3TJ6dU6J3AKMD-W"/>
+</div>
+<button class="text-primary font-semibold text-sm hover:text-blue-700 dark:hover:text-blue-400 flex items-center gap-1 transition-colors">
+                                Run
+                                <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:shadow-lg hover:border-slate-300 dark:hover:border-slate-700 transition-all group cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 mb-2 border border-slate-200 dark:border-slate-700">
+                                    DRAFT
+                                </span>
+<h3 class="font-bold text-lg text-slate-900 dark:text-slate-100 leading-tight">Regression Pack v2.1</h3>
+</div>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="mb-6 space-y-3">
+<div class="flex justify-between text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+<span>Progress</span>
+<span class="text-slate-900 dark:text-slate-100">0%</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+<div class="bg-slate-300 dark:bg-slate-700 h-2 rounded-full" style="width: 0%"></div>
+</div>
+<div class="flex gap-4 pt-1 text-sm text-slate-500 dark:text-slate-400">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">science</span>
+<span>156 Tests</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span>Nov 01</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4 mt-auto">
+<div class="flex -space-x-2">
+<img alt="AW" class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArBuQTeuNSAp-C8cBwhm8LXL78qgcFpTXsP0DxrXKnQozwkZYR6TLDVYl2YglCf6glPOhYbdh47TbHvJCzV0ypsua8ybp4PeKfuauIz6yFFmC4rOUYM3KY3LIYrkdRhh9OPHPF8toeSr4_v_QwYcpM_APDoeZ93cIT20VZUrtIZIz6NzTZ0H-6T8SRNPqcqWye908zBIhMZ1-ZBGswZkL42SUbP44SQwBiDh702DZGwHz_SsQb0_Tj7vxPYXwihkrQREIyEZEbgYY9"/>
+</div>
+<button class="text-slate-600 dark:text-slate-400 font-semibold text-sm hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1 transition-colors">
+                                Edit Details
+                            </button>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:shadow-lg hover:border-green-200 dark:hover:border-green-900/50 transition-all group cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300 mb-2 border border-green-100 dark:border-green-800">
+                                    COMPLETED
+                                </span>
+<h3 class="font-bold text-lg text-slate-900 dark:text-slate-100 leading-tight">Payment Gateway Integration</h3>
+</div>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="mb-6 space-y-3">
+<div class="flex justify-between text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+<span>Progress</span>
+<span class="text-green-600 dark:text-green-400 font-bold">100%</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+<div class="bg-green-500 h-2 rounded-full" style="width: 100%"></div>
+</div>
+<div class="flex gap-4 pt-1 text-sm text-slate-500 dark:text-slate-400">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">science</span>
+<span>32 Tests</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+<span class="text-green-600 dark:text-green-400 font-medium">Passed</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4 mt-auto">
+<div class="flex -space-x-2">
+<img alt="DK" class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxTj7z4QPeQFmtGJKy6iQEQTNIdj8aLB-gAybEU113DYHKz98yuCzKluEE5F0OzimzFcZih4EmJBlC77WgmhrFGNy3vRinuWzbqF2ClEkIroV4twZpcuy3FIGx74reSZJLB3XYlRGz3BI4eoQygQf6KZSja8-NBLZXHM6NB4QMn5-4vySZugB8RdSD2i4e63MSsvHYaXJVrxoT3XxH6WgP0WS3QP3zRq7mLIyXkf5pFvSfRbeHPkPbSO7i4UsX1FYdX4PNfXVTdZir"/>
+<img alt="JL" class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWlFSmtSca_h5SeW58hFllnLAN8R3yaeQVlJHABNuzcQGY4W-6pT9EfgzThzv1fqPRpSqLckPrsMznvi_pxNnYWWlsmxBYuDRqI5bpPLfwAufxtsuhhi7JoLduVder6_4v3XrZufLXopc1YoI4kiDD-UnvDTTOaAZhSkPOVR19Nvo0gijhF_GadK-w5H92gtUxyWElmJX-6dIKh4nbS_rmkBHsxHYkSeKkHBAB7IqZdf1qnf14mwoF2Pb0wgx8To3GCFuz1L5-1oqq"/>
+<div class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-500">+1</div>
+</div>
+<button class="text-primary font-semibold text-sm hover:text-blue-700 dark:hover:text-blue-400 flex items-center gap-1 transition-colors">
+                                View Report
+                            </button>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-900/50 transition-all group cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 mb-2 border border-blue-100 dark:border-blue-800">
+                                    IN PROGRESS
+                                </span>
+<h3 class="font-bold text-lg text-slate-900 dark:text-slate-100 leading-tight">Mobile V2 - Smoke Test</h3>
+</div>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="mb-6 space-y-3">
+<div class="flex justify-between text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+<span>Progress</span>
+<span class="text-slate-900 dark:text-slate-100">32%</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+<div class="bg-primary h-2 rounded-full relative overflow-hidden" style="width: 32%"></div>
+</div>
+<div class="flex gap-4 pt-1 text-sm text-slate-500 dark:text-slate-400">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">science</span>
+<span>8 Tests</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span>Today</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4 mt-auto">
+<div class="flex -space-x-2">
+<img alt="SA" class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxqNoOo0Q2_9OFDgXz6Vri_QqVc3mvu1hE5AHpliFY-4DgpTy_7a5GKujZED3BTMXRGgQI8Yn2Y8rZ8_Me-u9lKCMXnkP11PyJMoKZbTs-Pmu0bFGUvz7hybwIAKo8jN1m7B2I4xeJkHVwBRgxabH3sd9tlSJ2hMtGVwQYPai8WgLYeOtuxkZLeW8mDflA1Hv6Mu9N2Qb7FoRtiUw2tyrbWzuXkVsQCnz_t7gvmO3OvA6qRoa8psZ_ZlO2DO3WVbHL_jfic0hiH79U"/>
+</div>
+<button class="text-primary font-semibold text-sm hover:text-blue-700 dark:hover:text-blue-400 flex items-center gap-1 transition-colors">
+                                Run
+                                <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QA Artifacts - Workspaces Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#2563eb", // Blue-600
+              "background-light": "#f8fafc", // Slate-50
+              "background-dark": "#0f172a", // Slate-900
+              "card-light": "#ffffff",
+              "card-dark": "#1e293b",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.75rem",
+            },
+          },
+        },
+      };
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col fixed inset-y-0">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white">
+<span class="material-icons-round">qr_code_2</span>
+</div>
+<span class="font-bold text-xl tracking-tight">QA Artifacts</span>
+</div>
+<nav class="flex-1 px-4 mt-4 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-xl font-medium" href="#">
+<span class="material-icons-round">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors" href="#">
+<span class="material-icons-round">play_circle</span>
+                Runs
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors" href="#">
+<span class="material-icons-round">bar_chart</span>
+                Reports
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors" href="#">
+<span class="material-icons-round">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<button class="w-full flex items-center justify-between px-4 py-2 text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" onclick="document.documentElement.classList.toggle('dark')">
+<span>Theme Mode</span>
+<span class="material-icons-round text-lg">dark_mode</span>
+</button>
+</div>
+</aside>
+<main class="ml-64 flex-1 flex flex-col min-h-screen">
+<header class="h-20 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-8 flex items-center justify-between sticky top-0 z-10">
+<h1 class="text-2xl font-bold">Workspaces</h1>
+<div class="flex items-center gap-6">
+<button class="relative p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-icons-round">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 border-2 border-white dark:border-slate-900 rounded-full"></span>
+</button>
+<div class="flex items-center gap-3 pl-6 border-l border-slate-200 dark:border-slate-800">
+<div class="text-right">
+<p class="text-sm font-semibold">Alex Rivers</p>
+<p class="text-xs text-slate-500">Admin</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-orange-200 flex items-center justify-center overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmeYLwKl9QCOyUiapt7o8I-StE6zp1rXxFto05eruFJcUZrkLcJ5XH6LzotxLIxMTFWIK9WlEYrpe_u73AwAs2Imzl-qeMxcxz36QuFCDV5vwppnzF6YKFq3PZ3SGjaJwVKlY6ASM8yxnUF_UX43TnbaeIuS07xEiInRUx5Tbvp_4ppftLwVeEzHDy5o8k-SIjLtFxGjiyhzndgnp8IT_LCRMPD_EwHOjSvbre1r5E333ZCoIQvH7V8Q_maM3Yu4lBuZc_c-4fnFQ"/>
+</div>
+</div>
+</div>
+</header>
+<div class="p-8 space-y-8 max-w-7xl mx-auto w-full">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+<div class="md:col-span-4 space-y-2">
+<label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Workspace</label>
+<div class="relative">
+<select class="w-full pl-4 pr-10 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl appearance-none focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer">
+<option>FinTech Core Team</option>
+<option>Product Marketing</option>
+<option>DevOps Infrastructure</option>
+</select>
+<span class="material-icons-round absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">unfold_more</span>
+</div>
+</div>
+<div class="md:col-span-8 flex flex-col md:flex-row gap-4">
+<div class="relative flex-1">
+<span class="material-icons-round absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="Search projects..." type="text"/>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all">
+<span class="material-icons-round">add</span>
+                        New Project
+                    </button>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex flex-wrap gap-2">
+<button class="px-5 py-2 bg-primary text-white rounded-full text-sm font-medium">All</button>
+<button class="px-5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-primary text-slate-600 dark:text-slate-300 rounded-full text-sm font-medium transition-all flex items-center gap-2">
+<span class="material-icons-round text-sm text-blue-500">bolt</span>
+                        AI Active
+                    </button>
+<button class="px-5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-primary text-slate-600 dark:text-slate-300 rounded-full text-sm font-medium transition-all">Completed</button>
+<button class="px-5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-primary text-slate-600 dark:text-slate-300 rounded-full text-sm font-medium transition-all">Testing</button>
+</div>
+<button class="text-primary font-semibold text-sm hover:underline">View All</button>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+<div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400">
+<span class="material-icons-round">smartphone</span>
+</div>
+<div>
+<h3 class="font-bold text-lg leading-none mb-1">Mobile Redesign V2</h3>
+<p class="text-xs text-slate-400">Updated 2h ago</p>
+</div>
+</div>
+<span class="bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md flex items-center gap-1">
+<span class="material-icons-round text-xs">auto_awesome</span>
+                                AI Processing
+                            </span>
+</div>
+<div class="grid grid-cols-3 gap-4 mb-8">
+<div class="text-center">
+<p class="text-2xl font-bold">12</p>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Stories</p>
+</div>
+<div class="text-center border-x border-slate-100 dark:border-slate-700">
+<p class="text-2xl font-bold">88</p>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tests</p>
+</div>
+<div class="text-center">
+<p class="text-xl font-bold text-primary italic">AI</p>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-tight">Generating</p>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-3">
+<img alt="Member" class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCobbXwhd--5CYcEASMCSpcSVt0IUWi1CicLaXq7k9gIw2fSbAYK6g53cYVAX39KZ4M7azMKXIOhWwN1FqHIsHY8DYd0hW6DRcL54x3NOa5aw1hgjXT6vAhJRwy33COV67v3l-WzMUdIXMBdSInf056r3MgGoMfni31sicjDbiR1lVX97YCcNd-5Nij6cXaNDNKlZO5FPq3h0sy2mzZmcygPdEg0TGSFzwsq5v45guiGpNG7gYKvEjCw7nklXKaBwklN1wyF1bwuUA"/>
+<img alt="Member" class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYCWObLqLfc9BRC9uzBvJJsA8HZk2T3_2yQ8WfQuW5K51Tdzo8IkKx6z58aSdCEXbSr4_lZwxBWS3rQY5cg_sdom5k3kCeIIzg6dVCXyN7KOGv7QTnow0cipvQ2xApOTTnW3i7gDk2mKCa0yNCcImqtXPGvFQxvzpi73QdvmZgHAyTcbtvyjxw2HF1Y55hx3sqhsYx6yfhqDKVb-5fi0hLM9s5DnQoPwruvDRXqzhpPqFMMgoDR_MbjBm71wuy5oPzj_WFuBzlf-k"/>
+<div class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 bg-primary flex items-center justify-center text-[10px] font-bold text-white">
+                                +4
+                            </div>
+</div>
+<button class="px-4 py-2 bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-primary dark:text-blue-400 font-bold text-sm rounded-lg transition-colors">
+                            View Details
+                        </button>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400">
+<span class="material-icons-round">payments</span>
+</div>
+<div>
+<h3 class="font-bold text-lg leading-none mb-1">Payment Gateway</h3>
+<p class="text-xs text-slate-400">Updated Yesterday</p>
+</div>
+</div>
+<span class="bg-orange-50 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md">
+                                Review
+                            </span>
+</div>
+<div class="grid grid-cols-3 gap-4 mb-8">
+<div class="text-center">
+<p class="text-2xl font-bold">24</p>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Stories</p>
+</div>
+<div class="text-center border-x border-slate-100 dark:border-slate-700">
+<p class="text-2xl font-bold">142</p>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tests</p>
+</div>
+<div class="text-center">
+<p class="text-2xl font-bold text-red-500">08</p>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Defects</p>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-3">
+<img alt="Member" class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqFMHVxYL0MvkBZzkWnmmmTyGM0SlxmXo0AsN-bCqGj9ReSy-LyqWwTMlVtPn04zbMqlRK7ZEBv5ZFhjtUJ2VbTMrQy-eQl4F-AABxQGzF6BMl0IbzPQeaOycr3Y-ArOmuxpq5oD4y98GFLjy3bSjaflbarLeapz6NRWkCRlM2QnnhBWm6dTs4Ilcw90EVocH8Vzf02mZYdV8dHbR5BDiryASz3zW4ma0yblDpc2TfERLZHAnkDjgQUWcXUhexPxf9i8KuKCcTX-M"/>
+<img alt="Member" class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAZhO5kbOLz0ANCyo_x26GZLKnPNgcN6GsdMB7Oclo2ObfjVM_YWrEGf3O4fg-0N2X0l5MHdZGkMTGcNlnkGTkFU-2GADO3TXMNeP_040dunI9ES7YsYyrG-2AZU01eiqxV64oaAyD_tjhv1aCZ_dsiznn0yELDeGHMRmXxFRx1eKmvr7HH1Uw1gHKU7TxiY2unwkt3yPT3F_OfDS4MC0hbkZaB5YSOKDJJB3ZV6U3988ongkPkQVwC0iArZJ362USZBatztBDH1E"/>
+</div>
+<button class="px-4 py-2 bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-primary dark:text-blue-400 font-bold text-sm rounded-lg transition-colors">
+                            View Details
+                        </button>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center text-green-600 dark:text-green-400">
+<span class="material-icons-round">security</span>
+</div>
+<div>
+<h3 class="font-bold text-lg leading-none mb-1">Security Audit Q3</h3>
+<p class="text-xs text-slate-400">Closed 4 days ago</p>
+</div>
+</div>
+<span class="bg-green-50 dark:bg-green-900/40 text-green-600 dark:text-green-400 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md">
+                                Done
+                            </span>
+</div>
+<div class="grid grid-cols-3 gap-4 mb-8">
+<div class="text-center">
+<p class="text-2xl font-bold">05</p>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Stories</p>
+</div>
+<div class="text-center border-x border-slate-100 dark:border-slate-700">
+<p class="text-2xl font-bold">34</p>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tests</p>
+</div>
+<div class="text-center">
+<p class="text-2xl font-bold">00</p>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Defects</p>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-3">
+<img alt="Member" class="w-8 h-8 rounded-full border-2 border-white dark:border-slate-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxyro_iBnUzLQn9dd9HdwCUmc3MnlVWi47EuTee587BP3WxbXPToiKqhIVVC7oiHv6tdqmhN8hrS6j4TwSZmOKptIauQiclzBRN2cjN0qXa6QlmcCSf0YM7-RWv3VNX0_v61cjuynpj_yV_4Ac77vGaV96qLEZTaLyfOxDsemE0pat2OLWP94d-pSEYwsY9p-NlaLBuYs2m8ZCDveBhZuz8iFkL5CYWkMZ5TXS7uV17D5_t89nI4Y63c7mTlTF6YMsCr9yetKYNP4"/>
+</div>
+<button class="px-4 py-2 bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-400 font-bold text-sm rounded-lg transition-colors">
+                            Archive
+                        </button>
+</div>
+</div>
+</div>
+<div class="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl p-12 flex flex-col items-center justify-center text-center space-y-4">
+<div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400">
+<span class="material-icons-round text-3xl">add_circle_outline</span>
+</div>
+<div>
+<h4 class="font-bold text-lg">Create a new Project</h4>
+<p class="text-slate-500 max-w-xs mx-auto">Start organizing your QA tests and stories by creating a new project container.</p>
+</div>
+<button class="text-primary font-bold hover:underline">Get Started</button>
+</div>
+</div>
+</main>
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-lg shadow-primary/30 flex items-center justify-center hover:scale-110 active:scale-95 transition-all">
+<span class="material-icons-round text-3xl">add</span>
+</button>
+
+</body></html>
+

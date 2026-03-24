@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QA Artifacts - Test Case Tab Optimized</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#6366f1",
+                        "brand-purple": "#7c3aed",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-background-light text-slate-900 font-sans;
+            }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative">
+<header class="sticky top-0 z-50 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
+<div class="flex items-center gap-6">
+<button class="text-slate-400 hover:text-slate-600">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex flex-col">
+<nav class="flex items-center gap-2 text-xs text-slate-400 mb-0.5">
+<span>Projects</span>
+<span class="material-symbols-outlined text-[12px]">chevron_right</span>
+<span>Authentication Suite</span>
+<span class="material-symbols-outlined text-[12px]">chevron_right</span>
+<span class="text-brand-purple font-medium">US-104</span>
+</nav>
+<h1 class="text-lg font-bold text-slate-800 leading-none">User Authentication</h1>
+</div>
+</div>
+<div class="bg-slate-100 p-1 rounded-xl flex gap-1">
+<button class="px-5 py-1.5 text-sm font-medium text-slate-500 rounded-lg hover:bg-slate-200 transition-colors">Story</button>
+<button class="px-5 py-1.5 text-sm font-semibold bg-white text-brand-purple rounded-lg shadow-sm">Test Case</button>
+<button class="px-5 py-1.5 text-sm font-medium text-slate-500 rounded-lg hover:bg-slate-200 transition-colors">Test Plan</button>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-400 hover:text-slate-600">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<button class="bg-gradient-to-r from-brand-purple to-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md shadow-indigo-200 hover:opacity-90 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">save</span>
+                Save Test Case
+            </button>
+<button class="text-slate-400">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 py-8">
+<div class="grid grid-cols-12 gap-8">
+<div class="col-span-12 lg:col-span-8 space-y-6">
+<div class="bg-gradient-to-br from-brand-purple via-indigo-600 to-indigo-700 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl shadow-indigo-100">
+<div class="relative z-10">
+<div class="flex items-center gap-2 mb-4">
+<span class="bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">Drafting Phase</span>
+<span class="text-indigo-200 text-xs flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> 2h ago
+                            </span>
+</div>
+<h2 class="text-3xl font-bold mb-3">AI-Generated Test Cases</h2>
+<p class="text-indigo-100 text-sm max-w-xl opacity-90 leading-relaxed">
+                            These test cases were generated based on User Story 104 requirements. Review and approve them to integrate into your test cycle.
+                        </p>
+</div>
+<div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between px-2 mb-4">
+<div class="flex items-center gap-2 text-slate-500 font-semibold text-sm">
+<span class="material-symbols-outlined text-indigo-500">auto_awesome</span>
+                            8 Suggested Artifacts
+                        </div>
+<button class="text-xs text-brand-purple font-bold hover:underline">Select All</button>
+</div>
+<div class="bg-white border border-slate-200 rounded-xl p-5 hover:border-indigo-300 transition-colors shadow-sm group">
+<div class="flex items-start gap-4">
+<div class="mt-1">
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" type="checkbox"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-3">
+<span class="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded">TC-01</span>
+<h3 class="font-bold text-slate-800">Successful Login Flow</h3>
+</div>
+<span class="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">POSITIVE</span>
+</div>
+<p class="text-sm text-slate-500 leading-relaxed">Verifies standard login flow with correct user credentials and session initialization for premium accounts.</p>
+</div>
+</div>
+</div>
+<div class="bg-white border border-slate-200 rounded-xl p-5 hover:border-indigo-300 transition-colors shadow-sm group">
+<div class="flex items-start gap-4">
+<div class="mt-1">
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" type="checkbox"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-3">
+<span class="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded">TC-02</span>
+<h3 class="font-bold text-slate-800">Invalid Password Feedback</h3>
+</div>
+<span class="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full bg-rose-50 text-rose-600 border border-rose-100">NEGATIVE</span>
+</div>
+<p class="text-sm text-slate-500 leading-relaxed">Ensures system rejects incorrect credentials with appropriate feedback message and lock-out logic.</p>
+</div>
+</div>
+</div>
+<div class="bg-white border border-slate-200 rounded-xl p-5 hover:border-indigo-300 transition-colors shadow-sm group">
+<div class="flex items-start gap-4">
+<div class="mt-1">
+<input class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" type="checkbox"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-3">
+<span class="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded">TC-03</span>
+<h3 class="font-bold text-slate-800">Field Character Limits</h3>
+</div>
+<span class="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full bg-amber-50 text-amber-600 border border-amber-100">BOUNDARY</span>
+</div>
+<p class="text-sm text-slate-500 leading-relaxed">Maximum character limit for username and password field validation and edge case handling.</p>
+</div>
+</div>
+</div>
+<div class="mt-8 border-2 border-dashed border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center text-center bg-slate-50/50">
+<div class="w-12 h-12 bg-white rounded-xl shadow-sm border border-slate-100 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-indigo-500">magic_button</span>
+</div>
+<p class="text-slate-600 text-sm font-medium mb-1">Don't see exactly what you need?</p>
+<button class="text-brand-purple font-bold text-sm hover:underline">Refine with AI Instructions</button>
+</div>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-4 space-y-6">
+<div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-slate-400 text-lg">assignment</span>
+<h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Execution Details</h4>
+</div>
+<div class="space-y-6">
+<div>
+<label class="block text-xs font-bold text-slate-700 mb-2">Expected Results</label>
+<div class="bg-slate-50 border border-slate-100 rounded-xl p-4 text-sm text-slate-600 leading-relaxed italic">
+                                "Successfully bypass the password screen using biometric scanner without any latency or error messages."
+                            </div>
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-700 mb-3">Current Status</label>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-500 cursor-pointer">Pending</span>
+<span class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-purple text-white cursor-pointer shadow-sm shadow-indigo-100">Ready</span>
+<span class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 text-rose-500 cursor-pointer">Fail</span>
+<span class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 text-amber-500 cursor-pointer">Blocked</span>
+</div>
+</div>
+<div class="pt-4 border-t border-slate-100">
+<div class="flex items-center justify-between mb-3">
+<label class="block text-xs font-bold text-slate-700">Assignee</label>
+<button class="text-[10px] text-brand-purple font-bold">CHANGE</button>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-slate-200 overflow-hidden flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400 text-lg">person</span>
+</div>
+<div>
+<p class="text-sm font-bold text-slate-800">Alex Johnson</p>
+<p class="text-[10px] text-slate-400">Senior QA Engineer</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-slate-400 text-lg">layers</span>
+<h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Related Artifacts</h4>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-3 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-indigo-500 text-sm">link</span>
+</div>
+<div>
+<p class="text-xs font-bold text-slate-800">Authentication Epic</p>
+<p class="text-[10px] text-slate-400">Jira Ticket AR-1223</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-indigo-500 text-sm">open_in_new</span>
+</div>
+<div class="flex items-center justify-between p-3 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-pink-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-pink-500 text-sm">description</span>
+</div>
+<div>
+<p class="text-xs font-bold text-slate-800">UI/UX Figma Design</p>
+<p class="text-[10px] text-slate-400">Security Screens v2.4</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-pink-500 text-sm">open_in_new</span>
+</div>
+</div>
+</div>
+<div class="pt-2">
+<button class="w-full bg-slate-900 hover:bg-black text-white py-4 rounded-xl flex items-center justify-center gap-3 shadow-lg shadow-slate-200 transition-all font-bold text-sm">
+<span class="material-symbols-outlined text-lg">library_add_check</span>
+                        Add Selected to Test Plan
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-12 py-8 border-t border-slate-200 text-center">
+<p class="text-[10px] text-slate-400 font-medium">© 2024 QA Artifacts AI Professional QA Management Platform.</p>
+</footer>
+<div class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center transition-opacity opacity-100 visible">
+<div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl transform transition-all scale-100 mx-4">
+<div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+<h3 class="text-lg font-bold text-slate-800">Save to Test Suite</h3>
+<button class="text-slate-400 hover:text-slate-600 transition-colors rounded-full hover:bg-slate-100 p-1">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+<div class="p-6">
+<div class="relative mb-6">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2.5 rounded-xl border-slate-200 focus:border-brand-purple focus:ring-brand-purple text-sm placeholder:text-slate-400 shadow-sm" placeholder="Search test suites..." type="text"/>
+</div>
+<div class="space-y-3 mb-4">
+<h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Recent Suites</h4>
+<label class="flex items-center p-3 rounded-xl border border-brand-purple bg-indigo-50/30 cursor-pointer group transition-all ring-1 ring-brand-purple/20">
+<input checked="" class="w-5 h-5 text-brand-purple border-slate-300 focus:ring-brand-purple" name="suite" type="radio"/>
+<div class="ml-3 flex-1">
+<p class="text-sm font-bold text-slate-800">Authentication Suite</p>
+<p class="text-xs text-slate-500">Includes 45 test cases</p>
+</div>
+<span class="material-symbols-outlined text-brand-purple text-lg">folder_open</span>
+</label>
+<label class="flex items-center p-3 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-slate-50 cursor-pointer group transition-all">
+<input class="w-5 h-5 text-brand-purple border-slate-300 focus:ring-brand-purple" name="suite" type="radio"/>
+<div class="ml-3 flex-1">
+<p class="text-sm font-bold text-slate-800">Mobile Regression</p>
+<p class="text-xs text-slate-500">Includes 120 test cases</p>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-indigo-400 text-lg">folder</span>
+</label>
+<label class="flex items-center p-3 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-slate-50 cursor-pointer group transition-all">
+<input class="w-5 h-5 text-brand-purple border-slate-300 focus:ring-brand-purple" name="suite" type="radio"/>
+<div class="ml-3 flex-1">
+<p class="text-sm font-bold text-slate-800">Payment Gateway</p>
+<p class="text-xs text-slate-500">Includes 24 test cases</p>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-indigo-400 text-lg">folder</span>
+</label>
+</div>
+<button class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-brand-purple font-bold text-sm hover:bg-slate-50 hover:border-brand-purple/30 transition-all flex items-center justify-center gap-2 group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">add_circle</span>
+                Create New Test Suite
+            </button>
+</div>
+<div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3 rounded-b-2xl">
+<button class="px-5 py-2.5 text-slate-600 font-bold text-sm hover:bg-slate-200 rounded-lg transition-colors">Cancel</button>
+<button class="px-5 py-2.5 bg-brand-purple text-white font-bold text-sm rounded-lg shadow-lg shadow-indigo-200 hover:opacity-90 transition-all flex items-center gap-2">
+                Save to Selection
+            </button>
+</div>
+</div>
+</div>
+</body></html>

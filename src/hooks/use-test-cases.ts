@@ -1,0 +1,167 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "@/lib/axios";
+import type { TestCase, CreateTestCaseInput, UpdateTestCaseInput } from "@/types/test-case.types";
+import type { PagedResponse, PaginatedResult, PaginationParams } from "@/types/pagination.types";
+import { extractPage } from "@/types/pagination.types";
+
+export function useTestCases(params?: PaginationParams) {
+  return useQuery({
+    queryKey: ["testCases", params],
+    queryFn: async (): Promise<PaginatedResult<TestCase>> => {
+      const { data } = await axios.get<PagedResponse<TestCase>>("/test-cases", {
+        params: { page: params?.page ?? 0, size: params?.size ?? 20, sort: params?.sort },
+      });
+      return extractPage(data);
+    },
+  });
+}
+
+/**
+ * Project-scoped test cases — fetches stories in the project,
+ * then fetches TCs per story in parallel.
+ * Workaround until backend supports GET /projects/{id}/test-cases
+ */
+export function useTestCasesByProject(projectId: string) {
+  return useQuery({
+    queryKey: ["testCases", "by-project", projectId],
+    queryFn: async (): Promise<TestCase[]> => {
+      // Step 1: Get all stories in the project
+      const { data: storiesRes } = await axios.get<PagedResponse<{ userStoryId: string }>>(
+        `/user-stories/project/${projectId}`,
+        { params: { page: 0, size: 200 } }
+      );
+
+      // Handle both ApiResponse wrapper (data.content) and HATEOAS (_embedded) formats
+      const rawData = (storiesRes as any)?.data ?? storiesRes;
+      const stories: { userStoryId: string }[] =
+        rawData?.content ??
+        rawData?._embedded?.userStoryResponses ??
+        storiesRes?._embedded?.userStoryResponses ??
+        [];
+
+      if (stories.length === 0) return [];
+
+      // Step 2: Fetch TCs per story in parallel
+      const results = await Promise.all(
+        stories.map((s) =>
+          axios
+            .get(`/test-cases/user-story/${s.userStoryId}`, {
+              params: { page: 0, size: 200 },
+            })
+            .then((r) => {
+              // Handle both ApiResponse wrapper and HATEOAS formats
+              const raw = (r.data as any)?.data ?? r.data;
+              const items: TestCase[] =
+                raw?.content ??
+                raw?._embedded?.testCaseResponses ??
+                r.data?._embedded?.testCaseResponses ??
+                [];
+              return items;
+            })
+            .catch(() => [] as TestCase[])
+        )
+      );
+      return results.flat();
+    },
+    enabled: !!projectId,
+  });
+}
+
+export function useTestCasesByAcceptanceCriteria(
+  acceptanceCriteriaId: string,
+  params?: PaginationParams
+) {
+  return useQuery({
+    queryKey: ["testCases", "acceptance-criteria", acceptanceCriteriaId, params],
+    queryFn: async (): Promise<PaginatedResult<TestCase>> => {
+      const { data } = await axios.get<PagedResponse<TestCase>>(
+        `/test-cases/acceptance-criteria/${acceptanceCriteriaId}`,
+        { params: { page: params?.page ?? 0, size: params?.size ?? 20, sort: params?.sort } }
+      );
+      return extractPage(data);
+    },
+    enabled: !!acceptanceCriteriaId,
+  });
+}
+
+export function useTestCasesByUserStory(
+  userStoryId: string,
+  params?: PaginationParams
+) {
+  return useQuery({
+    queryKey: ["testCases", "user-story", userStoryId, params],
+    queryFn: async (): Promise<PaginatedResult<TestCase>> => {
+      const { data } = await axios.get<PagedResponse<TestCase>>(
+        `/test-cases/user-story/${userStoryId}`,
+        { params: { page: params?.page ?? 0, size: params?.size ?? 20, sort: params?.sort } }
+      );
+      return extractPage(data);
+    },
+    enabled: !!userStoryId,
+  });
+}
+
+export function useSearchTestCases(title: string, params?: PaginationParams) {
+  return useQuery({
+    queryKey: ["testCases", "search", title, params],
+    queryFn: async (): Promise<PaginatedResult<TestCase>> => {
+      const { data } = await axios.get<PagedResponse<TestCase>>("/test-cases/search", {
+        params: { title, page: params?.page ?? 0, size: params?.size ?? 20, sort: params?.sort },
+      });
+      return extractPage(data);
+    },
+    enabled: !!title,
+  });
+}
+
+export function useTestCase(id: string) {
+  return useQuery({
+    queryKey: ["testCases", id],
+    queryFn: async () => {
+      const { data } = await axios.get<{ data?: TestCase } & TestCase>(`/test-cases/${id}`);
+      // Unwrap ApiResponse wrapper if present, otherwise use raw data (HATEOAS)
+      return (data as any)?.data ?? data;
+    },
+    enabled: !!id,
+  });
+}
+
+export function useCreateTestCase() {
+  return useMutation({
+    mutationFn: async (input: CreateTestCaseInput) => {
+      const { data } = await axios.post<{ data: TestCase }>("/test-cases", input);
+      return data.data; // unwrap ApiResponse → TestCase
+    },
+    // NOTE: No onSuccess / invalidateQueries here.
+    // The caller handles optimistic cache updates to prevent
+    // "Disappearing Act" when filters are active.
+  });
+}
+
+export function useUpdateTestCase() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: UpdateTestCaseInput & { id: string }) => {
+      const { data } = await axios.put<TestCase>(`/test-cases/${id}`, updates);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["testCases"] });
+    },
+  });
+}
+
+export function useDeleteTestCase() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await axios.delete(`/test-cases/${id}`);
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["testCases"] });
+    },
+  });
+}
