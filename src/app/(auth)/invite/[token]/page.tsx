@@ -79,9 +79,9 @@ export default function AcceptInvitationPage() {
         <div className="rounded-xl border bg-card overflow-hidden shadow-sm">
           {/* Header */}
           <div className="bg-zinc-900 dark:bg-zinc-800 px-8 py-6 text-center">
-            <h1 className="text-lg font-bold text-white tracking-tight">
-              ✓ QA Artifacts
-            </h1>
+            <h2 className="text-xl font-bold text-white tracking-tight">
+              ✓ QuraEx
+            </h2>
           </div>
 
           {/* Body */}

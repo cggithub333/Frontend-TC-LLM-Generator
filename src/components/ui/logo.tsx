@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -18,19 +19,17 @@ export function Logo({
   variant = "default",
 }: LogoProps) {
   const sizeMap = {
-    sm: { box: "h-6 w-6 rounded text-[8px]", text: "text-sm" },
-    md: { box: "h-9 w-9 rounded-lg text-sm", text: "text-lg" },
+    sm: { img: 24, text: "text-sm" },
+    md: { img: 36, text: "text-lg" },
   };
 
   const s = sizeMap[size];
 
   const variantMap = {
     default: {
-      box: "bg-primary text-primary-foreground",
       text: "text-foreground",
     },
     white: {
-      box: "bg-white/20 backdrop-blur-sm text-white",
       text: "text-white",
     },
   };
@@ -39,15 +38,14 @@ export function Logo({
 
   const content = (
     <>
-      <div
-        className={cn(
-          "flex items-center justify-center font-bold leading-none",
-          s.box,
-          v.box,
-        )}
-      >
-        QE
-      </div>
+      <Image
+        src="/image-removebg-preview.png"
+        alt="QuraEx Logo"
+        width={s.img}
+        height={s.img}
+        className="object-contain"
+        priority
+      />
       {showText && (
         <span className={cn("font-bold tracking-tight", s.text, v.text)}>
           QuraEx
