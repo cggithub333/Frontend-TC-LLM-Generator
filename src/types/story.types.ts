@@ -1,9 +1,7 @@
 export type StoryStatus =
   | "DRAFT"
-  | "READY"
   | "IN_PROGRESS"
-  | "DONE"
-  | "ARCHIVED";
+  | "DONE";
 
 export interface AcceptanceCriteria {
   acceptanceCriteriaId: string;
@@ -12,6 +10,7 @@ export interface AcceptanceCriteria {
   orderNo: number;
   completed: boolean;
   createdAt: string;
+  testCases?: import("./test-case.types").TestCase[];
 }
 
 export interface UserStory {

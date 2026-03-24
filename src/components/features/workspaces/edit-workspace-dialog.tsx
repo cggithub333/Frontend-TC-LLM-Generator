@@ -22,6 +22,7 @@ import { AlertCircle } from "lucide-react";
 import { useUpdateWorkspace } from "@/hooks/use-workspaces";
 import { cn } from "@/lib/utils";
 import type { Workspace } from "@/types/workspace.types";
+import { toast } from "sonner";
 
 interface EditWorkspaceDialogProps {
   open: boolean;
@@ -79,8 +80,12 @@ export function EditWorkspaceDialog({
 
         onOpenChange(false);
         onSuccess?.();
+        toast.success("Workspace updated successfully");
       } catch (error) {
-        console.error("Failed to update workspace:", error);
+        const msg = error instanceof Error
+          ? error.message
+          : "Failed to update workspace. Please try again.";
+        toast.error(msg);
       }
     },
     [name, description, workspace, updateWorkspace, onOpenChange, onSuccess],

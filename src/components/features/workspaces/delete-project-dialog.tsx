@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
 import { useDeleteProject } from "@/hooks/use-projects";
 import type { Project } from "@/types/workspace.types";
+import { toast } from "sonner";
 
 interface DeleteProjectDialogProps {
   open: boolean;
@@ -41,8 +42,12 @@ export function DeleteProjectDialog({
       await deleteProject.mutateAsync(project.projectId);
       onOpenChange(false);
       onSuccess?.();
+      toast.success("Project deleted");
     } catch (error) {
-      console.error("Failed to delete project:", error);
+      const msg = error instanceof Error
+        ? error.message
+        : "Failed to delete project. Please try again.";
+      toast.error(msg);
     }
   }, [project, deleteProject, onOpenChange, onSuccess]);
 

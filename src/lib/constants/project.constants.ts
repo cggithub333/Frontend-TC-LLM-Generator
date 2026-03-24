@@ -23,9 +23,9 @@ export const PROJECT_STATUS_COLOR_MAP: Record<string, StatusColorConfig> = {
     badge: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
   },
   Active: {
-    bg: "bg-blue-50 dark:bg-blue-900/20",
-    text: "text-blue-700 dark:text-blue-400",
-    badge: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+    bg: "bg-primary/10 dark:bg-primary/20",
+    text: "text-primary",
+    badge: "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary",
   },
   Archived: {
     bg: "bg-gray-50 dark:bg-gray-900/20",

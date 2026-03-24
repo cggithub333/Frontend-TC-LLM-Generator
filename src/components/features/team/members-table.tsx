@@ -41,19 +41,19 @@ export function MembersTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-muted/50">
-              <th className="px-6 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Member
               </th>
-              <th className="px-6 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Email
               </th>
-              <th className="px-6 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Project Role
               </th>
-              <th className="px-6 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Change Role
               </th>
-              <th className="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Actions
               </th>
             </tr>

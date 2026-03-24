@@ -3,6 +3,29 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Users,
   UserCheck,
@@ -10,7 +33,14 @@ import {
   Search,
   Download,
   Loader2,
+  Shield,
+  Mail,
+  Calendar,
+  KeyRound,
+  AlertTriangle,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import { StatsCard } from "@/components/features/admin/stats-card";
 import { UserTable, type AdminUser } from "@/components/features/admin/user-table";
 import { Pagination } from "@/components/features/admin/pagination";
@@ -23,6 +53,34 @@ interface UserStats {
   suspendedUsers: number;
 }
 
+// ── Helpers ────────────────────────────────────
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+const avatarColors = [
+  "bg-gradient-to-br from-blue-400 to-indigo-500",
+  "bg-gradient-to-br from-purple-400 to-pink-500",
+  "bg-gradient-to-br from-green-400 to-emerald-500",
+  "bg-gradient-to-br from-orange-400 to-red-500",
+  "bg-gradient-to-br from-teal-400 to-cyan-500",
+  "bg-gradient-to-br from-rose-400 to-pink-500",
+];
+
+// ── Main Component ─────────────────────────────
 export default function AdminUsersPage() {
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,11 +94,18 @@ export default function AdminUsersPage() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // ── Dialog states ──
+  const [viewUser, setViewUser] = useState<AdminUser | null>(null);
+  const [editUser, setEditUser] = useState<AdminUser | null>(null);
+  const [editRole, setEditRole] = useState<string>("");
+  const [suspendUser, setSuspendUser] = useState<AdminUser | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+
   // Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery);
-      setPage(0); // Reset to first page on new search
+      setPage(0);
     }, 400);
     return () => clearTimeout(timer);
   }, [searchQuery]);
@@ -63,8 +128,6 @@ export default function AdminUsersPage() {
       if (!res.ok) throw new Error("Failed to fetch users");
 
       const json = await res.json();
-
-      // ApiResponse wraps PagedModel: data.content contains user array
       const userList = json.data?.content ?? [];
       const pageInfo = json.data?.page;
 
@@ -96,11 +159,9 @@ export default function AdminUsersPage() {
     try {
       const res = await fetch("/api/proxy/users/stats");
       if (!res.ok) throw new Error("Failed to fetch stats");
-
       const json = await res.json();
       setStats(json.data);
     } catch {
-      // Stats failure is non-critical — cards show 0
       setStats({ totalUsers: 0, activeUsers: 0, suspendedUsers: 0 });
     } finally {
       setLoadingStats(false);
@@ -115,7 +176,62 @@ export default function AdminUsersPage() {
     fetchStats();
   }, [fetchStats]);
 
-  // Build stats cards from real data
+  // ── Admin Actions ──
+
+  const handleChangeRole = async () => {
+    if (!editUser || !editRole) return;
+    setActionLoading(true);
+    try {
+      const res = await fetch(`/api/proxy/users/${editUser.userId}/role`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: editRole }),
+      });
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        throw new Error(json.message || "Failed to change role");
+      }
+      toast.success(`Role changed to ${editRole}`);
+      setEditUser(null);
+      fetchUsers();
+      fetchStats();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to change role");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleToggleStatus = async () => {
+    if (!suspendUser) return;
+    const newStatus = suspendUser.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
+    setActionLoading(true);
+    try {
+      const res = await fetch(`/api/proxy/users/${suspendUser.userId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        throw new Error(json.message || "Failed to change status");
+      }
+      toast.success(
+        newStatus === "SUSPENDED"
+          ? `${suspendUser.fullName} has been suspended`
+          : `${suspendUser.fullName} has been activated`
+      );
+      setSuspendUser(null);
+      fetchUsers();
+      fetchStats();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to change status");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Build stats cards
   const statsData = stats
     ? [
         {
@@ -213,7 +329,15 @@ export default function AdminUsersPage() {
               <span className="ml-2 text-muted-foreground">Loading users...</span>
             </div>
           ) : (
-            <UserTable users={users} />
+            <UserTable
+              users={users}
+              onView={(user) => setViewUser(user)}
+              onEdit={(user) => {
+                setEditUser(user);
+                setEditRole(user.role);
+              }}
+              onSuspend={(user) => setSuspendUser(user)}
+            />
           )}
 
           {/* Pagination */}
@@ -227,6 +351,287 @@ export default function AdminUsersPage() {
           )}
         </div>
       </div>
+
+      {/* ═══════ VIEW USER SIDE PANEL ═══════ */}
+      <Sheet open={!!viewUser} onOpenChange={(val) => !val && setViewUser(null)}>
+        <SheetContent>
+          {viewUser && (
+            <div>
+              <SheetHeader>
+                <div className="flex items-center gap-4">
+                  <div
+                    className={cn(
+                      "w-14 h-14 rounded-full flex items-center justify-center text-lg font-bold text-white ring-2 ring-background",
+                      avatarColors[
+                        users.findIndex((u) => u.userId === viewUser.userId) %
+                          avatarColors.length
+                      ]
+                    )}
+                  >
+                    {getInitials(viewUser.fullName)}
+                  </div>
+                  <div>
+                    <SheetTitle className="text-xl">{viewUser.fullName}</SheetTitle>
+                    <SheetDescription className="text-sm">
+                      {viewUser.email}
+                    </SheetDescription>
+                  </div>
+                </div>
+              </SheetHeader>
+
+              <div className="mt-8 space-y-6">
+                {/* Info Grid */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <Shield className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase">Role</p>
+                      <Badge
+                        className={cn(
+                          "mt-1 text-xs font-bold",
+                          viewUser.role === "ADMIN"
+                            ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
+                            : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                        )}
+                      >
+                        {viewUser.role}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase">Email</p>
+                      <p className="text-sm mt-0.5">{viewUser.email}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <KeyRound className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase">Auth Provider</p>
+                      <Badge
+                        className={cn(
+                          "mt-1 text-xs font-bold",
+                          viewUser.authProvider === "GOOGLE"
+                            ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                            : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                        )}
+                      >
+                        {viewUser.authProvider}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <div
+                      className={cn(
+                        "w-2.5 h-2.5 rounded-full shrink-0",
+                        viewUser.status === "ACTIVE" ? "bg-green-500" : "bg-red-500"
+                      )}
+                    />
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase">Status</p>
+                      <Badge
+                        className={cn(
+                          "mt-1 text-xs font-bold",
+                          viewUser.status === "ACTIVE"
+                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                            : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                        )}
+                      >
+                        {viewUser.status}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase">Joined</p>
+                      <p className="text-sm mt-0.5">{formatDate(viewUser.createdAt)}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="flex gap-2 pt-4 border-t">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 gap-2"
+                    onClick={() => {
+                      setViewUser(null);
+                      setEditUser(viewUser);
+                      setEditRole(viewUser.role);
+                    }}
+                  >
+                    <Shield className="h-3.5 w-3.5" />
+                    Change Role
+                  </Button>
+                  <Button
+                    variant={viewUser.status === "ACTIVE" ? "destructive" : "default"}
+                    size="sm"
+                    className="flex-1 gap-2"
+                    onClick={() => {
+                      setViewUser(null);
+                      setSuspendUser(viewUser);
+                    }}
+                  >
+                    {viewUser.status === "ACTIVE" ? (
+                      <>
+                        <UserX className="h-3.5 w-3.5" />
+                        Suspend
+                      </>
+                    ) : (
+                      <>
+                        <UserCheck className="h-3.5 w-3.5" />
+                        Activate
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+
+      {/* ═══════ EDIT ROLE DIALOG ═══════ */}
+      <Dialog open={!!editUser} onOpenChange={(val) => !val && setEditUser(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              Change User Role
+            </DialogTitle>
+            <DialogDescription>
+              Update the role for <strong>{editUser?.fullName}</strong> ({editUser?.email})
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4 space-y-4">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border">
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase">Current Role</p>
+                <Badge
+                  className={cn(
+                    "mt-1 text-xs font-bold",
+                    editUser?.role === "ADMIN"
+                      ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
+                      : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                  )}
+                >
+                  {editUser?.role}
+                </Badge>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">New Role</label>
+              <Select value={editRole} onValueChange={setEditRole}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="USER">
+                    <span className="flex items-center gap-2">
+                      <Users className="h-3.5 w-3.5" />
+                      USER — Regular user
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="ADMIN">
+                    <span className="flex items-center gap-2">
+                      <Shield className="h-3.5 w-3.5" />
+                      ADMIN — Full platform access
+                    </span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {editRole === "ADMIN" && editUser?.role !== "ADMIN" && (
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 text-sm">
+                <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                <p>Promoting to ADMIN grants full platform management access including user management.</p>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setEditUser(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleChangeRole}
+              disabled={actionLoading || editRole === editUser?.role}
+            >
+              {actionLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ═══════ SUSPEND/ACTIVATE CONFIRMATION ═══════ */}
+      <Dialog open={!!suspendUser} onOpenChange={(val) => !val && setSuspendUser(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {suspendUser?.status === "ACTIVE" ? (
+                <>
+                  <UserX className="h-5 w-5 text-red-500" />
+                  Suspend User
+                </>
+              ) : (
+                <>
+                  <UserCheck className="h-5 w-5 text-green-500" />
+                  Activate User
+                </>
+              )}
+            </DialogTitle>
+            <DialogDescription>
+              {suspendUser?.status === "ACTIVE"
+                ? `Are you sure you want to suspend ${suspendUser?.fullName}? They will lose access to the platform.`
+                : `Are you sure you want to reactivate ${suspendUser?.fullName}? They will regain access to the platform.`}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-2">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border">
+              <div>
+                <p className="text-sm font-semibold">{suspendUser?.fullName}</p>
+                <p className="text-xs text-muted-foreground">{suspendUser?.email}</p>
+              </div>
+              <Badge
+                className={cn(
+                  "ml-auto text-xs font-bold",
+                  suspendUser?.status === "ACTIVE"
+                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                    : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                )}
+              >
+                {suspendUser?.status}
+              </Badge>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setSuspendUser(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant={suspendUser?.status === "ACTIVE" ? "destructive" : "default"}
+              onClick={handleToggleStatus}
+              disabled={actionLoading}
+            >
+              {actionLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {suspendUser?.status === "ACTIVE" ? "Suspend User" : "Activate User"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

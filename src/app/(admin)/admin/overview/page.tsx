@@ -11,6 +11,7 @@ import {
   Filter,
 } from "lucide-react";
 import { StatsCard } from "@/components/features/admin/stats-card";
+import { cn } from "@/lib/utils";
 import { useAdminOverview } from "@/hooks/use-admin-overview";
 import { useCurrentUser } from "@/hooks/use-auth";
 import {
@@ -387,8 +388,10 @@ export default function AdminOverviewPage() {
                 {data && data.userGrowth.length > 0 ? (
                   <UserGrowthChart data={data.userGrowth} />
                 ) : (
-                  <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
-                    No user growth data available
+                  <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
+                    <Calendar className="h-8 w-8 mb-3 opacity-40" />
+                    <p className="text-sm font-medium">No growth data yet</p>
+                    <p className="text-xs mt-1 opacity-70">Data will appear as users register</p>
                   </div>
                 )}
               </div>
@@ -415,7 +418,10 @@ export default function AdminOverviewPage() {
           {/* Bottom Row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent System Activity */}
-            <div className="lg:col-span-2 bg-card rounded-xl border shadow-sm p-6">
+            <div className={cn(
+              "bg-card rounded-xl border shadow-sm p-6",
+              data && data.recentActivities.length > 0 ? "lg:col-span-2" : "lg:col-span-1"
+            )}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-base font-semibold">
                   Recent System Activity
@@ -469,9 +475,10 @@ export default function AdminOverviewPage() {
                       <tr>
                         <td
                           colSpan={4}
-                          className="py-8 text-center text-sm text-muted-foreground"
+                          className="py-12 text-center text-muted-foreground"
                         >
-                          No recent activity
+                          <p className="text-sm font-medium">No recent activity</p>
+                          <p className="text-xs mt-1 opacity-70">System events will show up here</p>
                         </td>
                       </tr>
                     )}

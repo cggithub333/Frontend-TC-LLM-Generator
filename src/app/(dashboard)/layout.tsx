@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from "@/components/layout/sidebar";
+import { GlobalHeader } from "@/components/layout/header";
 import { SidebarProvider, useSidebar } from "@/components/layout/sidebar-context";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +15,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         isCollapsed ? "ml-20" : "ml-64"
       )}
     >
+      <GlobalHeader />
       {children}
     </main>
   );

@@ -3,7 +3,7 @@
  */
 
 import type { ProjectMember } from "@/types/team.types";
-import { MEMBER_ROLE_CONFIG } from "@/lib/constants/member.constants";
+import { MEMBER_ROLE_CONFIG, WORKSPACE_ROLE_CONFIG } from "@/lib/constants/member.constants";
 
 /**
  * Get role badge class for a member role
@@ -59,11 +59,42 @@ export function isValidEmail(email: string): boolean {
 export function sortMembersByRole(members: ProjectMember[]): ProjectMember[] {
   const rolePriority: Record<string, number> = {
     Lead: 1,
-    Contributor: 2,
-    Viewer: 3,
+    Developer: 2,
+    Tester: 3,
+    Viewer: 4,
   };
 
   return [...members].sort((a, b) => {
     return (rolePriority[a.role] ?? 99) - (rolePriority[b.role] ?? 99);
   });
+}
+
+// ── Workspace Permission Helpers ──────────────────────────────
+
+export type WorkspaceRole = "Owner" | "Admin" | "Member";
+
+export function canInviteToWorkspace(role: string): boolean {
+  return role === "Owner" || role === "Admin";
+}
+
+export function canRemoveMember(callerRole: string, targetRole: string): boolean {
+  if (targetRole === "Owner") return false;
+  if (targetRole === "Admin") return callerRole === "Owner";
+  return callerRole === "Owner" || callerRole === "Admin";
+}
+
+export function canChangeRole(callerRole: string, targetRole: string): boolean {
+  if (targetRole === "Owner") return false;
+  return callerRole === "Owner";
+}
+
+export function canManageWorkspaceMembers(role: string): boolean {
+  return role === "Owner" || role === "Admin";
+}
+
+/**
+ * Get workspace role badge class
+ */
+export function getWorkspaceRoleBadgeClass(role: string): string {
+  return WORKSPACE_ROLE_CONFIG[role]?.badgeClass || WORKSPACE_ROLE_CONFIG.Member.badgeClass;
 }

@@ -5,8 +5,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Logo } from "@/components/ui/logo";
 import {
-  CheckCircle2,
   Loader2,
   ArrowLeft,
   Mail,
@@ -21,21 +21,32 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // TODO: Call POST /api/v1/auth/forgot-password when BE implements it
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
-    setIsLoading(false);
-    setIsSubmitted(true);
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Something went wrong");
+      }
+
+      setIsSubmitted(true);
+    } catch {
+      // Still show success — security: don't reveal if email exists
+      setIsSubmitted(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <>
       {/* Mobile logo */}
       <header className="flex items-center gap-3 mb-10 lg:hidden">
-        <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
-          <CheckCircle2 className="h-5 w-5" />
-        </div>
-        <span className="text-xl font-bold tracking-tight">QA Artifacts</span>
+        <Logo href={undefined} />
       </header>
 
       {isSubmitted ? (

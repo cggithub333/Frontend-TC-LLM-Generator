@@ -18,6 +18,7 @@ import {
 import type { ProjectMember } from "@/types/team.types";
 import { getRoleBadgeClass, getMemberInitials } from "@/lib/utils/member.utils";
 import { useUpdateProjectMember } from "@/hooks/use-project-members";
+import { toast } from "sonner";
 
 interface MemberTableRowProps {
   member: ProjectMember;
@@ -35,15 +36,19 @@ export function MemberTableRow({ member, onMenuClick }: MemberTableRowProps) {
           memberId: member.projectMemberId,
           role: newRole,
         });
+        toast.success(`Role updated to ${newRole}`);
       } catch (error) {
-        console.error("Failed to update member role:", error);
+        const msg = error instanceof Error
+          ? error.message
+          : "Failed to update member role. Please try again.";
+        toast.error(msg);
       }
     },
     [member.projectId, member.projectMemberId, updateMember]
   );
 
   return (
-    <tr className="hover:bg-muted/50 transition-colors">
+    <tr className="hover:bg-muted/50 transition-colors duration-150">
       {/* Member */}
       <td className="px-6 py-4">
         <div className="flex items-center gap-3">
@@ -86,7 +91,8 @@ export function MemberTableRow({ member, onMenuClick }: MemberTableRowProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="Lead">Lead</SelectItem>
-            <SelectItem value="Contributor">Contributor</SelectItem>
+            <SelectItem value="Developer">Developer</SelectItem>
+            <SelectItem value="Tester">Tester</SelectItem>
             <SelectItem value="Viewer">Viewer</SelectItem>
           </SelectContent>
         </Select>

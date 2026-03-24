@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAddProjectMember } from "@/hooks/use-project-members";
 import { DEFAULT_MEMBER_ROLE } from "@/lib/constants/member.constants";
+import { toast } from "sonner";
 
 interface InviteMemberDialogProps {
   open: boolean;
@@ -65,12 +66,13 @@ export function InviteMemberDialog({
         setRole(DEFAULT_MEMBER_ROLE);
         setError(undefined);
         onSuccess?.();
+        toast.success("Member added successfully");
       } catch (err) {
-        setError(
-          err instanceof Error
+        const msg = err instanceof Error
             ? err.message
-            : "Failed to add member. Please try again."
-        );
+            : "Failed to add member. Please try again.";
+        setError(msg);
+        toast.error(msg);
       }
     },
     [userId, role, projectId, addMember, onOpenChange, onSuccess]
@@ -131,8 +133,9 @@ export function InviteMemberDialog({
                 <SelectValue placeholder="Select role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Contributor">Contributor</SelectItem>
                 <SelectItem value="Lead">Lead</SelectItem>
+                <SelectItem value="Developer">Developer</SelectItem>
+                <SelectItem value="Tester">Tester</SelectItem>
                 <SelectItem value="Viewer">Viewer</SelectItem>
               </SelectContent>
             </Select>
